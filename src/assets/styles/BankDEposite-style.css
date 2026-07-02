@@ -1,0 +1,135 @@
+.deposit-card{
+    background:#f8fbff;
+    border:1px solid #e2e8f0;
+    border-radius:8px;
+    padding:15px;
+    width:100%;
+    /* max-width:550px; */
+    font-family:Arial, sans-serif;
+}
+
+
+.deposit-card h3{
+    margin:0 0 10px;
+    font-size:14px;
+    color:#111;
+}
+
+
+.deposit-card .bank-details{
+    border:1px dashed #cbd5e1;
+    border-radius:8px;
+    padding:8px;
+    background:white;
+}
+
+
+.deposit-card  .row{
+    display:grid;
+    grid-template-columns:190px 1fr;
+    padding:6px 0;
+    border-bottom:1px solid #edf2f7;
+    font-size:11px;
+}
+
+
+.deposit-card  .row:last-child{
+    border-bottom:none;
+}
+
+
+.deposit-card  .row b{
+    color:#17375e;
+}
+
+
+.deposit-card  .row span{
+    color:#334155;
+}
+
+
+.deposit-card  .note{
+    font-size:10px;
+    color:#64748b;
+    font-style:italic;
+    margin:6px 0 0;
+}
+
+
+
+.deposit-card  .payment-form{
+    display:flex;
+    gap:45px;
+    margin-top:18px;
+}
+
+
+.deposit-card  .input-group{
+    display:flex;
+    flex-direction:column;
+    width:32%;
+}
+
+
+.deposit-card .input-group label{
+    font-size:12px;
+    margin-bottom:4px;
+    color:#333;
+}
+
+
+.deposit-card  .input-group input{
+    height:30px;
+    border:1px solid #cbd5e1;
+    border-radius:5px;
+    padding:0 8px;
+    font-size:12px;
+}
+
+
+.deposit-card .input-group input:focus{
+    outline:none;
+    border-color:#b8924a;
+}
+
+
+
+.deposit-card  .submit-btn{
+
+    margin-top:15px;
+
+    background:#b8924a;
+    color:white;
+
+    border:none;
+    border-radius:5px;
+
+    padding:8px 15px;
+
+    font-size:12px;
+
+    cursor:pointer;
+}
+
+.deposit-card  .submit-btn:hover{
+    background:#b8924a;
+}
+
+
+
+@media(max-width:600px){
+
+.deposit-card  .payment-form{
+    flex-direction:column;
+    gap:10px;
+}
+
+.deposit-card .input-group{
+    width:100%;
+}
+
+.deposit-card  .row{
+    grid-template-columns:120px 1fr;
+}
+
+}
