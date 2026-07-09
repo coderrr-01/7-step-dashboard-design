@@ -135,18 +135,15 @@ border-radius:12px;
 cursor:pointer;
 
 }
-
-
-
 .option-button h4{
     font-size: 18px;
     font-weight: 600;
     margin: 0px;
     font-family: 'Barlow'
 }
-
-
-
+.chat-input-area .btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active{
+  background-color: unset;
+}
 .option-button p{
 
 font-size: 16px;

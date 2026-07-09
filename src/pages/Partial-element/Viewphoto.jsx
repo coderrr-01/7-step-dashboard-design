@@ -1,5 +1,6 @@
 import React from 'react'
 import PageLayout from "../../components/PageLayout";
+import { Link } from 'react-router-dom';
 const Viewphoto = () => {
 
   const categories = ['ALL SPACES', 'LIVING ROOMS', 'SLEEPING', 'AMENITIES'];
@@ -9,10 +10,10 @@ const Viewphoto = () => {
         <main className="container container-narrow">
           <div class="row align-items-end mb-5 gy-4">
             <div className="col-lg-7">
-              <a href='view-room' className="text-decoration-none d-flex align-items-center gap-2 mb-3 text-muted-custom nav-link-custom">
+              <Link to='/view-room' className="text-decoration-none d-flex align-items-center gap-2 mb-3 text-muted-custom nav-link-custom">
                 <span className="material-symbols-outlined fs-6">arrow_back</span>
                 <span>BACK TO PROPERTY</span>
-              </a>
+              </Link>
               <h1 class="display-4 serif-heading heading-hero mb-3 hero-title">Available Residences</h1>
               <p className="text-muted-custom fs-5 mb-0">A complete visual journey through the heritage-inspired architecture and bespoke interiors of our most exclusive residence.</p>
             </div>

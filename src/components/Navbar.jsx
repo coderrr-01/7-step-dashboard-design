@@ -32,11 +32,11 @@ export default function Navbar() {
 
   const activeLabel = activeStepData[0];
 
-  const homepageNavigate =() =>{
-   navigate("/");
+  const homepageNavigate = () => {
+    navigate("/");
   }
   return (
-    <div className="container-fluid p-0">
+    <div className="stepper-container-fluid p-0">
       <div className="stepper-row">
 
         {/* Dashboard */}
@@ -44,13 +44,14 @@ export default function Navbar() {
           <div className="stepper-dashboard-box">
             <div className="homepage_icon" onClick={homepageNavigate}>
               <FaHome />
-              <span className="home-nav">Dashboard</span>
+              <span className="home-nav">DASHBOARD</span>
             </div>
           </div>
         )}
 
         {/* Desktop Stepper */}
-        <div className="desktopview-stepper">
+        <div className={`desktopview-stepper ${pathname === "/payment-screen" ? "payment-active" : ""
+          }`}>
           <div className="stepper-container">
             {steps.map(([label, path], index) => (
               <Link
@@ -108,7 +109,7 @@ export default function Navbar() {
 
         {/* Navigator */}
         <div className="stepper-completion">
-          <Navigator />
+          <Navigator title={activeLabel} />
         </div>
 
       </div>

@@ -16,7 +16,7 @@ export default function DocumentSign() {
    return (
       <PageLayout page="DocumentSign">
          {/* Main Content */}
-         <main className="container-fluid py-5 px-lg-5 flex-grow-1 bg-field">
+         <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 bg-field">
             <div className="container container-narrow">
                <div className="row g-5">
                   {/* Document Section */}

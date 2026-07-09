@@ -19,9 +19,13 @@ align-items:center;
 margin-bottom:20px;
 
 }
+.calendar-header button{
+    color: #000;
+}
 .calendar-header .month-title{
     background-color: unset;
     border: none;
+    color: #000;
 }
 .months-list button{
     background: unset;

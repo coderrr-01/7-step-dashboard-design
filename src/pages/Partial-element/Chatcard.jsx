@@ -1,30 +1,23 @@
-import React, { useState } from "react";
-import "../../assets/styles/chat-style.css"
-
+import React, { useState, useEffect, useRef } from "react";
+import "../../assets/styles/chat-style.css";
 
 const ChatCard = () => {
 
-
     const [message, setMessage] = useState("");
-
     const [showOptions, setShowOptions] = useState(true);
-
-
+    const [chatStarted, setChatStarted] = useState(false);
 
     const [messages, setMessages] = useState([
-
         {
             text: "Welcome back, Julian. Please select your room type.",
             type: "bot"
         }
-
     ]);
 
-
+    const chatEndRef = useRef(null);
 
     const options = [
-
-        {
+           {
             title: "Single Room",
             desc: "Private Solitude",
             icon: (
@@ -63,223 +56,139 @@ const ChatCard = () => {
                 </svg>
             )
         }
-
-
+      
     ];
 
-
-
-
-
+    // 🔥 OPTION SELECT
     const selectOption = (option) => {
 
-
-        // user message add
-
         setMessages(prev => [
-
             ...prev,
-
             {
                 text: option.title,
                 type: "user"
             }
-
-
         ]);
-
-
-
-        // options hide
-
         setShowOptions(false);
-
-
-
-        // bot reply
-
+        setChatStarted(true);
         setTimeout(() => {
-
-
             setMessages(prev => [
-
                 ...prev,
-
                 {
-                    text: `Great choice! You selected ${option.title}. I will help you with next steps.`,
+                    text: `Great! You selected ${option.title}. Now you can continue chatting.`,
                     type: "bot"
                 }
-
-
-            ])
-
-
-        }, 500)
-
-
-
-    }
-
-
-
-
-
-
-
+            ]);
+        }, 500);
+    };
     const sendMessage = () => {
-
 
         if (!message.trim()) return;
 
+        if (!chatStarted) {
+            alert("Please select a room first");
+            return;
+        }
 
-
-        setMessages([
-
-            ...messages,
-
+        setMessages(prev => [
+            ...prev,
             {
                 text: message,
                 type: "user"
             }
-
         ]);
-
 
         setMessage("");
 
-    }
+        setTimeout(() => {
+            setMessages(prev => [
+                ...prev,
+                {
+                    text: "Thanks for your message. We will assist you shortly.",
+                    type: "bot"
+                }
+            ]);
+        }, 500);
+    };
 
-
-
-
+    // 🔥 AUTO SCROLL
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
     return (
-
-
         <div className="chat-card">
 
-
-
+            {/* HEADER */}
             <div className="chat-header">
-
                 <h3>Online</h3>
-
             </div>
 
-
-
-
+            {/* CHAT AREA */}
             <div className="chat-history">
 
-
-                {
-
-                    messages.map((item, index) => (
-
-
-                        <div
-                            key={index}
-                            className={`message-row ${item.type}`}
-                        >
-
-
-                            <div className="message-bubble">
-
-                                {item.text}
-
-                            </div>
-
-
+                {messages.map((item, index) => (
+                    <div key={index} className={`message-row ${item.type}`}>
+                        <div className="message-bubble">
+                            {item.text}
                         </div>
+                    </div>
+                ))}
 
+                {/* OPTIONS (only before selection) */}
+                {showOptions && !chatStarted && (
+                    <div className="options-row">
+                        {options.map((item, index) => (
+                            <button
+                                key={index}
+                                className="option-button"
+                                onClick={() => selectOption(item)}
+                            >
+                               {item.icon}
+                                <h4>{item.title}</h4>
+                                <p>{item.desc}</p>
+                            </button>
+                        ))}
+                    </div>
+                )}
 
-                    ))
-
-
-                }
-
-
-
-
-
-                {
-                    showOptions && (
-
-                        <div className="options-row">
-
-
-                            {
-
-                                options.map((item, index) => (
-
-
-                                    <button
-
-                                        key={index}
-
-                                        className="option-button"
-
-                                        onClick={() => selectOption(item)}
-
-                                    >
-                                        {item.icon}
-                                        <h4>{item.title}</h4>
-
-                                        <p>{item.desc}</p>
-
-
-                                    </button>
-
-
-                                ))
-
-
-                            }
-
-
-                        </div>
-
-                    )
-
-                }
-
-
+                <div ref={chatEndRef} />
 
             </div>
 
-
-
-
-
+            {/* INPUT AREA */}
             <div className="chat-input-area">
-                <div class="input-wrapper mb-3">
-                    <input class="chat-input"
+
+                <div className="input-wrapper mb-3">
+
+                    <input
+                        className="chat-input"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                        placeholder="Type your inquiry here..." />
-                    <button onClick={sendMessage} class="btn p-0 border-0 chat-send-btn">
-                        <svg fill="currentColor" height="20" class="chat-send-icon" viewBox="0 0 24 24" width="20">
+                        placeholder={
+                            chatStarted
+                                ? "Type your message..."
+                                : "Please select an option first..."
+                        }
+                        disabled={!chatStarted}
+                    />
+
+                    <button
+                        onClick={sendMessage}
+                        className="btn p-0 border-0 chat-send-btn"
+                    >
+                        <svg fill="currentColor" height="20" viewBox="0 0 24 24" width="20">
                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
                         </svg>
                     </button>
-                </div>
 
+                </div>
 
             </div>
 
-
-
-
-
-
         </div>
-
-
-    )
-
-
-}
-
+    );
+};
 
 export default ChatCard;

@@ -1,18 +1,17 @@
+import { Link } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import Calendar from "./Partial-element/Calendar";
 import { IoArrowBack } from "react-icons/io5";
 export default function ViewRoom() {
    return (
       <PageLayout page="ViewRoom">
-         {/* Navbar */}
-         {/* Main Content */}
          <main className="container-fluid py-5 px-lg-5 flex-grow-1 bg-field">
             <div className="container container-narrow">
                <div className=" flex-direction_change d-flex justify-content-between align-items-start mb-4">
                   <div data-purpose="page-intro">
                      <h1 className="display-4 serif-heading heading-hero mb-3 hero-title">Secure Your Residency</h1>
                   </div>
-                  <a href="/room-search"><button className="back-btn"><IoArrowBack /> BACK</button></a>
+                  <Link to="/room-search"><button className="back-btn"><IoArrowBack /> BACK</button></Link>
                </div>
                <div className="row g-4">
                   <div className="col-xl-8">
@@ -21,11 +20,11 @@ export default function ViewRoom() {
                            <div className="parchment-card p-4">
                               <div className="position-relative mb-4">
                                  <img alt="Main" className="w-100 gallery-main shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVfkL8eMoD4BRwoPZpU7RgLDUjbRLK3wH-XAdz6WV0kl6Du2f9yQcpOr7eTdjNWMDhmvQdihD1BrYLZgDmUp9Merj2fIgvWSZUw-NdZ1sgTwt2VceIiSimt_tDdNm1rYmGz2h9qJ9tbVt9bPdhcHml9lpYH4CDHeaEbDuKUxGcOpdkL-_Ln2Ic_GlPSiFdKp3y1dZcnAE25vyKoB_qYXoxj61V68bMgd6i5d4CcYyruqknzYFDsyh5Qg" />
-                                   <a href="/Viewphoto"><button className="view-all-btn btn d-flex align-items-center gap-2">
+                                   <Link to="/Viewphoto"><button className="view-all-btn btn d-flex align-items-center gap-2">
                                     <span className="material-symbols-outlined fs-6">grid_view</span>
                                     VIEW ALL PHOTOS
                                  </button>
-                                 </a>
+                                 </Link>
                               </div>
                               <div className="row g-3">
                                  <div className="col-lg-3 col-sm-6 col-6">
@@ -166,7 +165,7 @@ export default function ViewRoom() {
                         </div>
                         <div className="d-grid gap-3 mb-4">
                            <button className="btn btn-primary-elite">Lock In Residency</button>
-                           <a href="/interview"><button className="btn btn-outline-elite">Schedule Interview</button></a>
+                           <Link to="/interview"><button className="btn btn-outline-elite">Schedule Interview</button></Link>
                         </div>
                         <p className="text-center small text-muted text-uppercase mb-0 summary-disclaimer">
                            By clicking 'Lock In', you agree to the preliminary institutional residency terms and the immediate payment of the holding deposit.

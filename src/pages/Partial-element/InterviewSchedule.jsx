@@ -2,20 +2,22 @@ import { useState } from "react";
 import Calendar from "./Calendar";
 import Timeslot from "./Timeslot";
 import { useNavigate } from 'react-router-dom';
+import tourImg from "../../assets/images/tour-img.png";
+import interviewImg from "../../assets/images/interview-img.png";
 function InterviewSchedule({ interview_progress, datatext }) {
     const [activeTab, setActiveTab] = useState("schedule");
     const contentMap = {
         securePlaneblock: {
-            img: "/src/assets/images/tour-img.png",
+            img: tourImg,
             title: "Your Private Tour is Confirmed!",
             alt: "Private Tour",
-            discription:"An exclusive viewing of your future residence has been scheduled. A concierge will be waiting at the grand entrance."
+            discription: "An exclusive viewing of your future residence has been scheduled. A concierge will be waiting at the grand entrance."
         },
         interview: {
-            img: "/src/assets/images/interview-img.png",
+            img: interviewImg,
             title: "Your Interview is Confirmed!",
             alt: "Interview Schedule",
-            discription:"An exclusive viewing of your future residence has been scheduled. A concierge will be waiting at the grand entrance."
+            discription: "An exclusive viewing of your future residence has been scheduled. A concierge will be waiting at the grand entrance."
 
         },
     };
@@ -64,7 +66,7 @@ function InterviewSchedule({ interview_progress, datatext }) {
                                         AVAILABLE SLOTS FOR OCT 10
                                     </h6>
                                     <Timeslot />
-                                    <button 
+                                    <button
                                         className="btn btn-gold mb-2"
                                         onClick={() => setActiveTab("confirm")}
                                     >
@@ -99,12 +101,6 @@ function InterviewSchedule({ interview_progress, datatext }) {
                                             {content.title}
                                         </h2>
                                         <p className="text-muted small">{content.discription}</p>
-
-
-
-                                        <p >
-                                            
-                                        </p>
                                     </div>
                                 </div>
                                 <div className="col-md-6">

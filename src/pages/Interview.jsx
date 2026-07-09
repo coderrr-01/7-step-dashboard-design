@@ -27,7 +27,7 @@ export default function Interview() {
             {Avalableresidence &&
                (
                   <>
-                     <main className="container-fluid py-5 px-lg-5 flex-grow-1 scheduling-section bg-field">
+                     <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 scheduling-section bg-field">
                         <div className="container container-narrow">
 
                            <div class="row mb-5">

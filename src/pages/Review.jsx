@@ -1,6 +1,7 @@
 import PageLayout from "../components/PageLayout";
 import { MdMarkEmailRead } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
+import { Link } from "react-router-dom";
 export default function Review() {
    return (
       <PageLayout page="Review">
@@ -37,23 +38,6 @@ export default function Review() {
                         </div>
                      </div>
                   </div>
-
-                  {/* <div className="status-visual-container">
-       
-                        <div className="glow-effect"></div>
-                        <svg className="w-100 h-100 text-primary-container spinning-svg" viewBox="0 0 200 200">
-                           <circle cx="100" cy="100" fill="none" r="80" stroke="currentColor" stroke-dasharray="4 4" strokeWidth="0.5"></circle>
-                           <circle cx="100" cy="100" fill="none" r="60" stroke="currentColor" strokeWidth="1"></circle>
-                           <g className="orbit-dot">
-                              <circle cx="100" cy="40" fill="currentColor" r="4"></circle>
-                           </g>
-                           <path className="opacity-50" d="M70 100 L90 120 L130 80" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-                           <rect fill="none" height="30" stroke="currentColor" strokeWidth="0.5" transform="rotate(45 100 100)" width="30" x="85" y="85"></rect>
-                        </svg>
-                        <div className="position-absolute top-50 start-50 translate-middle">
-                           <span className="material-symbols-outlined fs-1 text-primary" style={{ fontVariationSettings: "'wght' 200" }}></span>
-                        </div>
-                     </div> */}
                </div>
                {/* Right Status Card */}
                <div className="col-md-7">
@@ -93,7 +77,10 @@ export default function Review() {
                         </div>
                      </div>
                      <div>
-                        <button className="btn btn-jrny-dark w-100 shadow-lg">View Submitted Dossier</button>
+                        <Link to="/room-search">
+                           <button className="btn btn-jrny-dark w-100 shadow-lg">View Submitted Dossier</button>
+                        </Link>
+
                      </div>
                   </div>
                   <p className="mt-4 text-center text-md-start fst-italic text-muted small">

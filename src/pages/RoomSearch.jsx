@@ -2,6 +2,7 @@ import PageLayout from "../components/PageLayout";
 import { IoLocationSharp } from "react-icons/io5";
 import { FaAngleDown } from "react-icons/fa6";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 export default function RoomSearch() {
    const [roomAccomadtion, setroomAccomadtion] = useState(false);
    const [selected, setSelected] = useState("Room type");
@@ -33,14 +34,9 @@ export default function RoomSearch() {
       setlocationPrefereance(!locationPrefereance);
       setroomAccomadtion(false)
    };
-
    return (
-
       <PageLayout page="RoomSearch">
-         {/* BEGIN: MainHeader */}
-         {/* END: MainHeader */}
-         {/* BEGIN: MainContent */}
-         <main className="container-fluid py-5 px-lg-5 flex-grow-1 bg-field">
+         <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 bg-field">
             <div className="container container-narrow">
                <section className="mb-4 ">
                   <div class="row">
@@ -61,7 +57,6 @@ export default function RoomSearch() {
                      </button>
                      {locationPrefereance && (
                         <ul className="dropdown-mock-menu" >
-
                            {locationwise.map((item) => (
                               <li
                                  key={item}
@@ -74,7 +69,6 @@ export default function RoomSearch() {
                                  {item}
                               </li>
                            ))}
-
                         </ul>
                      )}
                   </div>
@@ -91,7 +85,6 @@ export default function RoomSearch() {
                      </button>
                      {roomAccomadtion && (
                         <ul className="dropdown-mock-menu">
-
                            {roomtypeAccomadtion.map((item) => (
                               <li
                                  key={item}
@@ -104,11 +97,9 @@ export default function RoomSearch() {
                                  {item}
                               </li>
                            ))}
-
                         </ul>
                      )}
                   </div>
-
                   <div className="col-lg-6 col-md-4 text-md-end pb-1">
                      <span className="small text-muted fw-bold">Showing <span className="text-dark">12</span> Exclusive Units</span>
                   </div>
@@ -165,7 +156,7 @@ export default function RoomSearch() {
                               <span className="rent-label">Monthly Rent</span>
                               <span className="rent-amount">$2,100</span> <span className="rent-period">/mo</span>
                            </div>
-                           <a href="/view-room"> <button className="btn btn-gold">View Room</button></a>
+                           <Link to="/view-room"> <button className="btn btn-gold">View Room</button></Link>
                         </div>
                      </div>
                   </div>
@@ -192,7 +183,7 @@ export default function RoomSearch() {
                               <span className="rent-label">Monthly Rent</span>
                               <span className="rent-amount">$1,975</span> <span className="rent-period">/mo</span>
                            </div>
-                           <a href="/view-room"> <button className="btn btn-gold">View Room</button></a>
+                          <Link to="/view-room"> <button className="btn btn-gold">View Room</button></Link>
                         </div>
                      </div>
                   </div>
@@ -218,7 +209,7 @@ export default function RoomSearch() {
                               <span className="rent-label">Monthly Rent</span>
                               <span className="rent-amount">$1,975</span> <span className="rent-period">/mo</span>
                            </div>
-                           <a href="/view-room"> <button className="btn btn-gold">View Room</button></a>
+                           <Link to="/view-room"> <button className="btn btn-gold">View Room</button></Link>
                         </div>
                      </div>
                   </div>

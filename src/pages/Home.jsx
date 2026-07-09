@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PageLayout from "../components/PageLayout";
 import ChatCard from "./Partial-element/Chatcard";
-
+import { Link } from "react-router-dom";
 export default function Home() {
    const [message, setMessage] = useState("");
    const [messages, setMessages] = useState([]);
@@ -13,7 +13,7 @@ export default function Home() {
    };
    return (
       <PageLayout page="Home">
-         <main className="container-fluid py-5 px-lg-5 flex-grow-1 bg-field">
+         <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 bg-field">
             <div className="container container-narrow homepage-screen">
                <div className="row g-5">
                   <div className="col-lg-8">
@@ -51,10 +51,11 @@ export default function Home() {
                         </div>
                      </div>
                      <div className="mt-4">
-                        <a href="/review"><button className="btn btn-jrny-dark w-100 shadow-lg">
-                           Next
-                        </button>
-                        </a>
+                        <Link to="/review">
+                           <button className="btn btn-jrny-dark w-100 shadow-lg">
+                              Next
+                           </button>
+                        </Link>
                      </div>
 
                   </div>

@@ -33,9 +33,9 @@
     .user-profile .tracking-widest-sm{
         display: none;
     }
-    .navbar-logo {
+    /* .navbar-logo {
     height: 85px;
-}
+} */
 }
 
 @media (max-width: 991px) {
@@ -135,6 +135,10 @@
 }
 
 @media only screen and (max-width:767px) {
+    .verification-card{
+        padding: 25px;
+    }
+
    
     .desktopview-stepper {
         display: none;
@@ -146,6 +150,7 @@
         flex-direction: column-reverse;
         gap: 25px;
         margin-bottom: 10px !important;
+        align-items: flex-start !important;
     }
     .mobile-stepper {
         display: block;
@@ -190,10 +195,12 @@
     .stepper-row {
         padding: 10px;
         gap: 14px;
+        top: -33px;
     }
 
     .stepper-dashboard-box {
         padding: 0px;
+        background: none;
     }
 
     .step-dropdown {
@@ -201,7 +208,7 @@
     }
 
     .stepper-completion {
-        height: auto;
+        display: none;
     }
 
     .homepage-screen .chat-card {
@@ -217,11 +224,11 @@
     }
 
     .step-header {
-        padding: 2rem 0;
+        padding: 0px 0px 35px 0px;
     }
 
     .bg-field {
-        padding-top: 2rem !important;
+        padding-top: 0px !important;
         padding-bottom: 2rem !important;
     }
 
@@ -230,17 +237,9 @@
         display: none;
     }
 
-    .stepper-completion {
-        padding: 0px;
-    }
 
     .navigator-menu {
         right: 0px;
-    }
-
-    .stepper-dashboard-box,
-    .stepper-completion {
-        border: unset;
     }
 
     .homepage_icon svg {
@@ -249,6 +248,32 @@
     }
 
     .navigator-header svg {}
+
+    .drawer-header {
+        position: relative;
+        height: 60px;
+    }
+
+    .drawer-logo {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        height: 50px;
+        width: auto;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        font-size: 26px;
+        cursor: pointer;
+        color: #5b4636;
+        padding: 0;
+    }
 
     .mobile-stepper .dropdown-item {
         font-size: 14px;
@@ -276,11 +301,11 @@
     }
 
     .navbar-logo {
-        height: 70px;
+        height: 50px;
     }
 
     .navbar-custom {
-        padding: 10px 7px;
+        padding: 10px 10px 35px 7px;
     }
 
     .user-profile-details .tracking-widest-sm {
@@ -290,6 +315,24 @@
 
     .user-profile-details {
         gap: 10px !important;
+    }
+    .scheduling-tabs .tab-item{
+            width: max-content;
+                gap: 6px;
+    }
+    .scheduling-tabs{
+        margin: 0px 16px;
+    }
+    .user-profile .user-name{
+        display: none;
+    }
+    .user-profile{
+        border-radius: 5px;
+        padding:5px
+    }
+    .new-iconset svg{
+        width: 20px;
+        height: 20px;
     }
 }
 
