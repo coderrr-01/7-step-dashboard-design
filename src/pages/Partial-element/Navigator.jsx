@@ -4,12 +4,19 @@ import { IoClose } from "react-icons/io5";
 import "../../assets/styles/Navigator-style.css"
 import { FaLock, FaUnlock } from "react-icons/fa";
 import { FaCompass } from "react-icons/fa6";
-export default function Navigator({ title  }) {
+export default function Navigator({  activeStep = 1, totalSteps = 7, title  }) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <div className="navigator-header" onClick={() => setOpen(true)}>
+        <div className="navigator-current">
+          <span>
+            {String(activeStep).padStart(2, "0")}/
+            {String(totalSteps).padStart(2, "0")}
+          </span>
+        </div>
+        <FaCompass />
         <h2>{title}</h2>
       </div>
       {open && (

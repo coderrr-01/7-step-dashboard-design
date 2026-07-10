@@ -7,8 +7,8 @@ import { FaChevronDown } from "react-icons/fa6";
 const steps = [
   ["APPLY", "/", 1],
   ["REVIEW", "/review", 2],
-  ["ROOM SEARCH", "/room-search", 4],
-  ["INTERVIEW", "/interview", 3],
+  ["ROOM SEARCH", "/room-search", 3],
+  ["INTERVIEW", "/interview", 4],
   ["SECURE BOOKING", "/secure-booking", 5],
   ["LEASE SIGN", "/document-sign", 6],
   ["SECURE PAYMENT", "/payment-screen", 7],
@@ -31,6 +31,8 @@ export default function Navbar() {
     steps.find(([, path]) => path === activePath) || steps[0];
 
   const activeLabel = activeStepData[0];
+  const activeStep = activeStepData[2];
+  const totalSteps = steps.length;
 
   const homepageNavigate = () => {
     navigate("/");
@@ -109,7 +111,11 @@ export default function Navbar() {
 
         {/* Navigator */}
         <div className="stepper-completion">
-          <Navigator title={activeLabel} />
+          <Navigator 
+            title={activeLabel} 
+            activeStep={activeStep}
+            totalSteps={totalSteps}
+          />
         </div>
 
       </div>
