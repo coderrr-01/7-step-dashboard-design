@@ -3068,7 +3068,19 @@ width: calc(100% + 1px);
 
 /* DESKTOP NAV */
 
-
+.close-btn {
+    position: absolute;
+    left: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #000;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
 
 
 .desktop-nav a:hover::after {
