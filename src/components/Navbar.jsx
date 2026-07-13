@@ -3,16 +3,9 @@ import { useState } from "react";
 import Navigator from "../pages/Partial-element/Navigator";
 import { FaHome } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa6";
+import stepsConfig from "../config/stepsConfig";
 
-const steps = [
-  ["APPLY", "/", 1],
-  ["REVIEW", "/review", 2],
-  ["ROOM SEARCH", "/room-search", 3],
-  ["INTERVIEW", "/interview", 4],
-  ["SECURE BOOKING", "/secure-booking", 5],
-  ["LEASE SIGN", "/document-sign", 6],
-  ["SECURE PAYMENT", "/payment-screen", 7],
-];
+const steps = stepsConfig.map(({ label, path, number }) => [label, path, number]);
 
 export default function Navbar() {
   const { pathname } = useLocation();

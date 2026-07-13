@@ -257,6 +257,10 @@
 
     .navigator-header svg {}
 
+    .verification-house-card{
+        display: none;
+    }
+
     .drawer-header {
         position: relative;
         height: 60px;
@@ -272,14 +276,6 @@
     }
 
     .close-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        font-size: 26px;
-        cursor: pointer;
-        color: #5b4636;
         padding: 0;
     }
 

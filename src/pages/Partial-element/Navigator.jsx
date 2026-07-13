@@ -1,11 +1,56 @@
 import { useState } from "react";
-import { IoIosInformationCircle } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import "../../assets/styles/Navigator-style.css"
 import { FaLock, FaUnlock } from "react-icons/fa";
 import { FaCompass } from "react-icons/fa6";
-export default function Navigator({  activeStep = 1, totalSteps = 7, title  }) {
+import stepsConfig from "../../config/stepsConfig";
+
+export default function Navigator({ activeStep = 1, totalSteps = 7, title }) {
   const [open, setOpen] = useState(false);
+
+  const getStepState = (stepNumber) => {
+    if (stepNumber < activeStep) return "completed";
+    if (stepNumber === activeStep) return "active";
+    if (stepNumber === activeStep + 1) return "inactive";
+    return "muted";
+  };
+
+  const getTimelineClass = (state) => {
+    switch (state) {
+      case "completed":
+        return "timeline-item";
+      case "active":
+        return "timeline-item timeline-item-active";
+      case "inactive":
+        return "timeline-item timeline-item-inactive";
+      case "muted":
+        return "timeline-item timeline-item-muted";
+      default:
+        return "timeline-item";
+    }
+  };
+
+  const getBadgeClass = (state) => {
+    switch (state) {
+      case "completed":
+        return "completed-badges";
+      case "active":
+        return "active-badges";
+      default:
+        return "upcoming-badges";
+    }
+  };
+
+  const getBadgeLabel = (state) => {
+    switch (state) {
+      case "completed":
+        return "Completed";
+      case "active":
+        return "Active";
+      default:
+        return "Upcoming";
+    }
+  };
 
   return (
     <>
@@ -23,116 +68,46 @@ export default function Navigator({  activeStep = 1, totalSteps = 7, title  }) {
         <div className="nav-overlay" onClick={() => setOpen(false)} />
       )}
       <div className={`nav-panel ${open ? "open" : ""}`}>
-
-        <div class="sidebar-card-gold">
-          <div class="d-flex align-items-center timeline-header gap-2 ">
+        <div className="sidebar-card-gold">
+          <div className="d-flex align-items-center timeline-header gap-2">
             <div className="d-flex align-items-center gap-2">
-              <div class="phase-indicator-dot"></div>
-              <h4 class="heading-section-label">Registration</h4>
+              <div className="phase-indicator-dot"></div>
+              <h4 className="heading-section-label">Registration</h4>
             </div>
-
             <button className="close-btn" onClick={() => setOpen(false)}>
               <IoClose />
             </button>
           </div>
-          <div class="timeline-container mb-4">
-            <div class="timeline-line"></div>
+          <div className="timeline-container mb-4">
+            <div className="timeline-line"></div>
 
-            <div class="timeline-item">
-              <div class="timeline-icon-wrapper">
-                <div class="timeline-icon">
-                  <FaLock />
+            {stepsConfig.map((step) => {
+              const state = getStepState(step.number);
+              return (
+                <div key={step.number} className={getTimelineClass(state)}>
+                  <div className="timeline-icon-wrapper">
+                    <div className="timeline-icon">
+                      {state === "active" ? <FaUnlock /> : <FaLock />}
+                    </div>
+                  </div>
+                  <div>
+                    <p className={`label-caps mb-1 ${state === "completed" || state === "active" ? "text-primary" : ""}`}>
+                      {String(step.number).padStart(2, "0")}
+                    </p>
+                    <h3 className={`font-archivo h6 fw-bold text-dark mb-2`}>
+                      {step.label}
+                    </h3>
+                    <p className={`small text-muted mb-0 ${state === "active" ? "fst-italic" : ""}`}>
+                      {step.description}
+                    </p>
+                    <div className={getBadgeClass(state)}>
+                      {getBadgeLabel(state)}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <p class="label-caps text-primary mb-1">01 </p>
-                <h3 class="font-archivo h6 fw-bold text-dark mb-2">Apply</h3>
-                <p class="small text-muted mb-0">Identity verification and profile setup completed on Oct 12.</p>
-                <div className="completed-badges">Completed</div>
-              </div>
-            </div>
+              );
+            })}
 
-            <div class="timeline-item timeline-item-active">
-              <div class="timeline-icon-wrapper">
-                <div class="timeline-icon">
-                  <FaUnlock />
-                </div>
-              </div>
-              <div>
-                <p class="label-caps text-primary mb-1">02 </p>
-                <h3 class="font-archivo h6 fw-bold text-dark mb-2">Review</h3>
-                <p class="small text-muted fst-italic ">Selecting finishes, layouts, and custom heritage features for your residence.</p>
-                <div className="active-badges">Active</div>
-              </div>
-            </div>
-
-            <div class="timeline-item timeline-item-inactive">
-              <div class="timeline-icon-wrapper">
-                <div class="timeline-icon">
-                  <FaLock />
-                </div>
-              </div>
-              <div>
-                <p class="label-caps mb-1">03 </p>
-                <h3 class="font-archivo h6 fw-bold text-dark mb-2">Room Search</h3>
-                <p class="small text-muted mb-0">Secure verification of prestige-tier funding sources.</p>
-                <div className="upcoming-badges">Upcoming</div>
-              </div>
-            </div>
-
-            <div class="timeline-item timeline-item-inactive">
-              <div class="timeline-icon-wrapper">
-                <div class="timeline-icon">
-                  <FaLock />
-                </div>
-              </div>
-              <div>
-                <p class="label-caps mb-1">04 </p>
-                <h3 class="font-archivo h6 fw-bold mb-1">Interview</h3>
-                <p class="small text-muted mb-0">Board review and legal attestation of heritage membership.</p>
-                <div className="upcoming-badges">Upcoming</div>
-              </div>
-            </div>
-
-            <div class="timeline-item timeline-item-muted">
-              <div class="timeline-icon-wrapper">
-                <div class="timeline-icon">
-                  <FaLock />
-                </div>
-              </div>
-              <div>
-                <p class="label-caps mb-1">05 </p>
-                <h3 class="font-archivo h6 fw-bold mb-1">Secure Booking</h3>
-                <p class="small text-muted mb-0">Completion of the Elysian Heritage onboarding journey.</p>
-                <div className="upcoming-badges">Upcoming</div>
-              </div>
-            </div>
-            <div class="timeline-item timeline-item-muted">
-              <div class="timeline-icon-wrapper">
-                <div class="timeline-icon">
-                  <FaLock />
-                </div>
-              </div>
-              <div>
-                <p class="label-caps mb-1">06 </p>
-                <h3 class="font-archivo h6 fw-bold mb-1">Lease Sign</h3>
-                <p class="small text-muted mb-0">Completion of the Elysian Heritage onboarding journey.</p>
-                <div className="upcoming-badges">Upcoming</div>
-              </div>
-            </div>
-            <div class="timeline-item timeline-item-muted">
-              <div class="timeline-icon-wrapper">
-                <div class="timeline-icon">
-                  <FaLock />
-                </div>
-              </div>
-              <div>
-                <p class="label-caps mb-1">07 </p>
-                <h3 class="font-archivo h6 fw-bold mb-1">Secure Payment</h3>
-                <p class="small text-muted mb-0">Completion of the Elysian Heritage onboarding journey.</p>
-                <div className="upcoming-badges">Upcoming</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

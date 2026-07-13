@@ -230,14 +230,11 @@ background: #ffff;
 
 /* close button */
 .stepper-completion .close-btn {
-  /* position: absolute; */
-  /* top: 12px; */
-  right: 11px;
+  position: static;
   border: none;
-  background: transparent;
+  background: #b8924a;
   font-size: 22px;
   cursor: pointer;
-  background: #b8924a;
   border-radius: 2px;
   color: #fff;
   display: flex;
@@ -246,6 +243,7 @@ background: #ffff;
   height: 30px;
   justify-content: center;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .completed-badges , .active-badges , .upcoming-badges{
