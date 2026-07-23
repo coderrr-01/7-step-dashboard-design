@@ -4,8 +4,10 @@ import Timeslot from "./Timeslot";
 import { useNavigate } from 'react-router-dom';
 import tourImg from "../../assets/images/tour-img.png";
 import interviewImg from "../../assets/images/interview-img.png";
-function InterviewSchedule({ interview_progress, datatext }) {
+function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedDate, confirmedTime, meetLink, submitting }) {
     const [activeTab, setActiveTab] = useState("schedule");
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedTime, setSelectedTime] = useState(null);
     const contentMap = {
         securePlaneblock: {
             img: tourImg,
@@ -58,19 +60,26 @@ function InterviewSchedule({ interview_progress, datatext }) {
                         <div className="tab_schedule_room">
                             <div className="row">
                                 <div className="col-md-6 pe-md-4">
-                                    <Calendar />
+                                    <Calendar onSelectDate={setSelectedDate} />
                                 </div>
                                 {/* Slots */}
                                 <div className="col-md-6 ps-md-2 mt-4 mt-md-0">
                                     <h6 className="slots-heading">
-                                        AVAILABLE SLOTS FOR OCT 10
+                                        AVAILABLE SLOTS FOR {selectedDate ? selectedDate.label : 'TODAY'}
                                     </h6>
-                                    <Timeslot />
+                                    <Timeslot selectedTime={selectedTime} onSelectTime={setSelectedTime} />
                                     <button
                                         className="btn btn-gold mb-2"
-                                        onClick={() => setActiveTab("confirm")}
+                                        disabled={submitting}
+                                        onClick={() => {
+                                            if (onConfirm && selectedDate && selectedTime) {
+                                                onConfirm(selectedDate, selectedTime, () => setActiveTab("confirm"));
+                                            } else {
+                                                setActiveTab("confirm");
+                                            }
+                                        }}
                                     >
-                                        Confirm Time Slot
+                                        {submitting ? 'Booking...' : 'Confirm Time Slot'}
                                     </button>
                                     <div className="divider-text">
                                         OR
@@ -110,7 +119,7 @@ function InterviewSchedule({ interview_progress, datatext }) {
                                                 Date
                                             </span>
                                             <span className="detail-value">
-                                                Oct 14, 2024
+                                                {confirmedDate || (selectedDate ? selectedDate.label : 'Oct 14, 2024')}
                                             </span>
                                         </div>
                                         <div className="detail-row">
@@ -118,7 +127,7 @@ function InterviewSchedule({ interview_progress, datatext }) {
                                                 Time
                                             </span>
                                             <span className="detail-value">
-                                                02:00 PM
+                                                {confirmedTime || selectedTime || '02:00 PM'}
                                             </span>
                                         </div>
                                         <div className="detail-row">
@@ -130,10 +139,18 @@ function InterviewSchedule({ interview_progress, datatext }) {
                                             </span>
                                         </div>
                                     </div>
-                                    <button type="button" className="btn btn-whatsapp mb-3" onClick={interview_progress}>
-                                        <i className="bi bi-whatsapp me-2"></i>
-                                        Interview with Najat
-                                    </button>
+                                    {meetLink && (
+                                        <a href={meetLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp mb-3 d-inline-block">
+                                            <i className="bi bi-camera-video me-2"></i>
+                                            Join Google Meet
+                                        </a>
+                                    )}
+                                    {!meetLink && (
+                                        <button type="button" className="btn btn-whatsapp mb-3" onClick={interview_progress}>
+                                            <i className="bi bi-whatsapp me-2"></i>
+                                            Interview with Najat
+                                        </button>
+                                    )}
                                     <button
                                         type="button"
                                         className="btn btn-black"

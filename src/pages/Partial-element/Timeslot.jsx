@@ -1,8 +1,14 @@
 import { useState } from "react";
 
-function Timeslot() {
+function Timeslot({ selectedTime: externalTime, onSelectTime }) {
 
-    const [selectedTime, setSelectedTime] = useState("10:30 AM");
+    const [internalTime, setInternalTime] = useState("10:30 AM");
+    const selectedTime = externalTime !== undefined ? externalTime : internalTime;
+
+    const handleSelect = (time) => {
+        setInternalTime(time);
+        if (onSelectTime) onSelectTime(time);
+    };
 
 
     const timeSlots = [
@@ -41,7 +47,7 @@ function Timeslot() {
 
                                 console.log("clicked", time);
 
-                                setSelectedTime(time);
+                                handleSelect(time);
 
                             }}
 

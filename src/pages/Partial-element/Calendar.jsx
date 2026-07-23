@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../../assets/styles/calendar-style.css"
 
 
-function Calendar() {
+function Calendar({ onSelectDate }) {
 
 
   const [currentDate, setCurrentDate] = useState(
@@ -344,7 +344,20 @@ ${selectedDate === date ? "active" : ""}
               }
 
 
-              onClick={() => date && setSelectedDate(date)}
+              onClick={() => {
+                if (!date) return;
+                setSelectedDate(date);
+                if (onSelectDate) {
+                  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                  const yr = currentDate.getFullYear();
+                  const mo = currentDate.getMonth();
+                  const label = `${months[mo]} ${date}, ${yr}`;
+                  // Format for WP plugin: dd/mm/yyyy
+                  const padded = String(date).padStart(2,'0');
+                  const moPadded = String(mo + 1).padStart(2,'0');
+                  onSelectDate({ label, value: `${padded}/${moPadded}/${yr}` });
+                }
+              }}
 
             >
 

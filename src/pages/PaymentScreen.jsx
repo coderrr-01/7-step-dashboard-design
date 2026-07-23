@@ -1,10 +1,21 @@
 import { useState } from "react";
 import PageLayout from "../components/PageLayout";
-import BankDeposite from "../pages/Partial-element/BankDeposite"
+import BankDeposite from "../pages/Partial-element/BankDeposite";
+import { useClientData } from "../hooks/useClientData"
 
 export default function PaymentScreen() {
+   const { client } = useClientData();
    const [activeStep, setActiveStep] = useState("Security");
    const [activePayment, setActivePayment] = useState(0);
+
+   const depositAmount = client?.security_deposit ? `$ ${parseFloat(client.security_deposit).toLocaleString('en-US', {minimumFractionDigits:2})}` : '$ 1,800.00';
+   const rentAmount    = client?.rent_amount      ? `$ ${parseFloat(client.rent_amount).toLocaleString('en-US', {minimumFractionDigits:2})}`      : '$ 2,000.00';
+   const clientName    = client?.name    || 'Julianne Vanes-Harding';
+   const clientPhone   = client?.phone   || '+1 (212) 555-0198';
+   const clientEmail   = client?.email   || 'vanes@global-exec.com';
+   const startDate     = client?.start_date || 'September 01, 2024';
+   const endDate       = client?.end_date   || 'August 31, 2025';
+   const unitLabel     = client?.unit ? `Unit ${client.unit}` : 'The Victorian Premier';
    const paymentMethods = [
       {
          name: "Stripe",
@@ -50,7 +61,7 @@ export default function PaymentScreen() {
                            <div className="d-flex gap-3">
                               <img alt="The Victorian Premier" className="property-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA4V3fzGFxJRfHod-q3i610fpthD2Ue4VGIGDUje-iPYuVVdhTF9ISMA8pliiKaFrTiBcSdZR99tUouMkDjPEJq7AlRG5GL8uWblUgPopibMVKtg5K3ltNBt_-EWva5iLE2uCGEygHax40C2fDKHRddQUv_dQhbwQD_DLqLe1O952nifBIl5QaWyonzDRKBYcWu_wpXwgQ9Dug7wx2LCyLw5ewlbpMA0tqqKv4mVo6fuavy7TxWhwVlBDwZIsyg_L5joLScmveingP" />
                               <div>
-                                 <h4 className="h6 mb-1 fw-bold">The Victorian Premier</h4>
+                                 <h4 className="h6 mb-1 fw-bold">{unitLabel}</h4>
                                  <p className="small text-muted mb-2">King Studio â$¢ East Wing</p>
                                  <div className="d-flex align-items-center gap-1 text-primary-container">
                                     <span className="material-symbols-outlined fs-6">star</span>
@@ -62,16 +73,16 @@ export default function PaymentScreen() {
                         <div className="p-4">
                            <div className="d-flex justify-content-between small mb-2">
                               <span className="text-muted">Rent Start Date</span>
-                              <span className="fw-medium">September 01, 2024</span>
+                              <span className="fw-medium">{startDate}</span>
                            </div>
                            <div className="d-flex justify-content-between small mb-4">
                               <span className="text-muted">Rent End Date</span>
-                              <span className="fw-medium">August 31, 2025</span>
+                              <span className="fw-medium">{endDate}</span>
                            </div>
                            <hr className="my-4 opacity-10" />
                            <div className="d-flex justify-content-between small mb-2">
                               <span className="text-muted">Security Deposit</span>
-                              <span className="fw-medium">$ 1,800.00</span>
+                              <span className="fw-medium">{depositAmount}</span>
                            </div>
                            <div className="d-flex justify-content-between small mb-4">
                               <span className="text-muted">Administrative Fee</span>
@@ -80,7 +91,7 @@ export default function PaymentScreen() {
                            <hr className="my-4 opacity-10" />
                            <div className="d-flex justify-content-between align-items-baseline pt-2">
                               <span className="fw-bold">Total Due Now</span>
-                              <span className="h4 text-primary-container mb-0 fw-bold">$ 1,800.00</span>
+                              <span className="h4 text-primary-container mb-0 fw-bold">{depositAmount}</span>
                            </div>
                         </div>
                      </div>
@@ -91,16 +102,16 @@ export default function PaymentScreen() {
                         </div>
                         <div className="mb-3">
                            <label className="text-uppercase text-muted fw-bold mb-1 form-label-micro">Full Name</label>
-                           <p className="fw-medium mb-0">Julianne Vanes-Harding</p>
+                           <p className="fw-medium mb-0">{clientName}</p>
                         </div>
                         <div className="row g-3 mb-3">
                            <div className="col-6">
                               <label className="text-uppercase text-muted fw-bold mb-1 form-label-micro">Contact Phone</label>
-                              <p className="mb-0"><a className="text-primary-container text-decoration-none fw-medium" href="tel:+12125550198">+1 (212) 555-0198</a></p>
+                              <p className="mb-0"><a className="text-primary-container text-decoration-none fw-medium" href={`tel:${clientPhone}`}>{clientPhone}</a></p>
                            </div>
                            <div className="col-6">
                               <label className="text-uppercase text-muted fw-bold mb-1 form-label-micro">Email Address</label>
-                              <p className="mb-0 text-truncate fw-medium">vanes@global-exec.com</p>
+                              <p className="mb-0 text-truncate fw-medium">{clientEmail}</p>
                            </div>
                         </div>
                         <p className="small text-muted opacity-50 d-flex align-items-center gap-1 mt-3 pt-3 border-top border-light">
@@ -217,44 +228,20 @@ export default function PaymentScreen() {
                                        <label className="form-label small fw-bold text-muted mb-2">
                                           Amount to Authorize
                                        </label>
-
                                        <div className="amount_pay input-group">
-                                          <input
-                                             className="form-control p-3 fw-bold border-light bg-light"
-                                             readOnly
-                                             type="text"
-                                             value="$ 1,800.00"
-                                          />
-
-                                          <span className="input-group-text bg-light border-light">
-                                             <span className="material-symbols-outlined">
-                                                payments
-                                             </span>
-                                          </span>
+                                          <input className="form-control p-3 fw-bold border-light bg-light" readOnly type="text" value={depositAmount} />
+                                          <span className="input-group-text bg-light border-light"><span className="material-symbols-outlined">payments</span></span>
                                        </div>
                                     </div>
                                  )}
-
-
                                  {activeStep === "Rent" && (
                                     <div className="mb-5">
                                        <label className="form-label small fw-bold text-muted mb-2">
                                           Rent Amount
                                        </label>
-
                                        <div className="amount_pay input-group">
-                                          <input
-                                             className="form-control p-3 fw-bold border-light bg-light"
-                                             readOnly
-                                             type="text"
-                                             value="$ 2,000.00"
-                                          />
-
-                                          <span className="input-group-text bg-light border-light">
-                                             <span className="material-symbols-outlined">
-                                                payments
-                                             </span>
-                                          </span>
+                                          <input className="form-control p-3 fw-bold border-light bg-light" readOnly type="text" value={rentAmount} />
+                                          <span className="input-group-text bg-light border-light"><span className="material-symbols-outlined">payments</span></span>
                                        </div>
                                     </div>
                                  )}
@@ -325,47 +312,19 @@ export default function PaymentScreen() {
                                  </div>
                                  {activeStep === "Security" && (
                                     <div className="mb-5">
-                                       <label className="form-label small fw-bold text-muted mb-2">
-                                          Amount to Authorize
-                                       </label>
-
+                                       <label className="form-label small fw-bold text-muted mb-2">Amount to Authorize</label>
                                        <div className="amount_pay input-group">
-                                          <input
-                                             className="form-control p-3 fw-bold border-light bg-light"
-                                             readOnly
-                                             type="text"
-                                             value="$ 1,800.00"
-                                          />
-
-                                          <span className="input-group-text bg-light border-light">
-                                             <span className="material-symbols-outlined">
-                                                payments
-                                             </span>
-                                          </span>
+                                          <input className="form-control p-3 fw-bold border-light bg-light" readOnly type="text" value={depositAmount} />
+                                          <span className="input-group-text bg-light border-light"><span className="material-symbols-outlined">payments</span></span>
                                        </div>
                                     </div>
                                  )}
-
-
                                  {activeStep === "Rent" && (
                                     <div className="mb-5">
-                                       <label className="form-label small fw-bold text-muted mb-2">
-                                          Rent Amount
-                                       </label>
-
+                                       <label className="form-label small fw-bold text-muted mb-2">Rent Amount</label>
                                        <div className="amount_pay input-group">
-                                          <input
-                                             className="form-control p-3 fw-bold border-light bg-light"
-                                             readOnly
-                                             type="text"
-                                             value="$ 2,000.00"
-                                          />
-
-                                          <span className="input-group-text bg-light border-light">
-                                             <span className="material-symbols-outlined">
-                                                payments
-                                             </span>
-                                          </span>
+                                          <input className="form-control p-3 fw-bold border-light bg-light" readOnly type="text" value={rentAmount} />
+                                          <span className="input-group-text bg-light border-light"><span className="material-symbols-outlined">payments</span></span>
                                        </div>
                                     </div>
                                  )}
@@ -436,47 +395,19 @@ export default function PaymentScreen() {
                                  </div>
                                  {activeStep === "Security" && (
                                     <div className="mb-5">
-                                       <label className="form-label small fw-bold text-muted mb-2">
-                                          Amount to Authorize
-                                       </label>
-
+                                       <label className="form-label small fw-bold text-muted mb-2">Amount to Authorize</label>
                                        <div className="amount_pay input-group">
-                                          <input
-                                             className="form-control p-3 fw-bold border-light bg-light"
-                                             readOnly
-                                             type="text"
-                                             value="$ 1,800.00"
-                                          />
-
-                                          <span className="input-group-text bg-light border-light">
-                                             <span className="material-symbols-outlined">
-                                                payments
-                                             </span>
-                                          </span>
+                                          <input className="form-control p-3 fw-bold border-light bg-light" readOnly type="text" value={depositAmount} />
+                                          <span className="input-group-text bg-light border-light"><span className="material-symbols-outlined">payments</span></span>
                                        </div>
                                     </div>
                                  )}
-
-
                                  {activeStep === "Rent" && (
                                     <div className="mb-5">
-                                       <label className="form-label small fw-bold text-muted mb-2">
-                                          Rent Amount
-                                       </label>
-
+                                       <label className="form-label small fw-bold text-muted mb-2">Rent Amount</label>
                                        <div className="amount_pay input-group">
-                                          <input
-                                             className="form-control p-3 fw-bold border-light bg-light"
-                                             readOnly
-                                             type="text"
-                                             value="$ 2,000.00"
-                                          />
-
-                                          <span className="input-group-text bg-light border-light">
-                                             <span className="material-symbols-outlined">
-                                                payments
-                                             </span>
-                                          </span>
+                                          <input className="form-control p-3 fw-bold border-light bg-light" readOnly type="text" value={rentAmount} />
+                                          <span className="input-group-text bg-light border-light"><span className="material-symbols-outlined">payments</span></span>
                                        </div>
                                     </div>
                                  )}
@@ -547,14 +478,12 @@ export default function PaymentScreen() {
                                  </div>
                                  {activeStep === "Security" && (
                                     <div className="mb-4">
-                                       <BankDeposite rentTitle="Security Deposit" />
+                                       <BankDeposite rentTitle="Security Deposit" client={client} />
                                     </div>
                                  )}
-
-
                                  {activeStep === "Rent" && (
                                     <div className="mb-4">
-                                       <BankDeposite rentTitle="Rent Deposit" />
+                                       <BankDeposite rentTitle="Rent Deposit" client={client} />
                                     </div>
                                  )}
                               </>
@@ -586,7 +515,7 @@ export default function PaymentScreen() {
                         <div className="pt-4 border-top">
                            <button className="btn btn-primary-elite w-100 d-flex align-items-center justify-content-center gap-2 mb-3">
                               <span className="material-symbols-outlined fs-5">lock</span>
-                              Authorize  $ 1,800.00 Payment
+                              Authorize {activeStep === 'Rent' ? rentAmount : depositAmount} Payment
                            </button>
                            <p className="text-center text-uppercase fw-bold text-muted d-flex align-items-center justify-content-center gap-1 mb-0 security-note">
                               <span className="material-symbols-outlined icon-xs">shield</span>
