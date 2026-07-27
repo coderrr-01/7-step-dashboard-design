@@ -1,14 +1,40 @@
+import { useEffect, useState, useRef } from "react";
 import PageLayout from "../components/PageLayout";
 import { MdMarkEmailRead } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useSteps } from "../context/StepContext";
+import { getApplicationStatus } from "../services/api";
 import "../assets/styles/style.css";
 
 export default function Review() {
    const navigate = useNavigate();
    const { completeStep } = useSteps();
+   const [status, setStatus]     = useState('Submitted');
+   const [approved, setApproved] = useState(false);
+   const [loading, setLoading]   = useState(true);
+   const pollRef = useRef(null);
+
+   const fetchStatus = async () => {
+      try {
+         const res = await getApplicationStatus();
+         if (res.success) {
+            setStatus(res.status || 'Submitted');
+            setApproved(!!res.approved);
+            if (res.approved) clearInterval(pollRef.current);
+         }
+      } catch {}
+      finally { setLoading(false); }
+   };
+
+   useEffect(() => {
+      fetchStatus();
+      pollRef.current = setInterval(fetchStatus, 15000);
+      return () => clearInterval(pollRef.current);
+   }, []);
+
    const handleNext = () => {
+      if (!approved) return;
       completeStep(2);
       navigate('/room-search');
    };
@@ -287,36 +313,27 @@ export default function Review() {
                      {/* Decorative Guilloche */}
                      <div className="guilloche-corner">
                         <svg className="text-primary w-100 h-100" viewBox="0 0 100 100">
-                           <path
-                              d="M100 0 Q 80 0 80 20 Q 80 40 100 40"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="0.5"
-                           />
-                           <path
-                              d="M100 10 Q 85 10 85 25 Q 85 40 100 40"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="0.5"
-                           />
+                           <path d="M100 0 Q 80 0 80 20 Q 80 40 100 40" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                           <path d="M100 10 Q 85 10 85 25 Q 85 40 100 40" fill="none" stroke="currentColor" strokeWidth="0.5" />
                         </svg>
                      </div>
 
                      <div className="mb-4">
                         <div className="d-flex align-items-center gap-3 mb-3">
-                           <span className="status-badge">Current Status: Pending</span>
-                           <span className="ref-number">Ref: HR-2024-0892</span>
+                           <span className="status-badge">
+                              Current Status: {loading ? 'Loading...' : status}
+                           </span>
                         </div>
 
                         <h3 className="display-serif h2 mb-3">
-                           Verification in Progress
+                           {approved ? 'Application Approved!' : 'Verification in Progress'}
                         </h3>
 
                         <p className="fs-5 text-muted lh-base">
-                           Your application record is currently being processed by our residency
-                           specialists. This manual review ensures all provided lineage,
-                           financial, and academic documents meet the Heritage Residency's
-                           archival standards.
+                           {approved
+                              ? 'Your application has been approved. You can now proceed to browse available rooms.'
+                              : "Your application record is currently being processed by our residency specialists. This manual review ensures all provided lineage, financial, and academic documents meet the Heritage Residency's archival standards."
+                           }
                         </p>
                      </div>
 
@@ -327,7 +344,6 @@ export default function Review() {
                            <span className="material-symbols-outlined text-primary-container">
                               <MdMarkEmailRead />
                            </span>
-
                            <div>
                               <h4 className="h6 mb-1">Next Step: Email Notification</h4>
                               <p className="text-muted small mb-0">
@@ -341,7 +357,6 @@ export default function Review() {
                            <span className="material-symbols-outlined text-primary-container">
                               <FaFileAlt />
                            </span>
-
                            <div>
                               <h4 className="h6 mb-1">Document Integrity</h4>
                               <p className="text-muted small mb-0">
@@ -354,19 +369,27 @@ export default function Review() {
 
                      {/* Desktop Button */}
                      <div className="d-none d-md-block">
-                        <button className="btn btn-jrny-dark w-100 shadow-lg" onClick={handleNext}>
-                           View Submitted Dossier
+                        <button
+                           className="btn btn-jrny-dark w-100 shadow-lg"
+                           onClick={handleNext}
+                           disabled={!approved}
+                        >
+                           {approved ? 'Continue to Room Search' : 'Awaiting Approval...'}
                         </button>
+                        {!approved && (
+                           <p className="text-muted small text-center mt-2 mb-0">
+                              Checking automatically every 15 seconds.
+                           </p>
+                        )}
                      </div>
 
                      {/* Mobile Loader */}
                      <div className="d-flex d-md-none justify-content-center">
                         <div className="verification-loader">
                            <div className="loader-ring"></div>
-
                            <div className="loader-content">
                               <span className="loader-dot"></span>
-                              <p>Verification in Progress...</p>
+                              <p>{approved ? 'Approved!' : 'Verification in Progress...'}</p>
                            </div>
                         </div>
                      </div>
