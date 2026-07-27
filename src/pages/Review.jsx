@@ -1,10 +1,17 @@
 import PageLayout from "../components/PageLayout";
 import { MdMarkEmailRead } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useSteps } from "../context/StepContext";
 import "../assets/styles/style.css";
 
 export default function Review() {
+   const navigate = useNavigate();
+   const { completeStep } = useSteps();
+   const handleNext = () => {
+      completeStep(2);
+      navigate('/room-search');
+   };
 
    return (
       <PageLayout page="Review">
@@ -347,11 +354,9 @@ export default function Review() {
 
                      {/* Desktop Button */}
                      <div className="d-none d-md-block">
-                        <Link to="/room-search">
-                           <button className="btn btn-jrny-dark w-100 shadow-lg">
-                              View Submitted Dossier
-                           </button>
-                        </Link>
+                        <button className="btn btn-jrny-dark w-100 shadow-lg" onClick={handleNext}>
+                           View Submitted Dossier
+                        </button>
                      </div>
 
                      {/* Mobile Loader */}

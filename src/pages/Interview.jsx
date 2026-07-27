@@ -6,10 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { useClientData } from "../hooks/useClientData";
 import { bookInterview } from "../services/api";
 import { toast } from "react-toastify";
+import { useSteps } from "../context/StepContext";
 
 export default function Interview() {
    const navigate = useNavigate();
    const { client, loading } = useClientData();
+   const { completeStep } = useSteps();
 
    const viewroombtn = () => navigate('/view-room');
 
@@ -43,6 +45,7 @@ export default function Interview() {
             setConfirmedDate(selectedDate.label);
             setConfirmedTime(selectedTime);
             setMeetLink(res.meet_link || '');
+            completeStep(4);
             toast.success('Interview booked successfully!');
             onSuccess();
          } else {
@@ -189,7 +192,12 @@ export default function Interview() {
                                  </div>
                               </div>
                               <div>
-                                 <button className="btn btn-jrny-dark w-100 shadow-lg">Please Wait For Our Response</button>
+                                 <button
+                                    className="btn btn-jrny-dark w-100 shadow-lg"
+                                    onClick={() => { completeStep(4); navigate('/secure-booking'); }}
+                                 >
+                                    Please Wait For Our Response
+                                 </button>
                               </div>
                            </div>
                            <p className="mt-4 text-center text-md-start fst-italic text-muted small">

@@ -1,111 +1,138 @@
-// Central API service — all WordPress REST calls go through here
+// All WordPress REST calls — JWT Bearer token auth
 
 const WP_BASE = 'https://wordpress-1608288-6566160.cloudwaysapps.com/wp-json';
 const JRNY    = `${WP_BASE}/jrny/v1`;
 const LEASE   = `${WP_BASE}/lease-html-sign/v1`;
 
-// ─── AUTH ─────────────────────────────────────────────────────────────────────
-// Store credentials in localStorage after login
-export function saveAuth(username, password) {
-  const token = btoa(`${username}:${password}`);
-  localStorage.setItem('jrny_auth', token);
+const TOKEN_KEY  = 'jrny_jwt';
+const CLIENT_KEY = 'jrny_client';
+const NONCE_KEY  = 'jrny_nonce';
+
+// ─── TOKEN ────────────────────────────────────────────────────────────────────
+export function saveToken(token) {
+  localStorage.setItem(TOKEN_KEY, token);
 }
 
-export function getAuthHeader() {
-  const token = localStorage.getItem('jrny_auth');
-  if (!token) return {};
-  return { Authorization: `Basic ${token}` };
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || '';
 }
 
 export function isLoggedIn() {
-  return !!localStorage.getItem('jrny_auth');
+  const token = getToken();
+  if (!token) return false;
+  try {
+    // Decode JWT payload (part 2) and check exp
+    const payload = JSON.parse(
+      atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
+    );
+    return payload.exp > Math.floor(Date.now() / 1000);
+  } catch {
+    return false;
+  }
 }
 
 export function logout() {
-  localStorage.removeItem('jrny_auth');
-  localStorage.removeItem('jrny_nonce');
-  localStorage.removeItem('jrny_client');
-}
-
-// ─── NONCE ────────────────────────────────────────────────────────────────────
-async function getNonce() {
-  const cached = localStorage.getItem('jrny_nonce');
-  if (cached) return cached;
-
-  const res  = await apiFetch(`${JRNY}/nonce`, { method: 'GET' });
-  const data = await res.json();
-  if (data.nonce) {
-    localStorage.setItem('jrny_nonce', data.nonce);
-    return data.nonce;
-  }
-  return '';
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(CLIENT_KEY);
+  localStorage.removeItem(NONCE_KEY);
 }
 
 // ─── BASE FETCH ───────────────────────────────────────────────────────────────
 async function apiFetch(url, options = {}) {
+  const token = getToken();
   const headers = {
     'Content-Type': 'application/json',
-    ...getAuthHeader(),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {}),
   };
 
-  const res = await fetch(url, {
-    ...options,
-    credentials: 'include',
-    headers,
-  });
+  const res = await fetch(url, { ...options, credentials: 'include', headers });
 
   if (res.status === 401) {
     logout();
     throw new Error('Session expired. Please log in again.');
   }
-
   return res;
 }
 
 // ─── LOGIN ────────────────────────────────────────────────────────────────────
 export async function wpLogin(username, password) {
-  saveAuth(username, password);
+  logout(); // clear any stale token first
 
-  // Verify credentials by hitting /client-data
-  const res = await apiFetch(`${JRNY}/client-data`, { method: 'GET' });
-
-  if (res.status === 401) {
-    logout();
-    return { success: false, message: 'Invalid username or password.' };
-  }
+  const res = await fetch(`${JRNY}/login`, {
+    method:      'POST',
+    credentials: 'include',
+    headers:     { 'Content-Type': 'application/json' },
+    body:        JSON.stringify({ username, password }),
+  });
 
   const data = await res.json();
 
-  if (!data.success && res.status === 404) {
-    // Credentials valid but no CRM record — still allow login
-    return { success: true, data: null };
+  if (!res.ok || !data.success) {
+    return { success: false, message: data.message || 'Login failed.' };
   }
 
-  if (data.success) {
-    localStorage.setItem('jrny_client', JSON.stringify(data.data));
-    return { success: true, data: data.data };
+  saveToken(data.token);
+
+  if (data.client_data) {
+    localStorage.setItem(CLIENT_KEY, JSON.stringify(data.client_data));
   }
 
-  logout();
-  return { success: false, message: data.message || 'Login failed.' };
+  return { success: true, token: data.token, user: data.user, client_data: data.client_data };
+}
+
+// ─── REFRESH TOKEN ────────────────────────────────────────────────────────────
+export async function refreshToken() {
+  const res  = await apiFetch(`${JRNY}/refresh-token`, { method: 'GET' });
+  const data = await res.json();
+  if (data.success && data.token) {
+    saveToken(data.token);
+    return data.token;
+  }
+  return null;
+}
+
+// ─── NONCE ────────────────────────────────────────────────────────────────────
+async function getNonce() {
+  const cached = localStorage.getItem(NONCE_KEY);
+  if (cached) return cached;
+  const res  = await apiFetch(`${JRNY}/nonce`, { method: 'GET' });
+  const data = await res.json();
+  if (data.nonce) {
+    localStorage.setItem(NONCE_KEY, data.nonce);
+    return data.nonce;
+  }
+  return '';
 }
 
 // ─── CLIENT DATA ──────────────────────────────────────────────────────────────
 export async function getClientData() {
   const res  = await apiFetch(`${JRNY}/client-data`, { method: 'GET' });
   const data = await res.json();
-
-  if (data.success) {
-    localStorage.setItem('jrny_client', JSON.stringify(data.data));
-  }
-
+  if (data.success) localStorage.setItem(CLIENT_KEY, JSON.stringify(data.data));
   return data;
 }
 
 // ─── STEP STATUS ──────────────────────────────────────────────────────────────
 export async function getStepStatus() {
-  const res  = await apiFetch(`${JRNY}/step-status`, { method: 'GET' });
+  const res = await apiFetch(`${JRNY}/step-status`, { method: 'GET' });
+  return res.json();
+}
+
+// ─── APPLY FORM ──────────────────────────────────────────────────────────────
+export async function applyForm(data) {
+  const res = await fetch(`${JRNY}/apply`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+// ─── APPLICATION STATUS ───────────────────────────────────────────────────────
+export async function getApplicationStatus() {
+  const res = await apiFetch(`${JRNY}/application-status`, { method: 'GET' });
   return res.json();
 }
 
@@ -113,9 +140,8 @@ export async function getStepStatus() {
 export async function bookInterview({ date, time, booking_type }) {
   const nonce = await getNonce();
   const res   = await apiFetch(`${JRNY}/book-interview`, {
-    method:  'POST',
-    headers: { 'X-WP-Nonce': nonce },
-    body:    JSON.stringify({ date, time, booking_type }),
+    method: 'POST', headers: { 'X-WP-Nonce': nonce },
+    body: JSON.stringify({ date, time, booking_type }),
   });
   return res.json();
 }
@@ -124,39 +150,36 @@ export async function bookInterview({ date, time, booking_type }) {
 export async function secureBooking({ date, time, booking_type }) {
   const nonce = await getNonce();
   const res   = await apiFetch(`${JRNY}/secure-booking`, {
-    method:  'POST',
-    headers: { 'X-WP-Nonce': nonce },
-    body:    JSON.stringify({ date, time, booking_type }),
+    method: 'POST', headers: { 'X-WP-Nonce': nonce },
+    body: JSON.stringify({ date, time, booking_type }),
   });
   return res.json();
 }
 
-// ─── SIGN LEASE (uses existing lease plugin endpoint directly) ────────────────
+// ─── SIGN LEASE ───────────────────────────────────────────────────────────────
 export async function signLease({ client_id, signature }) {
   const nonce = await getNonce();
   const res   = await apiFetch(`${LEASE}/create`, {
-    method:  'POST',
-    headers: { 'X-WP-Nonce': nonce },
-    body:    JSON.stringify({ client_id, signature }),
+    method: 'POST', headers: { 'X-WP-Nonce': nonce },
+    body: JSON.stringify({ client_id, signature }),
   });
   return res.json();
 }
 
-// ─── ACH BANK PAYMENT ─────────────────────────────────────────────────────────
+// ─── ACH PAYMENT ─────────────────────────────────────────────────────────────
 export async function submitAchPayment({ type, amount, txn_id, account_number }) {
   const nonce = await getNonce();
   const res   = await apiFetch(`${JRNY}/ach-payment`, {
-    method:  'POST',
-    headers: { 'X-WP-Nonce': nonce },
-    body:    JSON.stringify({ type, amount, txn_id, account_number }),
+    method: 'POST', headers: { 'X-WP-Nonce': nonce },
+    body: JSON.stringify({ type, amount, txn_id, account_number }),
   });
   return res.json();
 }
 
-// ─── CACHED CLIENT (sync, no network) ────────────────────────────────────────
+// ─── CACHED CLIENT ────────────────────────────────────────────────────────────
 export function getCachedClient() {
   try {
-    const raw = localStorage.getItem('jrny_client');
+    const raw = localStorage.getItem(CLIENT_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;

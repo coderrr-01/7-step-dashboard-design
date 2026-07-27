@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../../assets/styles/BankDEposite-style.css";
 import { submitAchPayment } from "../../services/api";
 import { toast } from "react-toastify";
+import { useSteps } from "../../context/StepContext";
 
 const SecurityDeposit = ({ rentTitle, client }) => {
     const [depositeCard, setdepositeCard] = useState(false);
@@ -9,6 +10,7 @@ const SecurityDeposit = ({ rentTitle, client }) => {
     const [txnId, setTxnId]               = useState('');
     const [accountNumber, setAccountNumber] = useState('');
     const [submitted, setSubmitted]       = useState(false);
+    const { completeStep } = useSteps();
 
     const isDeposit = rentTitle === "Security Deposit";
     const paymentType = isDeposit ? 'deposit' : 'rent';
@@ -40,6 +42,7 @@ const SecurityDeposit = ({ rentTitle, client }) => {
 
             if (res.success) {
                 toast.success('Payment recorded! Pending verification.');
+                completeStep(7);
                 setSubmitted(true);
                 setdepositeCard(false);
             } else {

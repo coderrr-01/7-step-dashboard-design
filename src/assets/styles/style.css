@@ -2813,7 +2813,7 @@ body.page-room-search .page-description {
     white-space: nowrap;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-background: linear-gradient(to right, #000 0%, #000 90%, #ffd229 90%, #ffd229 100%);
+background: linear-gradient(to right, #000 0%, #000 75%, #ffd229 90%, #ffd229 100%);
     /* Firefox */
     scrollbar-width: thin;
         scrollbar-color: #b9934c #ffffff;
@@ -2910,6 +2910,26 @@ width: calc(100% + 1px);
 
     background:#0b6c3d;
 
+}
+
+/* ===========================
+   Completed
+=========================== */
+.stepper-item.completed {
+    color: #ffd229;
+}
+.stepper-item.completed::after {
+    background: #0b6c3d;
+    opacity: 0.6;
+}
+
+/* ===========================
+   Locked
+=========================== */
+.stepper-item.locked {
+    cursor: not-allowed !important;
+    pointer-events: none;
+    opacity: 0.45;
 }
 
 /* ===========================

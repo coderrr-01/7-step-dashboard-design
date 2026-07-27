@@ -3,9 +3,13 @@ import PageLayout from "../components/PageLayout";
 import { toast } from "react-toastify";
 import { useClientData } from "../hooks/useClientData";
 import { signLease } from "../services/api";
+import { useSteps } from "../context/StepContext";
+import { useNavigate } from "react-router-dom";
 
 export default function DocumentSign() {
+   const navigate = useNavigate();
    const { client, loading } = useClientData();
+   const { completeStep } = useSteps();
 
    const [verfiyeActive, setverfiyeActive] = useState(false);
    const [isVerified, setIsVerified]       = useState(false);
@@ -123,6 +127,7 @@ export default function DocumentSign() {
 
          if (res.success) {
             setSignedPdf(res.signed_pdf);
+            completeStep(6);
             toast.success('Lease signed successfully!');
          } else {
             toast.error(res.message || 'Signing failed. Please try again.');
@@ -311,12 +316,19 @@ export default function DocumentSign() {
                            </div>
                         </div>
                         <div className="d-grid gap-2">
-                           <button
+                           {/* <button
                               className="btn-gold"
                               disabled={submitting || (activeTab === 'type' && !isVerified)}
                               onClick={handleSign}
                            >
                               {submitting ? 'Signing...' : 'Adopt & Sign'}
+                           </button> */}
+                           <button
+                              className="btn-gold"
+                              disabled={submitting || (activeTab === 'type' && !isVerified)}
+                              onClick={() => { completeStep(6); navigate('/payment-screen'); }}
+                           >
+                              Adopt & Sign
                            </button>
                         </div>
                         <div className="security-badge mt-5">
