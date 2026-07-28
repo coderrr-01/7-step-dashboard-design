@@ -21,7 +21,10 @@ export default function Review() {
          if (res.success) {
             setStatus(res.status || 'Submitted');
             setApproved(!!res.approved);
-            if (res.approved) clearInterval(pollRef.current);
+            if (res.approved) {
+               clearInterval(pollRef.current);
+               completeStep(2);
+            }
          }
       } catch {}
       finally { setLoading(false); }
@@ -34,7 +37,6 @@ export default function Review() {
    }, []);
 
    const handleNext = () => {
-      if (!approved) return;
       completeStep(2);
       navigate('/room-search');
    };
