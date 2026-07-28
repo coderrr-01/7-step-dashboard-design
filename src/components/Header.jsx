@@ -9,12 +9,10 @@ import { FaSackDollar } from "react-icons/fa6";
 import { MdOutlineAddIcCall } from "react-icons/md";
 import { logout } from "../services/api";
 
-const WP_BASE = 'https://wordpress-1608288-6566160.cloudwaysapps.com';
-
 function handleLogout() {
    logout();
    localStorage.removeItem('jrny_completed_steps');
-   window.parent.location.href = WP_BASE + '/wp-login.php?action=logout';
+   window.location.href = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
 }
 
 export default function Header({ activeLabel }) {

@@ -10,14 +10,9 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { StepProvider } from "./context/StepContext";
 import { saveToken } from "./services/api";
 
-// Auto-login: WP dashboard injects ?token=JWT into the iframe src
-const params = new URLSearchParams(window.location.search);
-const urlToken = params.get('token');
-if (urlToken) {
-  saveToken(urlToken);
-  // Clean the token from the URL without a page reload
-  const clean = window.location.pathname;
-  window.history.replaceState({}, '', clean);
+// Auto-login: WP page injects window.jrnyData with JWT token
+if (window.jrnyData?.token) {
+  saveToken(window.jrnyData.token);
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(
