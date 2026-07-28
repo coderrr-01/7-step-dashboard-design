@@ -7,7 +7,15 @@ import { IoLogOut } from "react-icons/io5";
 import { FaFileCircleCheck } from "react-icons/fa6";
 import { FaSackDollar } from "react-icons/fa6";
 import { MdOutlineAddIcCall } from "react-icons/md";
-import { CiSettings } from "react-icons/ci";
+import { logout } from "../services/api";
+
+const WP_BASE = 'https://wordpress-1608288-6566160.cloudwaysapps.com';
+
+function handleLogout() {
+   logout();
+   localStorage.removeItem('jrny_completed_steps');
+   window.parent.location.href = WP_BASE + '/wp-login.php?action=logout';
+}
 
 export default function Header({ activeLabel }) {
    const [open, setOpen] = useState(false);
@@ -61,7 +69,7 @@ export default function Header({ activeLabel }) {
                      </div>
                      <div className={`profile-dropdown ${dropdown ? "active" : ""}`}>
                         <ul>
-                           <li className="logout"><span><IoLogOut /></span> Logout</li>
+                           <li className="logout" onClick={handleLogout}><span><IoLogOut /></span> Logout</li>
                         </ul>
                      </div>
                   </div>
