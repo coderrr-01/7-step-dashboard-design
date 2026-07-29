@@ -206,7 +206,7 @@ export default function ViewRoom() {
                            </div>
                         )}
                         <div className="d-grid gap-3 mb-4">
-                           <button className="btn btn-primary-elite">Lock In Residency</button>
+                           {/* <button className="btn btn-primary-elite">Lock In Residency</button> */}
                            <Link to="/interview"><button className="btn btn-outline-elite">Schedule Interview</button></Link>
                         </div>
                         <p className="text-center small text-muted text-uppercase mb-0 summary-disclaimer">

@@ -38,6 +38,7 @@ export default function SecureBooking() {
             date: selectedDate.value,
             time: selectedTime,
             booking_type: 'Apartment Tour',
+            client_id: client?.id || '',
          });
 
          if (res.success) {
