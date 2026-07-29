@@ -15,6 +15,13 @@ export default function Interview() {
 
    const viewroombtn = () => navigate('/view-room');
 
+   // Load selected room from localStorage
+   const selectedRoom = (() => {
+      try { return JSON.parse(localStorage.getItem('jrny_selected_room') || 'null'); } catch { return null; }
+   })();
+   const roomName = selectedRoom?.name || 'The Victorian Premier';
+   const roomId   = selectedRoom?.id   || '';
+
    const [interviewProgres, setinterviewProgres] = useState(false);
    const [Avalableresidence, setAvalableresidence] = useState(true);
    const [submitting, setSubmitting] = useState(false);
@@ -36,9 +43,11 @@ export default function Interview() {
       setSubmitting(true);
       try {
          const res = await bookInterview({
-            date: selectedDate.value,   // dd/mm/yyyy — format WP plugin expects
+            date: selectedDate.value,
             time: selectedTime,
             booking_type: 'Tenant Interview',
+            room_id:   roomId,
+            room_name: roomName,
          });
 
          if (res.success) {
@@ -58,8 +67,8 @@ export default function Interview() {
       }
    };
 
-   const unitLabel = client ? (client.unit ? `Unit ${client.unit}` : 'The Victorian Premier') : 'The Victorian Premier';
-   const rentLabel = client && client.rent_amount ? `$${client.rent_amount}/mo` : '$4,850/mo';
+   const unitLabel = client ? (client.unit ? `Unit ${client.unit}` : roomName) : roomName;
+   const rentLabel = client && client.rent_amount ? `$${client.rent_amount}/mo` : (selectedRoom?.monthly_rent ? `$${selectedRoom.monthly_rent}/mo` : '$4,850/mo');
 
    return (
       <>
@@ -105,6 +114,7 @@ export default function Interview() {
                               confirmedTime={confirmedTime}
                               meetLink={meetLink}
                               submitting={submitting}
+                              roomName={roomName}
                            />
                         </section>
                      </div>

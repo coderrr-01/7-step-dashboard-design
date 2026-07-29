@@ -137,11 +137,11 @@ export async function getApplicationStatus() {
 }
 
 // ─── BOOK INTERVIEW ───────────────────────────────────────────────────────────
-export async function bookInterview({ date, time, booking_type }) {
+export async function bookInterview({ date, time, booking_type, room_id, room_name }) {
   const nonce = await getNonce();
   const res   = await apiFetch(`${JRNY}/book-interview`, {
     method: 'POST', headers: { 'X-WP-Nonce': nonce },
-    body: JSON.stringify({ date, time, booking_type }),
+    body: JSON.stringify({ date, time, booking_type, room_id, room_name }),
   });
   return res.json();
 }

@@ -1,13 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Calendar from "./Calendar";
 import Timeslot from "./Timeslot";
 import { useNavigate } from 'react-router-dom';
 import tourImg from "../../assets/images/tour-img.png";
 import interviewImg from "../../assets/images/interview-img.png";
-function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedDate, confirmedTime, meetLink, submitting }) {
+
+const WP_BASE = 'https://wordpress-1608288-6566160.cloudwaysapps.com/wp-json/jrny/v1';
+
+function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedDate, confirmedTime, meetLink, submitting, roomName }) {
     const [activeTab, setActiveTab] = useState("schedule");
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
+    const [bookedSlots, setBookedSlots] = useState([]);
+
+    // Fetch booked slots whenever selected date changes
+    useEffect(() => {
+        if (!selectedDate) return;
+        fetch(`${WP_BASE}/booked-slots?date=${encodeURIComponent(selectedDate.value)}`)
+            .then(r => r.json())
+            .then(data => { if (data.success) setBookedSlots(data.booked || []); })
+            .catch(() => {});
+    }, [selectedDate]);
     const contentMap = {
         securePlaneblock: {
             img: tourImg,
@@ -67,7 +80,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                     <h6 className="slots-heading">
                                         AVAILABLE SLOTS FOR {selectedDate ? selectedDate.label : 'TODAY'}
                                     </h6>
-                                    <Timeslot selectedTime={selectedTime} onSelectTime={setSelectedTime} />
+                                    <Timeslot selectedTime={selectedTime} onSelectTime={setSelectedTime} bookedSlots={bookedSlots} />
                                     <button
                                         className="btn btn-gold mb-2"
                                         disabled={submitting}
@@ -135,7 +148,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                                 Room
                                             </span>
                                             <span className="detail-value">
-                                                The Victorian Premier
+                                                {roomName || 'The Victorian Premier'}
                                             </span>
                                         </div>
                                     </div>
