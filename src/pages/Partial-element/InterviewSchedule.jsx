@@ -12,6 +12,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
     const [bookedSlots, setBookedSlots] = useState([]);
+    const [error, setError] = useState('');
 
     // Fetch booked slots whenever selected date changes
     useEffect(() => {
@@ -73,19 +74,25 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                         <div className="tab_schedule_room">
                             <div className="row">
                                 <div className="col-md-6 pe-md-4">
-                                    <Calendar onSelectDate={setSelectedDate} />
+                                    <Calendar onSelectDate={(d) => { setSelectedDate(d); setError(''); }} />
                                 </div>
                                 {/* Slots */}
                                 <div className="col-md-6 ps-md-2 mt-4 mt-md-0">
                                     <h6 className="slots-heading">
                                         AVAILABLE SLOTS FOR {selectedDate ? selectedDate.label : 'TODAY'}
                                     </h6>
-                                    <Timeslot selectedTime={selectedTime} onSelectTime={setSelectedTime} bookedSlots={bookedSlots} />
+                                    <Timeslot selectedTime={selectedTime} onSelectTime={(t) => { setSelectedTime(t); setError(''); }} bookedSlots={bookedSlots} />
+                                    {error && (
+                                        <p className="text-danger small mb-2">{error}</p>
+                                    )}
                                     <button
                                         className="btn btn-gold mb-2"
                                         disabled={submitting}
                                         onClick={() => {
-                                            if (onConfirm && selectedDate && selectedTime) {
+                                            if (!selectedDate) { setError('Please select a date.'); return; }
+                                            if (!selectedTime) { setError('Please select a time slot.'); return; }
+                                            setError('');
+                                            if (onConfirm) {
                                                 onConfirm(selectedDate, selectedTime, () => setActiveTab("confirm"));
                                             } else {
                                                 setActiveTab("confirm");
