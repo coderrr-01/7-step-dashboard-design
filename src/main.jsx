@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, useLocation } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import App from "./App";
 import "./assets/styles/style.css";
 import "./assets/styles/media.css";
@@ -16,9 +16,9 @@ const _urlToken = _params.get('token');
 if (_urlToken) saveToken(_urlToken);
 else if (window.jrnyData?.token) saveToken(window.jrnyData.token);
 
-// Read ?step param to restore route on WP page refresh
-const _initialStep = _params.get('step');
-const _initialPath = _initialStep ? '/' + _initialStep : null;
+// Read ?step param passed by WP shortcode on refresh e.g. ?step=room-search
+const _step = _params.get('step');
+const _initialEntry = _step ? '/' + _step : '/apply';
 
 // Notify WP parent of route changes so it can update the browser URL
 function RouteReporter() {
@@ -32,9 +32,9 @@ function RouteReporter() {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter initialEntries={_initialPath ? [_initialPath] : undefined}>
+    <MemoryRouter initialEntries={[_initialEntry]} initialIndex={0}>
       <StepProvider><RouteReporter /><App /></StepProvider>
-    </BrowserRouter>
+    </MemoryRouter>
   </React.StrictMode>,
 );
 
