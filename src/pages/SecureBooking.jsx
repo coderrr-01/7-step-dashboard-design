@@ -15,6 +15,13 @@ export default function SecureBooking() {
 
    const viewroombtn = () => navigate('/view-room');
 
+   // Load selected room from localStorage — same as Interview
+   const selectedRoom = (() => {
+      try { return JSON.parse(localStorage.getItem('jrny_selected_room') || 'null'); } catch { return null; }
+   })();
+   const roomName = selectedRoom?.name || client?.room_name || '';
+   const roomId   = selectedRoom?.id   || client?.room_id   || '';
+
    const [interviewProgres, setinterviewProgres] = useState(false);
    const [Avalableresidence, setAvalableresidence] = useState(true);
    const [submitting, setSubmitting]     = useState(false);
@@ -58,8 +65,9 @@ export default function SecureBooking() {
       }
    };
 
-   const unitLabel = client ? (client.unit ? `Unit ${client.unit}` : 'The Victorian Premier (1BR)') : 'The Victorian Premier (1BR)';
-   const rentLabel = client && client.rent_amount ? `$${client.rent_amount}/mo` : '$4,850/mo';
+   // Dynamic labels — same pattern as Interview
+   const unitLabel = client ? (client.unit ? `Unit ${client.unit}` : roomName) : roomName;
+   const rentLabel = client && client.rent_amount ? `$${client.rent_amount}/mo` : (selectedRoom?.monthly_rent ? `$${selectedRoom.monthly_rent}/mo` : '$4,850/mo');
 
    return (
       <PageLayout page="SecureBooking">
@@ -80,7 +88,7 @@ export default function SecureBooking() {
                            <div className="d-flex justify-content-between setPricingblock">
                               <div>
                                  <h4 className="serif-font mb-0 residence-title">{unitLabel}</h4>
-                                 <p className="mb-0 residence-meta">East Wing, Floor 4 • 820 sq.ft • Limited Availability</p>
+                                 <p className="mb-0 residence-meta">{selectedRoom?.floor ? `Floor ${selectedRoom.floor}` : ''}{selectedRoom?.unit_number ? ` • Unit ${selectedRoom.unit_number}` : ''}{selectedRoom?.size_sq_ft ? ` • ${selectedRoom.size_sq_ft} sq.ft` : ''}{selectedRoom?.status ? ` • ${selectedRoom.status}` : ''}</p>
                               </div>
                               <div className="text-end">
                                  <div className="fw-bold residence-price">{rentLabel}</div>
@@ -104,6 +112,7 @@ export default function SecureBooking() {
                         confirmedTime={confirmedTime}
                         meetLink={meetLink}
                         submitting={submitting}
+                        roomName={roomName}
                      />
                   </section>
                </div>
@@ -151,12 +160,12 @@ export default function SecureBooking() {
                            </div>
                            <div className="mb-4">
                               <div className="d-flex align-items-center gap-3 mb-3">
-                                 <span className="status-badge">Current Status: Pending</span>
+                                 <span className="status-badge">Current Status: Booking Secured</span>
                                  <span className="ref-number">Ref: HR-2024-0892</span>
                               </div>
-                              <h3 className="display-serif h2 mb-3">Interview Verification</h3>
+                              <h3 className="display-serif h2 mb-3">Tour Booking Confirmed</h3>
                               <p className="fs-5 text-muted lh-base">
-                                 Your application record is currently being processed by our residency specialists. This manual review ensures all provided lineage, financial, and academic documents meet the Heritage Residency's archival standards.
+                                 Your apartment tour has been secured. Our concierge will be ready to welcome you at the scheduled time.
                               </p>
                            </div>
                            <hr className="my-4 review-divider" />
@@ -177,8 +186,8 @@ export default function SecureBooking() {
                               <div className="d-flex align-items-start gap-3 mb-4">
                                  <span className="material-symbols-outlined text-primary-container">k</span>
                                  <div>
-                                    <h4 className="h6 mb-1">Next Step: Email Notification</h4>
-                                    <p className="text-muted small mb-0">You will receive a formal invitation once your interview is approved. Expected turnaround: 3-5 business days.</p>
+                                    <h4 className="h6 mb-1">Next Step: Sign Your Lease</h4>
+                                    <p className="text-muted small mb-0">After your tour, proceed to sign your lease agreement to secure your residence.</p>
                                  </div>
                               </div>
                               <div className="d-flex align-items-start gap-3">
@@ -194,7 +203,7 @@ export default function SecureBooking() {
                                  className="btn btn-jrny-dark w-100 shadow-lg"
                                  onClick={() => { completeStep(5); navigate('/document-sign'); }}
                               >
-                                 Sign lease
+                                 Sign Lease
                               </button>
                            </div>
                         </div>
