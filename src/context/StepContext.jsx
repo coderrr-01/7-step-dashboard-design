@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { getCachedClient } from '../services/api';
 
 export const STEP_PATHS = {
-  1: '/',
+  1: '/apply',
   2: '/review',
   3: '/room-search',
   4: '/interview',

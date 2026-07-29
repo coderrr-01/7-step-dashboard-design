@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Home from "../pages/Home";
 import DocumentSign from "../pages/DocumentSign";
 import Interview from "../pages/Interview";
@@ -13,7 +13,8 @@ import Viewphoto from "../pages/Partial-element/Viewphoto";
 
 export default function AppRoutes() {
   return <Routes>
-    <Route path="/" element={<Home />} />
+    <Route path="/" element={<Navigate to="/apply" replace />} />
+    <Route path="/apply" element={<Home />} />
     <Route path="/document-sign" element={<DocumentSign />} />
     <Route path="/interview" element={<Interview />} />
     <Route path="/payment-screen" element={<PaymentScreen />} />
@@ -23,8 +24,6 @@ export default function AppRoutes() {
     <Route path="/secure-booking" element={<SecureBooking />} />
     <Route path="/view-room" element={<ViewRoom />} />
     <Route path="/Viewphoto" element={<Viewphoto />} />
-
-  </Routes> ;
-   
+  </Routes>;
 }
 
