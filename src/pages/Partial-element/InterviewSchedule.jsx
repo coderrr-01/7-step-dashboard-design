@@ -49,7 +49,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
         <div>
             {/* Tabs */}
             <div className="scheduling-tabs">
-                <div className={`tab-item ${activeTab === "schedule" ? "active" : ""}`} onClick={() => setActiveTab("schedule")}>
+                <div className={`tab-item ${activeTab === "schedule" ? "active" : ""}`} onClick={() => activeTab === "schedule" && setActiveTab("schedule")}>
                     <i className="bi bi-calendar3 fs-5"></i>
                     {
                         datatext === "securePlaneblock"
@@ -60,9 +60,8 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                     }
                 </div>
                 <div
-                    className={
-                        `tab-item ${activeTab === "confirm" ? "active" : ""}`
-                    }
+                    className={`tab-item ${activeTab === "confirm" ? "active" : ""}`}
+                    style={{ cursor: 'default' }}
                 >
                     <i className="bi bi-check-circle fs-5"></i>
                     CONFIRMED!
