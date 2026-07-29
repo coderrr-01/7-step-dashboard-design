@@ -19,7 +19,7 @@ export default function Interview() {
    const selectedRoom = (() => {
       try { return JSON.parse(localStorage.getItem('jrny_selected_room') || 'null'); } catch { return null; }
    })();
-   const roomName = selectedRoom?.name || 'The Victorian Premier';
+   const roomName = selectedRoom?.name || '';
    const roomId   = selectedRoom?.id   || '';
 
    const [interviewProgres, setinterviewProgres] = useState(false);
@@ -48,6 +48,7 @@ export default function Interview() {
             booking_type: 'Tenant Interview',
             room_id:   roomId,
             room_name: roomName,
+            client_id: client?.id || '',
          });
 
          if (res.success) {
