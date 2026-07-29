@@ -91,7 +91,7 @@ export default function Interview() {
                                  <div className="d-flex justify-content-between">
                                     <div>
                                        <h4 className="serif-font mb-0 residence-title">{unitLabel}</h4>
-                                       <p className="mb-0 residence-meta">East Wing, Floor 4 • 820 sq.ft • Limited Availability</p>
+                                       <p className="mb-0 residence-meta">{selectedRoom?.floor ? `Floor ${selectedRoom.floor}` : ''}{selectedRoom?.unit_number ? ` • Unit ${selectedRoom.unit_number}` : ''}{selectedRoom?.size_sq_ft ? ` • ${selectedRoom.size_sq_ft} sq.ft` : ''}{selectedRoom?.status ? ` • ${selectedRoom.status}` : ''}</p>
                                     </div>
                                     <div className="text-end">
                                        <div className="fw-bold residence-price">{rentLabel}</div>
