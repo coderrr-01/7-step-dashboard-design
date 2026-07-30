@@ -5,21 +5,15 @@ import { toast } from "react-toastify";
 import { useSteps } from "../../context/StepContext";
 
 const SecurityDeposit = ({ rentTitle, client, onPaid }) => {
-    const [depositeCard, setdepositeCard] = useState(false);
-    const [submitting, setSubmitting]     = useState(false);
-    const [txnId, setTxnId]               = useState('');
+    const [submitting, setSubmitting]       = useState(false);
+    const [txnId, setTxnId]                 = useState('');
     const [accountNumber, setAccountNumber] = useState('');
-    const [submitted, setSubmitted]       = useState(false);
+    const [submitted, setSubmitted]         = useState(false);
     const { completeStep } = useSteps();
 
-    const isDeposit = rentTitle === "Security Deposit";
+    const isDeposit   = rentTitle === "Security Deposit";
     const paymentType = isDeposit ? 'deposit' : 'rent';
-
-    const amount = isDeposit
-        ? (client?.security_deposit || '')
-        : (client?.rent_amount || '');
-
-    const payNow = () => setdepositeCard(true);
+    const amount      = isDeposit ? (client?.security_deposit || '') : (client?.rent_amount || '');
 
     const handleSubmit = async () => {
         if (!txnId.trim()) {
@@ -30,7 +24,6 @@ const SecurityDeposit = ({ rentTitle, client, onPaid }) => {
             toast.error('Amount not available. Please contact support.');
             return;
         }
-
         setSubmitting(true);
         try {
             const res = await submitAchPayment({
@@ -39,13 +32,11 @@ const SecurityDeposit = ({ rentTitle, client, onPaid }) => {
                 txn_id:         txnId.trim(),
                 account_number: accountNumber.trim(),
             });
-
             if (res.success) {
                 toast.success('Payment recorded! Pending verification.');
                 if (isDeposit && onPaid) onPaid();
                 else completeStep(7);
                 setSubmitted(true);
-                setdepositeCard(false);
             } else {
                 toast.error(res.message || 'Payment failed. Please try again.');
             }
@@ -59,8 +50,7 @@ const SecurityDeposit = ({ rentTitle, client, onPaid }) => {
     if (submitted) {
         return (
             <div className="deposit-card">
-                <h3>{rentTitle}</h3>
-                <p style={{ color: 'green' }}>
+                <p className="deposit-success">
                     ✓ Payment submitted successfully. Status: Pending Verification.
                 </p>
             </div>
@@ -69,77 +59,44 @@ const SecurityDeposit = ({ rentTitle, client, onPaid }) => {
 
     return (
         <div className="deposit-card">
-            {isDeposit ? <h3>Security Deposit</h3> : <h3>Rent Deposit</h3>}
-
             <div className="bank-details">
-                <div className="row">
-                    <b>Bank</b>
-                    <span>JPMorgan Chase</span>
-                </div>
-                <div className="row">
-                    <b>Account Name</b>
-                    <span>Journey Realty Group LLC</span>
-                </div>
-                <div className="row">
-                    <b>Account Number</b>
-                    <span>909503879</span>
-                </div>
-                <div className="row">
-                    <b>Routing Number</b>
-                    <span>021000021</span>
-                </div>
+                <div className="row"><b>Bank</b><span>JPMorgan Chase</span></div>
+                <div className="row"><b>Account Name</b><span>Journey Realty Group LLC</span></div>
+                <div className="row"><b>Account Number</b><span>909503879</span></div>
+                <div className="row"><b>Routing Number</b><span>021000021</span></div>
                 <div className="row">
                     <b>{isDeposit ? 'Security Deposit Amount' : 'Rent Amount'}</b>
                     <span>{amount ? `$${amount}` : 'N/A'}</span>
                 </div>
-                <p className="note">
-                    Use your registered name while transferring.
-                </p>
+                <p className="note">Use your registered name while transferring.</p>
             </div>
 
-            {!depositeCard && (
-                <button className="submit-btn" onClick={payNow}>
-                    Pay
-                </button>
-            )}
+            <div className="payment-form">
+                <div className="input-group">
+                    <label>Amount</label>
+                    <input value={amount ? `$${amount}` : ''} readOnly placeholder="Amount" />
+                </div>
+                <div className="input-group">
+                    <label>UTR / Transaction ID</label>
+                    <input
+                        placeholder="Enter UTR"
+                        value={txnId}
+                        onChange={e => setTxnId(e.target.value)}
+                    />
+                </div>
+                <div className="input-group">
+                    <label>Account Number</label>
+                    <input
+                        placeholder="Enter Account Number"
+                        value={accountNumber}
+                        onChange={e => setAccountNumber(e.target.value)}
+                    />
+                </div>
+            </div>
 
-            {depositeCard && (
-                <>
-                    <div className="payment-form">
-                        <div className="input-group">
-                            <label>Amount</label>
-                            <input
-                                value={amount ? `$${amount}` : ''}
-                                readOnly
-                                placeholder="Amount"
-                            />
-                        </div>
-                        <div className="input-group">
-                            <label>UTR / Transaction ID</label>
-                            <input
-                                placeholder="Enter UTR"
-                                value={txnId}
-                                onChange={e => setTxnId(e.target.value)}
-                            />
-                        </div>
-                        <div className="input-group">
-                            <label>Account Number</label>
-                            <input
-                                placeholder="Enter Account Number"
-                                value={accountNumber}
-                                onChange={e => setAccountNumber(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                    <button
-                        className="submit-btn"
-                        onClick={handleSubmit}
-                        disabled={submitting}
-                    >
-                        {submitting ? 'Submitting...' : `Submit ${isDeposit ? 'Deposit' : 'Rent'} Payment`}
-                    </button>
-                </>
-            )}
+            <button className="submit-btn" onClick={handleSubmit} disabled={submitting}>
+                {submitting ? 'Submitting...' : `Submit ${isDeposit ? 'Deposit' : 'Rent'} Payment`}
+            </button>
         </div>
     );
 };

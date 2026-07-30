@@ -57,17 +57,27 @@
 
 
 
-.deposit-card  .payment-form{
-    display:flex;
-    gap:45px;
+.deposit-card .payment-form{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:16px;
     margin-top:18px;
 }
 
 
-.deposit-card  .input-group{
+.deposit-card .input-group{
     display:flex;
     flex-direction:column;
-    width:32%;
+    width:100%;
+}
+
+
+.deposit-card .deposit-success{
+    color:green;
+    font-weight:600;
+    font-size:14px;
+    margin:0;
+    padding:8px 0;
 }
 
 
