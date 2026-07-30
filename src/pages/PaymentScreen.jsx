@@ -2,16 +2,27 @@ import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import BankDeposite from "../pages/Partial-element/BankDeposite";
 import { useClientData } from "../hooks/useClientData";
-import { submitStripePayment, submitPaypalPayment, submitRevolutPayment } from "../services/api";
+import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, getRooms } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
 export default function PaymentScreen() {
    const { client, refetch } = useClientData();
    const { completeStep } = useSteps();
-   const [activeStep, setActiveStep]     = useState("Security");
+   const [activeStep, setActiveStep]       = useState("Security");
    const [activePayment, setActivePayment] = useState(0);
-   const [submitting, setSubmitting]     = useState(false);
+   const [submitting, setSubmitting]       = useState(false);
+   const [selectedRoom, setSelectedRoom]   = useState(null);
+
+   useEffect(() => {
+      if (!client?.room_id) return;
+      getRooms().then(res => {
+         if (res?.rooms) {
+            const match = res.rooms.find(r => String(r.id) === String(client.room_id));
+            if (match) setSelectedRoom(match);
+         }
+      });
+   }, [client?.room_id]);
 
    // Persist deposit-paid state across refresh per client
    const storageKey = client?.id ? `jrny_deposit_paid_${client.id}` : null;
@@ -205,7 +216,9 @@ export default function PaymentScreen() {
                               <img alt="The Victorian Premier" className="property-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA4V3fzGFxJRfHod-q3i610fpthD2Ue4VGIGDUje-iPYuVVdhTF9ISMA8pliiKaFrTiBcSdZR99tUouMkDjPEJq7AlRG5GL8uWblUgPopibMVKtg5K3ltNBt_-EWva5iLE2uCGEygHax40C2fDKHRddQUv_dQhbwQD_DLqLe1O952nifBIl5QaWyonzDRKBYcWu_wpXwgQ9Dug7wx2LCyLw5ewlbpMA0tqqKv4mVo6fuavy7TxWhwVlBDwZIsyg_L5joLScmveingP" />
                               <div>
                                  <h4 className="h6 mb-1 fw-bold">{unitLabel}</h4>
-                                 <p className="small text-muted mb-2">King Studio â$¢ East Wing</p>
+                                 <p className="small text-muted mb-2">
+                                    {selectedRoom?.floor ? `Floor ${selectedRoom.floor}` : ''}{selectedRoom?.unit_number ? ` • Unit ${selectedRoom.unit_number}` : ''}{selectedRoom?.size_sq_ft ? ` • ${selectedRoom.size_sq_ft} sq.ft` : ''}{selectedRoom?.status ? ` • ${selectedRoom.status}` : ''}
+                                 </p>
                                  <div className="d-flex align-items-center gap-1 text-primary-container">
                                     <span className="material-symbols-outlined fs-6">star</span>
                                     <span className="small fw-bold text-uppercase elite-tier-label">Elite Tier Residence</span>

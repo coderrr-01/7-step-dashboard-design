@@ -120,6 +120,12 @@ export async function getStepStatus() {
   return res.json();
 }
 
+// ─── ROOMS ───────────────────────────────────────────────────────────────────
+export async function getRooms() {
+  const res = await fetch(`${JRNY}/rooms`, { method: 'GET', credentials: 'include' });
+  return res.json();
+}
+
 // ─── APPLY FORM ──────────────────────────────────────────────────────────────
 export async function applyForm(data) {
   const res = await fetch(`${JRNY}/apply`, {
