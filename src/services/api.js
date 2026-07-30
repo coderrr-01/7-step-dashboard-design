@@ -35,6 +35,7 @@ export function logout() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(CLIENT_KEY);
   localStorage.removeItem(NONCE_KEY);
+  localStorage.removeItem('jrny_signed_lease');
 }
 
 // ─── BASE FETCH ───────────────────────────────────────────────────────────────

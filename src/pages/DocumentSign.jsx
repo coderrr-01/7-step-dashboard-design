@@ -14,14 +14,19 @@ export default function DocumentSign() {
    const [activeTab, setActiveTab]   = useState("type");
    const [verified, setVerified]     = useState(false);
    const [submitting, setSubmitting] = useState(false);
-   const [signedPdf, setSignedPdf]   = useState('');
+   const [signedPdf, setSignedPdf]   = useState(
+      () => localStorage.getItem('jrny_signed_lease') || ''
+   );
 
    const canvasRef = useRef(null);
    const drawing   = useRef(false);
    const hasSigned = useRef(false);
 
    useEffect(() => {
-      if (client?.signed_lease) setSignedPdf(client.signed_lease);
+      if (client?.signed_lease) {
+         setSignedPdf(client.signed_lease);
+         localStorage.setItem('jrny_signed_lease', client.signed_lease);
+      }
    }, [client?.signed_lease]);
 
    // ── Canvas setup ──────────────────────────────────────────────────────────
@@ -93,6 +98,7 @@ export default function DocumentSign() {
          const res = await signLease({ client_id: client.id, signature: canvasRef.current.toDataURL('image/png') });
          if (res.success) {
             setSignedPdf(res.signed_pdf);
+            localStorage.setItem('jrny_signed_lease', res.signed_pdf);
             completeStep(6);
             toast.success('Lease signed successfully!');
             await refetch();
