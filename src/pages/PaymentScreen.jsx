@@ -43,6 +43,14 @@ export default function PaymentScreen() {
       }
    }, [client?.deposit_paid, storageKey]);
 
+   const paymentMethods = [
+      { name: "Stripe",  icon: "credit_card"          },
+      { name: "PayPal",  icon: "account_balance_wallet" },
+      { name: "Revolut", icon: "currency_exchange"     },
+      { name: "Bank",    icon: "account_balance"       },
+      { name: "Cash",    icon: "payments"              },
+   ];
+
    const depositPaid = depositPaidNow || !!client?.deposit_paid;
 
    // After deposit paid: only show the method used + Cash (index 4)
@@ -66,15 +74,7 @@ export default function PaymentScreen() {
    const clientEmail = client?.email || 'vanes@global-exec.com';
    const startDate   = client?.start_date || 'September 01, 2024';
    const endDate     = client?.end_date   || 'August 31, 2025';
-   const unitLabel = selectedRoom?.name || client?.unit || client?.room_name || 'The Victorian Premier';
-
-   const paymentMethods = [
-      { name: "Stripe",  icon: "credit_card"          },
-      { name: "PayPal",  icon: "account_balance_wallet" },
-      { name: "Revolut", icon: "currency_exchange"     },
-      { name: "Bank",    icon: "account_balance"       },
-      { name: "Cash",    icon: "payments"              },
-   ];
+   const unitLabel   = selectedRoom?.name || client?.unit || client?.room_name || 'The Victorian Premier';
 
    const handleRentTabClick = () => {
       if (!depositPaid) {
