@@ -44,7 +44,7 @@ export default function PaymentScreen() {
    const clientEmail = client?.email || 'vanes@global-exec.com';
    const startDate   = client?.start_date || 'September 01, 2024';
    const endDate     = client?.end_date   || 'August 31, 2025';
-   const unitLabel   = client?.unit ? `Unit ${client.unit}` : 'The Victorian Premier';
+   const unitLabel   = client?.unit || client?.room_name || 'The Victorian Premier';
 
    const paymentMethods = [
       { name: "Stripe",  icon: "credit_card"          },

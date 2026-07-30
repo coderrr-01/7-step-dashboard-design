@@ -114,7 +114,7 @@ export default function DocumentSign() {
 
    // ── Derived values from Zoho CRM client ───────────────────────────────────
    const name          = client?.name          || '';
-   const unit          = client?.unit          ? `Unit ${client.unit}` : 'The Victorian Premier';
+   const unit          = client?.unit || client?.room_name || 'The Victorian Premier';
    const address       = client?.address       || 'Suite 422B';
    const effectiveDate = client?.effective_date || '';
    const extStatus     = client?.extension_status || '';
