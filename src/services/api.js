@@ -93,7 +93,7 @@ export async function refreshToken() {
 }
 
 // ─── NONCE ────────────────────────────────────────────────────────────────────
-async function getNonce() {
+export async function getNonce() {
   const cached = localStorage.getItem(NONCE_KEY);
   if (cached) return cached;
   const res  = await apiFetch(`${JRNY}/nonce`, { method: 'GET' });
@@ -172,6 +172,16 @@ export async function submitAchPayment({ type, amount, txn_id, account_number })
   const res   = await apiFetch(`${JRNY}/ach-payment`, {
     method: 'POST', headers: { 'X-WP-Nonce': nonce },
     body: JSON.stringify({ type, amount, txn_id, account_number }),
+  });
+  return res.json();
+}
+
+// ─── EXTENSION REQUEST ──────────────────────────────────────────────────────
+export async function requestLeaseExtension({ client_id, start_date, end_date, comment }) {
+  const nonce = await getNonce();
+  const res   = await apiFetch(`${JRNY}/extension-request`, {
+    method: 'POST', headers: { 'X-WP-Nonce': nonce },
+    body: JSON.stringify({ client_id, start_date, end_date, comment }),
   });
   return res.json();
 }
