@@ -234,3 +234,9 @@ export function getCachedClient() {
     return null;
   }
 }
+
+// ─── PAYMENT UI (iframe HTML from WP shortcodes) ─────────────────────────────
+export async function getPaymentUI(method, section) {
+  const res = await apiFetch(`${JRNY}/payment-ui?method=${encodeURIComponent(method)}&section=${encodeURIComponent(section)}`, { method: 'GET' });
+  return res.json();
+}

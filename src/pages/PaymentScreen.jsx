@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import BankDeposite from "../pages/Partial-element/BankDeposite";
 import { useClientData } from "../hooks/useClientData";
-import { submitStripePayment, submitPaypalPayment, submitRevolutPayment } from "../services/api";
+import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, getPaymentUI } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
@@ -12,6 +12,38 @@ export default function PaymentScreen() {
    const [activeStep, setActiveStep]       = useState("Security");
    const [activePayment, setActivePayment] = useState(0);
    const [submitting, setSubmitting]       = useState(false);
+   const [iframeHtml, setIframeHtml]       = useState({});
+   const [iframeLoading, setIframeLoading] = useState(false);
+
+   // Fetch payment UI HTML from WP for current method+section
+   const loadPaymentUI = async (method, section) => {
+      const key = `${method}_${section}`;
+      if (iframeHtml[key]) return; // already loaded
+      setIframeLoading(true);
+      try {
+         const res = await getPaymentUI(method, section);
+         if (res?.success) {
+            setIframeHtml(prev => ({ ...prev, [key]: res.html }));
+            // Sync deposit_paid from server
+            if (res.deposit_paid && !depositPaidNow) {
+               setDepositPaidNow(true);
+               setDepositMethod(paymentMethods.findIndex(m => m.name.toLowerCase() === method));
+               if (storageKey) localStorage.setItem(storageKey, '1');
+               if (storageMethodKey) localStorage.setItem(storageMethodKey, String(paymentMethods.findIndex(m => m.name.toLowerCase() === method)));
+            }
+         }
+      } catch {}
+      finally { setIframeLoading(false); }
+   };
+
+   const methodNames = ['stripe', 'paypal', 'revolut', 'bank', 'cash'];
+
+   // Load iframe when method or step changes
+   useEffect(() => {
+      const method = methodNames[activePayment];
+      if (!method || method === 'cash') return;
+      loadPaymentUI(method, activeStep === 'Rent' ? 'rent' : 'deposit');
+   }, [activePayment, activeStep]);
 
    // Read selected room from localStorage (saved by RoomSearch when user clicks View Room)
    const [selectedRoom] = useState(() => {
@@ -338,7 +370,7 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 <AmountInput />
+                                 <PaymentIframe method="stripe" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} />
                               </>
                            )}
 
@@ -351,7 +383,7 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 <AmountInput />
+                                 <PaymentIframe method="paypal" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} />
                               </>
                            )}
 
@@ -364,7 +396,7 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 <AmountInput />
+                                 <PaymentIframe method="revolut" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} />
                               </>
                            )}
 
@@ -377,26 +409,7 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 {activeStep === "Security" && (
-                                    <div className="mb-4">
-                                       <BankDeposite
-                                          rentTitle="Security Deposit"
-                                          client={client}
-                                          onPaid={() => {
-                                             setDepositPaidNow(true);
-                                             setDepositMethod(3);
-                                             if (storageKey)       localStorage.setItem(storageKey, '1');
-                                             if (storageMethodKey) localStorage.setItem(storageMethodKey, '3');
-                                             setActiveStep("Rent");
-                                          }}
-                                       />
-                                    </div>
-                                 )}
-                                 {activeStep === "Rent" && (
-                                    <div className="mb-4">
-                                       <BankDeposite rentTitle="Rent Deposit" client={client} />
-                                    </div>
-                                 )}
+                                 <PaymentIframe method="bank" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} />
                               </>
                            )}
 
@@ -422,28 +435,18 @@ export default function PaymentScreen() {
 
                         </div>
 
-                        {/* ── AUTHORIZE BUTTON (hidden for Bank — BankDeposite has its own submit) ── */}
-                        {activePayment !== 3 && (
+                        {/* ── AUTHORIZE BUTTON — hidden for iframe methods (button is inside iframe) ── */}
+                        {activePayment === 4 && (
                            <div className="pt-4 border-top">
                               {!depositPaid && activeStep === "Rent" ? (
-                                 <button
-                                    className="btn btn-secondary w-100 d-flex align-items-center justify-content-center gap-2 mb-3"
-                                    disabled
-                                 >
+                                 <button className="btn btn-secondary w-100 d-flex align-items-center justify-content-center gap-2 mb-3" disabled>
                                     <span className="material-symbols-outlined fs-5">lock</span>
                                     Pay Security Deposit First
                                  </button>
                               ) : (
-                                 <button
-                                    className="btn btn-primary-elite w-100 d-flex align-items-center justify-content-center gap-2 mb-3"
-                                    onClick={handleAuthorize}
-                                    disabled={submitting || activePayment === 4}
-                                 >
-                                    <span className="material-symbols-outlined fs-5">lock</span>
-                                    {submitting
-                                       ? 'Processing...'
-                                       : `Authorize ${activeStep === 'Rent' ? rentAmount : depositAmount} Payment`
-                                    }
+                                 <button className="btn btn-primary-elite w-100 d-flex align-items-center justify-content-center gap-2 mb-3" disabled>
+                                    <span className="material-symbols-outlined fs-5">payments</span>
+                                    Pay at Office — 211E 43rd Street
                                  </button>
                               )}
                               <p className="text-center text-uppercase fw-bold text-muted d-flex align-items-center justify-content-center gap-1 mb-0 security-note">
@@ -459,5 +462,36 @@ export default function PaymentScreen() {
             </div>
          </main>
       </PageLayout>
+   );
+}
+
+// ── PaymentIframe: renders WP shortcode HTML inside srcdoc iframe ──────────────
+function PaymentIframe({ method, section, iframeHtml, iframeLoading }) {
+   const key  = `${method}_${section}`;
+   const html = iframeHtml[key];
+
+   if (iframeLoading && !html) {
+      return (
+         <div className="mb-4 text-center py-4">
+            <div className="spinner-border spinner-border-sm text-secondary" role="status" />
+            <p className="small text-muted mt-2 mb-0">Loading payment form...</p>
+         </div>
+      );
+   }
+   if (!html) return null;
+
+   return (
+      <iframe
+         srcDoc={html}
+         style={{ width: '100%', minHeight: '220px', border: 'none', display: 'block' }}
+         scrolling="no"
+         title={`${method}-${section}-payment`}
+         onLoad={e => {
+            try {
+               const h = e.target.contentDocument?.body?.scrollHeight;
+               if (h) e.target.style.minHeight = h + 20 + 'px';
+            } catch {}
+         }}
+      />
    );
 }
