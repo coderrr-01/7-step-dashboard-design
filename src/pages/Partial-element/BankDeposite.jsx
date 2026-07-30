@@ -4,7 +4,7 @@ import { submitAchPayment } from "../../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../../context/StepContext";
 
-const SecurityDeposit = ({ rentTitle, client }) => {
+const SecurityDeposit = ({ rentTitle, client, onPaid }) => {
     const [depositeCard, setdepositeCard] = useState(false);
     const [submitting, setSubmitting]     = useState(false);
     const [txnId, setTxnId]               = useState('');
@@ -42,7 +42,8 @@ const SecurityDeposit = ({ rentTitle, client }) => {
 
             if (res.success) {
                 toast.success('Payment recorded! Pending verification.');
-                completeStep(7);
+                if (isDeposit && onPaid) onPaid();
+                else completeStep(7);
                 setSubmitted(true);
                 setdepositeCard(false);
             } else {

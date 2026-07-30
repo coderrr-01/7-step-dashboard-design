@@ -167,6 +167,38 @@ export async function signLease({ client_id, signature }) {
   return res.json();
 }
 
+// ─── STRIPE PAYMENT ──────────────────────────────────────────────────────────
+export async function submitStripePayment({ type, client_id, amount, txn_id }) {
+  const nonce = await getNonce();
+  const route = type === 'deposit' ? 'stripe-deposit' : 'stripe-rent';
+  const res   = await apiFetch(`${JRNY}/${route}`, {
+    method: 'POST', headers: { 'X-WP-Nonce': nonce },
+    body: JSON.stringify({ client_id, amount, txn_id }),
+  });
+  return res.json();
+}
+
+// ─── PAYPAL PAYMENT ───────────────────────────────────────────────────────────
+export async function submitPaypalPayment({ type, client_id, amount }) {
+  const nonce = await getNonce();
+  const route = type === 'deposit' ? 'paypal-deposit' : 'paypal-rent';
+  const res   = await apiFetch(`${JRNY}/${route}`, {
+    method: 'POST', headers: { 'X-WP-Nonce': nonce },
+    body: JSON.stringify({ client_id, amount }),
+  });
+  return res.json();
+}
+
+// ─── REVOLUT PAYMENT ──────────────────────────────────────────────────────────
+export async function submitRevolutPayment({ type, client_id, amount }) {
+  const nonce = await getNonce();
+  const res   = await apiFetch(`${JRNY}/revolut-payment`, {
+    method: 'POST', headers: { 'X-WP-Nonce': nonce },
+    body: JSON.stringify({ type, client_id, amount }),
+  });
+  return res.json();
+}
+
 // ─── ACH PAYMENT ─────────────────────────────────────────────────────────────
 export async function submitAchPayment({ type, amount, txn_id, account_number }) {
   const nonce = await getNonce();
