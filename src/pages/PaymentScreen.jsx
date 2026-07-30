@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import BankDeposite from "../pages/Partial-element/BankDeposite";
 import { useClientData } from "../hooks/useClientData";
-import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, getRooms } from "../services/api";
+import { submitStripePayment, submitPaypalPayment, submitRevolutPayment } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
@@ -12,17 +12,12 @@ export default function PaymentScreen() {
    const [activeStep, setActiveStep]       = useState("Security");
    const [activePayment, setActivePayment] = useState(0);
    const [submitting, setSubmitting]       = useState(false);
-   const [selectedRoom, setSelectedRoom]   = useState(null);
 
-   useEffect(() => {
-      if (!client?.room_id) return;
-      getRooms().then(res => {
-         if (res?.rooms) {
-            const match = res.rooms.find(r => String(r.id) === String(client.room_id));
-            if (match) setSelectedRoom(match);
-         }
-      });
-   }, [client?.room_id]);
+   // Read selected room from localStorage (saved by RoomSearch when user clicks View Room)
+   const [selectedRoom] = useState(() => {
+      try { return JSON.parse(localStorage.getItem('jrny_selected_room') || 'null'); }
+      catch { return null; }
+   });
 
    // Persist deposit-paid state across refresh per client
    const storageKey = client?.id ? `jrny_deposit_paid_${client.id}` : null;
@@ -41,21 +36,23 @@ export default function PaymentScreen() {
 
    const depositPaid = depositPaidNow || !!client?.deposit_paid;
 
-   const depositAmount = client?.security_deposit
-      ? `$ ${parseFloat(client.security_deposit).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
-      : '$ 1,800.00';
-   const rentAmount = client?.rent_amount
-      ? `$ ${parseFloat(client.rent_amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
-      : '$ 2,000.00';
-   const rawDeposit = client?.security_deposit ? parseFloat(client.security_deposit) : 1800;
-   const rawRent    = client?.rent_amount      ? parseFloat(client.rent_amount)      : 2000;
+   // Amounts: prefer selectedRoom from localStorage, fall back to client CRM data
+   const rawDeposit = selectedRoom?.security_deposit
+      ? parseFloat(selectedRoom.security_deposit)
+      : (client?.security_deposit ? parseFloat(client.security_deposit) : 1800);
+   const rawRent = selectedRoom?.monthly_rent
+      ? parseFloat(selectedRoom.monthly_rent)
+      : (client?.rent_amount ? parseFloat(client.rent_amount) : 2000);
+
+   const depositAmount = `$ ${rawDeposit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+   const rentAmount    = `$ ${rawRent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
    const clientName  = client?.name  || 'Julianne Vanes-Harding';
    const clientPhone = client?.phone || '+1 (212) 555-0198';
    const clientEmail = client?.email || 'vanes@global-exec.com';
    const startDate   = client?.start_date || 'September 01, 2024';
    const endDate     = client?.end_date   || 'August 31, 2025';
-   const unitLabel   = client?.unit || client?.room_name || 'The Victorian Premier';
+   const unitLabel = selectedRoom?.name || client?.unit || client?.room_name || 'The Victorian Premier';
 
    const paymentMethods = [
       { name: "Stripe",  icon: "credit_card"          },
