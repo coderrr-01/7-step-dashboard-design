@@ -20,6 +20,18 @@ else if (window.jrnyData?.token) saveToken(window.jrnyData.token);
 const _step = _params.get('step');
 const _initialEntry = _step ? '/' + _step : '/apply';
 
+// When running inside an iframe, ensure the viewport meta is set correctly
+// so CSS media queries fire based on the device width, not the iframe container
+(function ensureViewportMeta() {
+  let meta = document.querySelector('meta[name="viewport"]');
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.name = 'viewport';
+    document.head.appendChild(meta);
+  }
+  meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0';
+})();
+
 // Notify WP parent of route changes so it can update the browser URL
 function RouteReporter() {
   const { pathname } = useLocation();
