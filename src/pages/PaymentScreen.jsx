@@ -20,21 +20,35 @@ export default function PaymentScreen() {
    });
 
    // Persist deposit-paid state across refresh per client
-   const storageKey = client?.id ? `jrny_deposit_paid_${client.id}` : null;
+   const storageKey       = client?.id ? `jrny_deposit_paid_${client.id}` : null;
+   const storageMethodKey = client?.id ? `jrny_deposit_method_${client.id}` : null;
+
    const [depositPaidNow, setDepositPaidNow] = useState(() => {
       if (!storageKey) return false;
       return localStorage.getItem(storageKey) === '1';
    });
 
+   // Which payment index was used to pay the deposit (null = not paid yet)
+   const [depositMethod, setDepositMethod] = useState(() => {
+      if (!storageMethodKey) return null;
+      const v = localStorage.getItem(storageMethodKey);
+      return v !== null ? parseInt(v, 10) : null;
+   });
+
    // Sync from Zoho data once loaded
    useEffect(() => {
-      if (client?.deposit_paid) {
+      if (client?.deposit_paid && !depositPaidNow) {
          setDepositPaidNow(true);
          if (storageKey) localStorage.setItem(storageKey, '1');
       }
    }, [client?.deposit_paid, storageKey]);
 
    const depositPaid = depositPaidNow || !!client?.deposit_paid;
+
+   // After deposit paid: only show the method used + Cash (index 4)
+   const visibleMethods = depositPaid && depositMethod !== null
+      ? paymentMethods.filter((_, i) => i === depositMethod || i === 4)
+      : paymentMethods;
 
    // Amounts: prefer selectedRoom from localStorage, fall back to client CRM data
    const rawDeposit = selectedRoom?.security_deposit
@@ -71,13 +85,11 @@ export default function PaymentScreen() {
    };
 
    const handleAuthorize = async () => {
-      const type      = activeStep === 'Rent' ? 'rent' : 'deposit';
-      const amount    = type === 'deposit' ? rawDeposit : rawRent;
-      const clientId  = client?.id || '';
+      const type     = activeStep === 'Rent' ? 'rent' : 'deposit';
+      const amount   = type === 'deposit' ? rawDeposit : rawRent;
+      const clientId = client?.id || '';
 
-      // Bank method handled by BankDeposite component — no action here
       if (activePayment === 3) return;
-      // Cash method — no online action
       if (activePayment === 4) {
          toast.info('Please visit our office at 211E 43rd Street to pay in cash.');
          return;
@@ -103,7 +115,9 @@ export default function PaymentScreen() {
             if (type === 'deposit') {
                toast.success('Security deposit recorded! Pending verification.');
                setDepositPaidNow(true);
-               if (storageKey) localStorage.setItem(storageKey, '1');
+               setDepositMethod(activePayment);
+               if (storageKey)       localStorage.setItem(storageKey, '1');
+               if (storageMethodKey) localStorage.setItem(storageMethodKey, String(activePayment));
                setActiveStep("Rent");
             } else {
                toast.success('Rent payment recorded! Pending verification.');
@@ -297,17 +311,20 @@ export default function PaymentScreen() {
                      <div className="checkout-card p-4">
                         <h3 className="h4 mb-4">Choose Payment Method</h3>
                         <div className="row g-3 mb-4">
-                           {paymentMethods.map((item, index) => (
-                              <div className="col" key={item.name}>
-                                 <button
-                                    className={`payment-tile w-100 h-100 ${activePayment === index ? "active" : ""}`}
-                                    onClick={() => setActivePayment(index)}
-                                 >
-                                    <span className="material-symbols-outlined">{item.icon}</span>
-                                    <span className="small fw-bold">{item.name}</span>
-                                 </button>
-                              </div>
-                           ))}
+                           {visibleMethods.map((item) => {
+                              const index = paymentMethods.findIndex(m => m.name === item.name);
+                              return (
+                                 <div className="col" key={item.name}>
+                                    <button
+                                       className={`payment-tile w-100 h-100 ${activePayment === index ? "active" : ""}`}
+                                       onClick={() => setActivePayment(index)}
+                                    >
+                                       <span className="material-symbols-outlined">{item.icon}</span>
+                                       <span className="small fw-bold">{item.name}</span>
+                                    </button>
+                                 </div>
+                              );
+                           })}
                         </div>
 
                         <div className="payment-method-details">
@@ -367,7 +384,9 @@ export default function PaymentScreen() {
                                           client={client}
                                           onPaid={() => {
                                              setDepositPaidNow(true);
-                                             if (storageKey) localStorage.setItem(storageKey, '1');
+                                             setDepositMethod(3);
+                                             if (storageKey)       localStorage.setItem(storageKey, '1');
+                                             if (storageMethodKey) localStorage.setItem(storageMethodKey, '3');
                                              setActiveStep("Rent");
                                           }}
                                        />
