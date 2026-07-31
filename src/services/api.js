@@ -32,21 +32,10 @@ export function isLoggedIn() {
 }
 
 export function logout() {
-  // Also clear the user-scoped steps key before removing the token.
-  try {
-    const token = getToken();
-    if (token) {
-      const payload = JSON.parse(
-        atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
-      );
-      if (payload.sub) localStorage.removeItem(`jrny_completed_steps_${payload.sub}`);
-    }
-  } catch {}
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(CLIENT_KEY);
-  localStorage.removeItem(NONCE_KEY);
-  localStorage.removeItem('jrny_signed_lease');
-  localStorage.removeItem('jrny_completed_steps');
+  // Clear every jrny key from localStorage
+  Object.keys(localStorage)
+    .filter(k => k.startsWith('jrny_'))
+    .forEach(k => localStorage.removeItem(k));
 }
 
 // ─── BASE FETCH ───────────────────────────────────────────────────────────────

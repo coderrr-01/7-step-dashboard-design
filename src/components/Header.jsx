@@ -10,13 +10,13 @@ export default function Header({ activeLabel }) {
    const ref = useRef(null);
 
    function handleLogout() {
+      // Clear all jrny_ keys
       logout();
       const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
-      // Always postMessage to parent (handles iframe case)
+      // postMessage to WP parent page (iframe case) — parent does the full-page redirect
       window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
-      // Also redirect current window — if in iframe this changes iframe src,
-      // if standalone (no parent) this navigates the full page
-      window.location.href = loginUrl;
+      // Direct redirect — works when running standalone (not in iframe)
+      window.location.replace(loginUrl);
    }
 
    useEffect(() => {

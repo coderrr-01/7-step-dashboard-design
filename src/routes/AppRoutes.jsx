@@ -14,11 +14,8 @@ import { isLoggedIn } from "../services/api";
 function RequireAuth({ children }) {
   if (!isLoggedIn()) {
     const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
-    if (window.parent !== window) {
-      window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
-      return null;
-    }
-    window.location.href = loginUrl;
+    window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
+    window.location.replace(loginUrl);
     return null;
   }
   return children;
