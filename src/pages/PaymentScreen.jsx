@@ -99,10 +99,10 @@ export default function PaymentScreen() {
    // Amounts: prefer selectedRoom from localStorage, fall back to client CRM data
    const rawDeposit = selectedRoom?.security_deposit
       ? parseFloat(selectedRoom.security_deposit)
-      : (client?.security_deposit ? parseFloat(client.security_deposit) : 1800);
+      : (client?.security_deposit ? parseFloat(client.security_deposit) : '');
    const rawRent = selectedRoom?.monthly_rent
       ? parseFloat(selectedRoom.monthly_rent)
-      : (client?.rent_amount ? parseFloat(client.rent_amount) : 2000);
+      : (client?.rent_amount ? parseFloat(client.rent_amount) : '');
 
    const depositAmount = `$ ${rawDeposit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
    const rentAmount    = `$ ${rawRent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
