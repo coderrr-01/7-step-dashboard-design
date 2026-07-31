@@ -11,8 +11,11 @@ import { logout } from "../services/api";
 
 function handleLogout() {
    logout();
-   localStorage.removeItem('jrny_completed_steps');
-   window.location.href = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
+   // Navigate the top-level WP page (parent of the iframe) to the login URL.
+   // Using window.location would only navigate the iframe, leaving the parent
+   // WP page intact and causing the login redirect to land inside the iframe.
+   const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
+   (window.parent !== window ? window.parent : window).location.href = loginUrl;
 }
 
 export default function Header({ activeLabel }) {
