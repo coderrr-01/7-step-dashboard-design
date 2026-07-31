@@ -10,7 +10,9 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { StepProvider } from "./context/StepContext";
 import { saveToken } from "./services/api";
 
-// Auto-login: read JWT from ?token param (WP iframe) or window.jrnyData
+// Auto-login: read JWT from ?token param (WP iframe) or window.jrnyData.
+// This MUST run before StepProvider mounts so stepsKey() finds the token
+// and reads the correct user-scoped localStorage key on first render.
 const _params = new URLSearchParams(window.location.search);
 const _urlToken = _params.get('token');
 if (_urlToken) saveToken(_urlToken);

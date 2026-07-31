@@ -29,8 +29,16 @@ function stepsKey() {
 }
 
 function getInitialCompleted() {
+  const key = stepsKey();
+
+  // If we have a user-scoped key, clear the legacy global key so it can
+  // never be read by a different user who falls back to the generic name.
+  if (key !== 'jrny_completed_steps') {
+    localStorage.removeItem('jrny_completed_steps');
+  }
+
   try {
-    const saved = localStorage.getItem(stepsKey());
+    const saved = localStorage.getItem(key);
     if (saved) return JSON.parse(saved);
   } catch {}
 

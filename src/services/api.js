@@ -32,12 +32,7 @@ export function isLoggedIn() {
 }
 
 export function logout() {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(CLIENT_KEY);
-  localStorage.removeItem(NONCE_KEY);
-  localStorage.removeItem('jrny_signed_lease');
-  // Remove the user-scoped steps key before the token is gone.
-  // We derive the key here the same way StepContext does.
+  // Derive and clear the user-scoped steps key BEFORE removing the token.
   try {
     const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
@@ -47,6 +42,12 @@ export function logout() {
       if (payload.sub) localStorage.removeItem(`jrny_completed_steps_${payload.sub}`);
     }
   } catch {}
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(CLIENT_KEY);
+  localStorage.removeItem(NONCE_KEY);
+  localStorage.removeItem('jrny_signed_lease');
+  // Also clear the legacy global key so a fresh user never inherits old state.
+  localStorage.removeItem('jrny_completed_steps');
 }
 
 // ─── BASE FETCH ───────────────────────────────────────────────────────────────
