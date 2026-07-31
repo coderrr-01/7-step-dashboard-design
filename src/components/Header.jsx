@@ -1,39 +1,30 @@
 import Navbar from "./Navbar";
-import { IoNotificationsCircleOutline } from "react-icons/io5";
-import { FaRegUser } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
 import logo from "../assets/images/jrny-logo.png";
 import { IoLogOut } from "react-icons/io5";
-import { FaFileCircleCheck } from "react-icons/fa6";
-import { FaSackDollar } from "react-icons/fa6";
-import { MdOutlineAddIcCall } from "react-icons/md";
 import { logout } from "../services/api";
-
-function handleLogout() {
-   logout();
-   const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
-   // Cross-origin iframe: use postMessage so the WP parent page does the redirect.
-   // Direct window.parent.location.href throws a security error across origins.
-   if (window.parent !== window) {
-      window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
-   } else {
-      window.location.href = loginUrl;
-   }
-}
 
 export default function Header({ activeLabel }) {
    const [open, setOpen] = useState(false);
    const [dropdown, setdropdown] = useState(false);
    const ref = useRef(null);
 
-   // close when click outside
+   function handleLogout() {
+      logout();
+      const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
+      if (window.parent !== window) {
+         window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
+      } else {
+         window.location.href = loginUrl;
+      }
+   }
+
    useEffect(() => {
       const handleClickOutside = (event) => {
          if (ref.current && !ref.current.contains(event.target)) {
             setdropdown(false);
          }
       };
-
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
    }, []);
@@ -73,7 +64,12 @@ export default function Header({ activeLabel }) {
                      </div>
                      <div className={`profile-dropdown ${dropdown ? "active" : ""}`}>
                         <ul>
-                           <li className="logout" onClick={handleLogout}><span><IoLogOut /></span> Logout</li>
+                           <li
+                              className="logout"
+                              onMouseDown={(e) => { e.stopPropagation(); handleLogout(); }}
+                           >
+                              <span><IoLogOut /></span> Logout
+                           </li>
                         </ul>
                      </div>
                   </div>
