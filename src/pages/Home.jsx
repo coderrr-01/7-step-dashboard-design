@@ -18,7 +18,7 @@ function getEmailFromToken() {
 
 export default function Home() {
   const navigate = useNavigate();
-  const { completeStep, completedSteps } = useSteps();
+  const { completeStep, completedSteps, clientLoading } = useSteps();
 
   const alreadySubmitted = completedSteps.includes(1);
 
@@ -90,6 +90,10 @@ export default function Home() {
       setSubmitting(false);
     }
   };
+
+  // Wait for async client-data fetch before deciding which screen to show.
+  // This prevents a flash of the empty form for users who already submitted.
+  if (clientLoading) return null;
 
   // Already submitted — show read-only summary, no form
   if (alreadySubmitted) {

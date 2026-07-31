@@ -84,16 +84,19 @@ function getInitialCompleted() {
 
 export function StepProvider({ children }) {
   const [completedSteps, setCompletedSteps] = useState(getInitialCompleted);
+  // True only during the async client-data fetch on redirect login.
+  // Prevents pages from rendering stale empty state before the fetch resolves.
+  const [clientLoading, setClientLoading] = useState(
+    () => !!(getToken() && !getCachedClient())
+  );
 
-  // If a token exists but no client_data is cached (e.g. after a WP redirect
-  // login where only the token URL param was saved), fetch client data from
-  // the backend and re-derive completed steps so returning users see the
-  // correct state without having to submit again.
   useEffect(() => {
     if (getToken() && !getCachedClient()) {
       getClientData().then(() => {
         setCompletedSteps(getInitialCompleted());
-      }).catch(() => {});
+      }).catch(() => {}).finally(() => {
+        setClientLoading(false);
+      });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -123,7 +126,7 @@ export function StepProvider({ children }) {
   })();
 
   return (
-    <StepContext.Provider value={{ completedSteps, completeStep, canAccessStep, currentStep }}>
+    <StepContext.Provider value={{ completedSteps, completeStep, canAccessStep, currentStep, clientLoading }}>
       {children}
     </StepContext.Provider>
   );
