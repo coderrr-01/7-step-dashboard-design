@@ -96,13 +96,13 @@ export default function PaymentScreen() {
       ? paymentMethods.filter((_, i) => i === depositMethod || i === 4)
       : paymentMethods;
 
-   // Amounts: prefer selectedRoom from localStorage, fall back to client CRM data
-   const rawDeposit = selectedRoom?.security_deposit
-      ? parseFloat(selectedRoom.security_deposit)
-      : (client?.security_deposit ? parseFloat(client.security_deposit) : '');
-   const rawRent = selectedRoom?.monthly_rent
-      ? parseFloat(selectedRoom.monthly_rent)
-      : (client?.rent_amount ? parseFloat(client.rent_amount) : '');
+   // Pricing source of truth: client (Zoho via API). selectedRoom used only if client has no assignment.
+   const rawDeposit = client?.security_deposit
+      ? parseFloat(client.security_deposit)
+      : (selectedRoom?.security_deposit ? parseFloat(selectedRoom.security_deposit) : 0);
+   const rawRent = client?.rent_amount
+      ? parseFloat(client.rent_amount)
+      : (selectedRoom?.monthly_rent ? parseFloat(selectedRoom.monthly_rent) : 0);
 
    const depositAmount = `$ ${rawDeposit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
    const rentAmount    = `$ ${rawRent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;

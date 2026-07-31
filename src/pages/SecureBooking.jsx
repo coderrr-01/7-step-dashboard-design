@@ -67,7 +67,7 @@ export default function SecureBooking() {
 
    // Dynamic labels — same pattern as Interview
    const unitLabel = client ? (client.unit ? `Unit ${client.unit}` : roomName) : roomName;
-   const rentLabel = client && client.rent_amount ? `$${client.rent_amount}/mo` : (selectedRoom?.monthly_rent ? `$${selectedRoom.monthly_rent}/mo` : '$4,850/mo');
+   const rentLabel = client?.rent_amount ? `$${Number(client.rent_amount).toLocaleString()}/mo` : (selectedRoom?.monthly_rent ? `$${Number(selectedRoom.monthly_rent).toLocaleString()}/mo` : '');
 
    return (
       <PageLayout page="SecureBooking">
