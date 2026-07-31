@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getCachedClient } from '../services/api';
+import { getCachedClient, getToken } from '../services/api';
 
 export const STEP_PATHS = {
   1: '/apply',
@@ -13,9 +13,24 @@ export const STEP_PATHS = {
 
 const StepContext = createContext(null);
 
+// Returns a user-scoped localStorage key so different accounts never share state.
+function stepsKey() {
+  try {
+    const token = getToken();
+    if (token) {
+      const payload = JSON.parse(
+        atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
+      );
+      // Use WordPress user ID (sub) as the unique identifier.
+      if (payload.sub) return `jrny_completed_steps_${payload.sub}`;
+    }
+  } catch {}
+  return 'jrny_completed_steps';
+}
+
 function getInitialCompleted() {
   try {
-    const saved = localStorage.getItem('jrny_completed_steps');
+    const saved = localStorage.getItem(stepsKey());
     if (saved) return JSON.parse(saved);
   } catch {}
 
@@ -54,7 +69,7 @@ export function StepProvider({ children }) {
   const [completedSteps, setCompletedSteps] = useState(getInitialCompleted);
 
   useEffect(() => {
-    localStorage.setItem('jrny_completed_steps', JSON.stringify(completedSteps));
+    localStorage.setItem(stepsKey(), JSON.stringify(completedSteps));
   }, [completedSteps]);
 
   const completeStep = (stepNumber) => {

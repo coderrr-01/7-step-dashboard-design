@@ -36,6 +36,17 @@ export function logout() {
   localStorage.removeItem(CLIENT_KEY);
   localStorage.removeItem(NONCE_KEY);
   localStorage.removeItem('jrny_signed_lease');
+  // Remove the user-scoped steps key before the token is gone.
+  // We derive the key here the same way StepContext does.
+  try {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token) {
+      const payload = JSON.parse(
+        atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
+      );
+      if (payload.sub) localStorage.removeItem(`jrny_completed_steps_${payload.sub}`);
+    }
+  } catch {}
 }
 
 // ─── BASE FETCH ───────────────────────────────────────────────────────────────
