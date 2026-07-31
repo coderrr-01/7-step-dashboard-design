@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import { useNavigate } from "react-router-dom";
 import { useSteps } from "../context/StepContext";
@@ -28,16 +28,33 @@ export default function Home() {
 
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    name:              cached?.name  || "",
+    name:              cached?.name              || "",
     email:             cachedEmail,
-    phone:             cached?.phone || "",
-    date_of_birth:     "",
-    current_address:   "",
-    employment_status: "",
-    monthly_income:    "",
-    move_in_date:      "",
-    message:           "",
+    phone:             cached?.phone             || "",
+    date_of_birth:     cached?.date_of_birth     || "",
+    current_address:   cached?.current_address   || "",
+    employment_status: cached?.employment_status || "",
+    monthly_income:    cached?.monthly_income    != null ? String(cached.monthly_income) : "",
+    move_in_date:      cached?.move_in_date      || "",
+    message:           cached?.message           || "",
   });
+
+  // Re-populate form if client data loads asynchronously (e.g. after WP redirect login)
+  useEffect(() => {
+    const client = getCachedClient();
+    if (!client) return;
+    setForm(prev => ({
+      name:              prev.name              || client.name              || "",
+      email:             prev.email             || client.email             || "",
+      phone:             prev.phone             || client.phone             || "",
+      date_of_birth:     prev.date_of_birth     || client.date_of_birth     || "",
+      current_address:   prev.current_address   || client.current_address   || "",
+      employment_status: prev.employment_status || client.employment_status || "",
+      monthly_income:    prev.monthly_income    || (client.monthly_income != null ? String(client.monthly_income) : ""),
+      move_in_date:      prev.move_in_date      || client.move_in_date      || "",
+      message:           prev.message           || client.message           || "",
+    }));
+  }, [completedSteps]);
 
   const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
