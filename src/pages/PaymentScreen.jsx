@@ -327,9 +327,9 @@ export default function PaymentScreen() {
                            <p className="mb-0">211 E 43rd Street, New York, NY 10029</p>
                            <p className="mb-0">Tel: <a className="text-primary-container fw-bold text-decoration-none" href="tel:+12125550198">+1 (212) 555-0198</a></p>
                         </div>
-                        <a className="text-primary-container fw-bold small text-decoration-none d-flex align-items-center justify-content-center gap-2 mb-3" href="#">
+                        <a className="text-primary-container fw-bold small text-decoration-none d-flex align-items-center justify-content-center gap-2 mb-3" href="https://journeyrealty.com/contact/" target="_blank" rel="noopener noreferrer">
                            <span className="material-symbols-outlined fs-6">chat_bubble</span>
-                           Customer Support (Live Chat)
+                           Customer Support {/* (Live Chat) */}
                         </a>
                         <div className="d-flex justify-content-center gap-3 opacity-50 payment-card-logos">
                            <img alt="Visa" height="12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPBiq8s9weYMoMJqD4SjmtqC4Iur2tqb0B_FbHTULec7qf7uKPoEokFiY9hJa33S6nikb8NoUteiKRyw2LzELTcGfyb8AjmVUsC6HQWPDfb6PRej6t5HfhS-IIW2OsOmUndOnz0ny5YhtsBlavxM8aEg_G9RM_9ozx64MI8ltQT0bXcuAAQD1lSc_XA5lsDBsfrGuCecDlfTCdnID42y5uPJpxb5Hf-zqjpntB0OsxodEsgCL_aowdAAad8KMasECFyRAke4ZJTgkm" />
