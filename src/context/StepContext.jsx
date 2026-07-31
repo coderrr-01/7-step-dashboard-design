@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getCachedClient, getToken } from '../services/api';
+import { getCachedClient, getClientData, getToken } from '../services/api';
 
 export const STEP_PATHS = {
   1: '/apply',
@@ -84,6 +84,19 @@ function getInitialCompleted() {
 
 export function StepProvider({ children }) {
   const [completedSteps, setCompletedSteps] = useState(getInitialCompleted);
+
+  // If a token exists but no client_data is cached (e.g. after a WP redirect
+  // login where only the token URL param was saved), fetch client data from
+  // the backend and re-derive completed steps so returning users see the
+  // correct state without having to submit again.
+  useEffect(() => {
+    if (getToken() && !getCachedClient()) {
+      getClientData().then(() => {
+        setCompletedSteps(getInitialCompleted());
+      }).catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(stepsKey(), JSON.stringify(completedSteps));
