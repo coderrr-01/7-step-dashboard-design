@@ -91,12 +91,17 @@ export function StepProvider({ children }) {
   );
 
   useEffect(() => {
-    if (getToken() && !getCachedClient()) {
+    if (!getToken()) return;
+    if (!getCachedClient()) {
+      // No client cache: fetch and update steps (also clears clientLoading).
       getClientData().then(() => {
         setCompletedSteps(getInitialCompleted());
       }).catch(() => {}).finally(() => {
         setClientLoading(false);
       });
+    } else {
+      // Client cache exists but may be stale — refresh silently in background.
+      getClientData().catch(() => {});
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
