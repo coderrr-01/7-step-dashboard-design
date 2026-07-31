@@ -11,11 +11,14 @@ import { logout } from "../services/api";
 
 function handleLogout() {
    logout();
-   // Navigate the top-level WP page (parent of the iframe) to the login URL.
-   // Using window.location would only navigate the iframe, leaving the parent
-   // WP page intact and causing the login redirect to land inside the iframe.
    const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
-   (window.parent !== window ? window.parent : window).location.href = loginUrl;
+   // Cross-origin iframe: use postMessage so the WP parent page does the redirect.
+   // Direct window.parent.location.href throws a security error across origins.
+   if (window.parent !== window) {
+      window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
+   } else {
+      window.location.href = loginUrl;
+   }
 }
 
 export default function Header({ activeLabel }) {
