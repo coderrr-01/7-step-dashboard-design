@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { getClientData, getUserSub, getToken } from '../services/api';
 
 export const STEP_PATHS = {
   1: '/apply',
@@ -12,9 +13,48 @@ export const STEP_PATHS = {
 
 const StepContext = createContext(null);
 
+// User-scoped key — different users never share step state
+function stepsKey() {
+  const sub = getUserSub();
+  return sub ? `jrny_completed_steps_${sub}` : 'jrny_completed_steps';
+}
+
+// Derive completed steps from WP client data
+function deriveStepsFromClient(client) {
+  if (!client) return null;
+  const steps = [];
+  const leaseStatus   = client.lease_status   || '';
+  const paymentStatus = client.payment_status || '';
+  const signedLease   = client.signed_lease   || '';
+
+  const hasSubmitted = !!leaseStatus || !!client.email;
+  if (hasSubmitted) steps.push(1, 2, 3);
+
+  const map = {
+    'Interview Scheduled': 4,
+    'Booking Secured':     5,
+    'Signed':              6,
+    'Extended':            6,
+    'Payment Complete':    7,
+  };
+
+  for (const [status, step] of Object.entries(map)) {
+    if (leaseStatus === status || leaseStatus.includes(status)) {
+      for (let i = 4; i <= step; i++) steps.push(i);
+      break;
+    }
+  }
+  if (signedLease && !steps.includes(6)) steps.push(6);
+  if (['Pending for Verification', 'Paid', 'completed'].includes(paymentStatus) && !steps.includes(7)) {
+    steps.push(7);
+  }
+  return [...new Set(steps)].sort((a, b) => a - b);
+}
+
+// Instant read from user-scoped localStorage key
 function getInitialCompleted() {
   try {
-    const saved = localStorage.getItem('jrny_completed_steps');
+    const saved = localStorage.getItem(stepsKey());
     if (saved) return JSON.parse(saved);
   } catch {}
   return [];
@@ -23,9 +63,29 @@ function getInitialCompleted() {
 export function StepProvider({ children }) {
   const [completedSteps, setCompletedSteps] = useState(getInitialCompleted);
 
+  // Persist to user-scoped key whenever steps change
   useEffect(() => {
-    localStorage.setItem('jrny_completed_steps', JSON.stringify(completedSteps));
+    localStorage.setItem(stepsKey(), JSON.stringify(completedSteps));
   }, [completedSteps]);
+
+  // Background fetch from WP on mount — syncs steps with server state
+  useEffect(() => {
+    if (!getToken()) return;
+    getClientData()
+      .then(data => {
+        if (!data?.success) return;
+        const serverSteps = deriveStepsFromClient(data.data);
+        if (!serverSteps) return;
+        // Merge: keep any locally completed steps + add server steps
+        setCompletedSteps(prev => {
+          const merged = [...new Set([...prev, ...serverSteps])].sort((a, b) => a - b);
+          // Only update if different to avoid unnecessary re-renders
+          return JSON.stringify(merged) !== JSON.stringify(prev) ? merged : prev;
+        });
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const completeStep = (stepNumber) => {
     setCompletedSteps(prev =>

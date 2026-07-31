@@ -31,10 +31,25 @@ export function isLoggedIn() {
   }
 }
 
+// ─── USER SUB ─────────────────────────────────────────────────────────────────
+export function getUserSub() {
+  try {
+    const token = getToken();
+    if (!token) return null;
+    const payload = JSON.parse(
+      atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
+    );
+    return payload.sub ? String(payload.sub) : null;
+  } catch { return null; }
+}
+
 export function logout() {
-  // Clear every jrny key from localStorage
+  // Clear all jrny_ keys EXCEPT the user-scoped steps key so
+  // the same user gets their progress back instantly on next login.
+  const sub = getUserSub();
+  const keepKey = sub ? `jrny_completed_steps_${sub}` : null;
   Object.keys(localStorage)
-    .filter(k => k.startsWith('jrny_'))
+    .filter(k => k.startsWith('jrny_') && k !== keepKey)
     .forEach(k => localStorage.removeItem(k));
 }
 
