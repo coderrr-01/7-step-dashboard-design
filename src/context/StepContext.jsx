@@ -42,14 +42,23 @@ function getInitialCompleted() {
     if (saved) return JSON.parse(saved);
   } catch {}
 
-  // Bootstrap from cached Zoho client
+  // Bootstrap from cached Zoho client — derive only what the server confirms.
+  // A brand-new user with no record starts with NO completed steps.
   const client = getCachedClient();
-  if (!client) return [1];
+  if (!client) return [];
 
-  const steps = [1, 2, 3];
+  const steps = [];
   const leaseStatus   = client.lease_status   || '';
   const paymentStatus = client.payment_status || '';
   const signedLease   = client.signed_lease   || '';
+
+  // Step 1 (Apply) is only complete when the backend has an actual record.
+  // Any non-empty lease_status means the application was submitted.
+  const hasSubmitted = !!leaseStatus || !!client.email;
+  if (hasSubmitted) steps.push(1);
+
+  // Steps 2 and 3 (Review, Room Search) are unlocked once application exists.
+  if (hasSubmitted) steps.push(2, 3);
 
   const map = {
     'Interview Scheduled': 4,
