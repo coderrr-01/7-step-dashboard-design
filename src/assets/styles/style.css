@@ -2808,15 +2808,13 @@ body.page-room-search .page-description {
     display: flex;
     align-items: center;
     height: 56px;
-    background: #000;
     position: relative;
     white-space: nowrap;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-background: linear-gradient(to right, #000 0%, #000 75%, #ffd229 90%, #ffd229 100%);
-    /* Firefox */
+    background: linear-gradient(to right, #000 0% 93%, #ffd229 90% 100%);
     scrollbar-width: thin;
-        scrollbar-color: #b9934c #ffffff;
+    scrollbar-color: #b9934c #ffffff;
 }
 .stepper-container::-webkit-scrollbar {
     height: 4px;
