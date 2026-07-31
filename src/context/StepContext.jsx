@@ -21,18 +21,24 @@ function stepsKey() {
       const payload = JSON.parse(
         atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
       );
-      // Use WordPress user ID (sub) as the unique identifier.
       if (payload.sub) return `jrny_completed_steps_${payload.sub}`;
     }
   } catch {}
   return 'jrny_completed_steps';
 }
 
+// Decode JWT payload — returns null on any error.
+function getJwtPayload() {
+  try {
+    const token = getToken();
+    if (!token) return null;
+    return JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+  } catch { return null; }
+}
+
 function getInitialCompleted() {
   const key = stepsKey();
 
-  // If we have a user-scoped key, clear the legacy global key so it can
-  // never be read by a different user who falls back to the generic name.
   if (key !== 'jrny_completed_steps') {
     localStorage.removeItem('jrny_completed_steps');
   }
@@ -42,8 +48,13 @@ function getInitialCompleted() {
     if (saved) return JSON.parse(saved);
   } catch {}
 
-  // Bootstrap from cached Zoho client — derive only what the server confirms.
-  // A brand-new user with no record starts with NO completed steps.
+  // Fast path: JWT payload contains `applied` flag set by WordPress on form submit.
+  // This is synchronous — no async fetch needed — so the correct screen shows
+  // immediately on every page load including after logout/login.
+  const jwt = getJwtPayload();
+  if (jwt?.applied) return [1, 2, 3];
+
+  // Fallback: derive from cached Zoho client data if available.
   const client = getCachedClient();
   if (!client) return [];
 
@@ -52,12 +63,8 @@ function getInitialCompleted() {
   const paymentStatus = client.payment_status || '';
   const signedLease   = client.signed_lease   || '';
 
-  // Step 1 (Apply) is only complete when the backend has an actual record.
-  // Any non-empty lease_status means the application was submitted.
   const hasSubmitted = !!leaseStatus || !!client.email;
   if (hasSubmitted) steps.push(1);
-
-  // Steps 2 and 3 (Review, Room Search) are unlocked once application exists.
   if (hasSubmitted) steps.push(2, 3);
 
   const map = {
@@ -84,16 +91,24 @@ function getInitialCompleted() {
 
 export function StepProvider({ children }) {
   const [completedSteps, setCompletedSteps] = useState(getInitialCompleted);
-  const [clientLoading, setClientLoading] = useState(() => !!getToken());
+  // Only block rendering when we have a token but no fast-path answer from the JWT.
+  // If jwt.applied is set we already know the answer synchronously.
+  const [clientLoading, setClientLoading] = useState(() => {
+    if (!getToken()) return false;
+    const jwt = getJwtPayload();
+    // If JWT says applied, we know immediately — no need to block.
+    if (jwt?.applied) return false;
+    // Otherwise block until the async fetch confirms the state.
+    return true;
+  });
 
   useEffect(() => {
     if (!getToken()) {
       setClientLoading(false);
       return;
     }
-    // Always fetch fresh client data on mount and re-derive steps from it.
-    // This is the single source of truth — localStorage is only a fast-path
-    // initial value that gets corrected here on every load.
+    // Always fetch fresh client data in background to keep cache current.
+    // Only update completedSteps from the result when we were blocking (loading).
     getClientData().then(() => {
       setCompletedSteps(getInitialCompleted());
     }).catch(() => {}).finally(() => {
