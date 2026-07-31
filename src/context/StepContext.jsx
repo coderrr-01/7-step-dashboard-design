@@ -84,25 +84,21 @@ function getInitialCompleted() {
 
 export function StepProvider({ children }) {
   const [completedSteps, setCompletedSteps] = useState(getInitialCompleted);
-  // True only during the async client-data fetch on redirect login.
-  // Prevents pages from rendering stale empty state before the fetch resolves.
-  const [clientLoading, setClientLoading] = useState(
-    () => !!(getToken() && !getCachedClient())
-  );
+  const [clientLoading, setClientLoading] = useState(() => !!getToken());
 
   useEffect(() => {
-    if (!getToken()) return;
-    if (!getCachedClient()) {
-      // No client cache: fetch and update steps (also clears clientLoading).
-      getClientData().then(() => {
-        setCompletedSteps(getInitialCompleted());
-      }).catch(() => {}).finally(() => {
-        setClientLoading(false);
-      });
-    } else {
-      // Client cache exists but may be stale — refresh silently in background.
-      getClientData().catch(() => {});
+    if (!getToken()) {
+      setClientLoading(false);
+      return;
     }
+    // Always fetch fresh client data on mount and re-derive steps from it.
+    // This is the single source of truth — localStorage is only a fast-path
+    // initial value that gets corrected here on every load.
+    getClientData().then(() => {
+      setCompletedSteps(getInitialCompleted());
+    }).catch(() => {}).finally(() => {
+      setClientLoading(false);
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
