@@ -92,8 +92,15 @@ export default function Home() {
   };
 
   // Wait for async client-data fetch before deciding which screen to show.
-  // This prevents a flash of the empty form for users who already submitted.
-  if (clientLoading) return null;
+  // Return a blank content area (inside PageLayout so header/logout still render)
+  // to prevent a flash of the form for users who already submitted.
+  if (clientLoading) {
+    return (
+      <PageLayout page="Home">
+        <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 bg-field" />
+      </PageLayout>
+    );
+  }
 
   // Already submitted — show read-only summary, no form
   if (alreadySubmitted) {
