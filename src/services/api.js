@@ -32,9 +32,16 @@ export function isLoggedIn() {
 }
 
 export function logout() {
-  // Keep the user-scoped steps key (jrny_completed_steps_${sub}) intentionally.
-  // On re-login the same user gets their step progress back immediately from
-  // localStorage without waiting for an async fetch.
+  // Also clear the user-scoped steps key before removing the token.
+  try {
+    const token = getToken();
+    if (token) {
+      const payload = JSON.parse(
+        atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
+      );
+      if (payload.sub) localStorage.removeItem(`jrny_completed_steps_${payload.sub}`);
+    }
+  } catch {}
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(CLIENT_KEY);
   localStorage.removeItem(NONCE_KEY);
@@ -55,6 +62,12 @@ async function apiFetch(url, options = {}) {
 
   if (res.status === 401) {
     logout();
+    const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
+    } else {
+      window.location.href = loginUrl;
+    }
     throw new Error('Session expired. Please log in again.');
   }
   return res;
