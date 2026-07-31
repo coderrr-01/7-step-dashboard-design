@@ -12,11 +12,11 @@ export default function Header({ activeLabel }) {
    function handleLogout() {
       logout();
       const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
-      if (window.parent !== window) {
-         window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
-      } else {
-         window.location.href = loginUrl;
-      }
+      // Always postMessage to parent (handles iframe case)
+      window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
+      // Also redirect current window — if in iframe this changes iframe src,
+      // if standalone (no parent) this navigates the full page
+      window.location.href = loginUrl;
    }
 
    useEffect(() => {
