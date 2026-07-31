@@ -7,33 +7,39 @@ import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
 export default function PaymentScreen() {
-   const { client, refetch } = useClientData();
+   const { client, loading: clientLoading, refetch } = useClientData();
    const { completeStep } = useSteps();
    const [activeStep, setActiveStep]       = useState("Security");
    const [activePayment, setActivePayment] = useState(0);
    const [submitting, setSubmitting]       = useState(false);
-   const [iframeHtml, setIframeHtml]       = useState({});
-   const [iframeLoading, setIframeLoading] = useState(false);
+   const [iframeHtml, setIframeHtml]         = useState({});
+   const [iframeLoading, setIframeLoading]   = useState({}); // per-key loading map
+   const [iframeError, setIframeError]       = useState({}); // per-key error map
 
    // Fetch payment UI HTML from WP for current method+section
    const loadPaymentUI = async (method, section) => {
       const key = `${method}_${section}`;
       if (iframeHtml[key]) return; // already loaded
-      setIframeLoading(true);
+      setIframeLoading(prev => ({ ...prev, [key]: true }));
+      setIframeError(prev => ({ ...prev, [key]: false }));
       try {
          const res = await getPaymentUI(method, section);
-         if (res?.success) {
+         if (res?.success && res.html) {
             setIframeHtml(prev => ({ ...prev, [key]: res.html }));
-            // Sync deposit_paid from server
             if (res.deposit_paid && !depositPaidNow) {
                setDepositPaidNow(true);
                setDepositMethod(paymentMethods.findIndex(m => m.name.toLowerCase() === method));
                if (storageKey) localStorage.setItem(storageKey, '1');
                if (storageMethodKey) localStorage.setItem(storageMethodKey, String(paymentMethods.findIndex(m => m.name.toLowerCase() === method)));
             }
+         } else {
+            setIframeError(prev => ({ ...prev, [key]: true }));
          }
-      } catch {}
-      finally { setIframeLoading(false); }
+      } catch {
+         setIframeError(prev => ({ ...prev, [key]: true }));
+      } finally {
+         setIframeLoading(prev => ({ ...prev, [key]: false }));
+      }
    };
 
    const methodNames = ['stripe', 'paypal', 'revolut', 'bank', 'cash'];
@@ -109,7 +115,8 @@ export default function PaymentScreen() {
    const unitLabel   = selectedRoom?.name || client?.unit || client?.room_name || 'The Victorian Premier';
 
    const handleRentTabClick = () => {
-      if (!depositPaid) {
+      // Don't block while client data is still loading
+      if (!clientLoading && !depositPaid) {
          toast.warning('Please pay the Security Deposit first.');
          return;
       }
@@ -181,10 +188,10 @@ export default function PaymentScreen() {
             </div>
          </div>
          <div
-            className={`chevron-tab ${activeStep === "Rent" ? "active" : "inactive"} ${!depositPaid ? "opacity-50" : ""}`}
+            className={`chevron-tab ${activeStep === "Rent" ? "active" : "inactive"} ${!clientLoading && !depositPaid ? "opacity-50" : ""}`}
             onClick={handleRentTabClick}
-            style={{ cursor: depositPaid ? "pointer" : "not-allowed" }}
-            title={!depositPaid ? "Pay Security Deposit first" : ""}
+            style={{ cursor: (!clientLoading && !depositPaid) ? "not-allowed" : "pointer" }}
+            title={!clientLoading && !depositPaid ? "Pay Security Deposit first" : ""}
          >
             <div className="step-num">02</div>
             <div className="lh-1">
@@ -284,8 +291,8 @@ export default function PaymentScreen() {
                               <span className="fw-medium">{depositAmount}</span>
                            </div>
                            <div className="d-flex justify-content-between small mb-4">
-                              <span className="text-muted">Administrative Fee</span>
-                              <span className="fw-medium">$ 0.00</span>
+                              <span className="text-muted">Rent Amount</span>
+                              <span className="fw-medium">{rentAmount}</span>
                            </div>
                            <hr className="my-4 opacity-10" />
                            <div className="d-flex justify-content-between align-items-baseline pt-2">
@@ -370,7 +377,7 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 <PaymentIframe method="stripe" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} />
+                                 <PaymentIframe method="stripe" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} iframeError={iframeError} />
                               </>
                            )}
 
@@ -383,7 +390,7 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 <PaymentIframe method="paypal" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} />
+                                 <PaymentIframe method="paypal" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} iframeError={iframeError} />
                               </>
                            )}
 
@@ -396,7 +403,7 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 <PaymentIframe method="revolut" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} />
+                                 <PaymentIframe method="revolut" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} iframeError={iframeError} />
                               </>
                            )}
 
@@ -409,7 +416,7 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 <PaymentIframe method="bank" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} />
+                                 <PaymentIframe method="bank" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} iframeError={iframeError} />
                               </>
                            )}
 
@@ -466,11 +473,13 @@ export default function PaymentScreen() {
 }
 
 // ── PaymentIframe: renders WP shortcode HTML inside srcdoc iframe ──────────────
-function PaymentIframe({ method, section, iframeHtml, iframeLoading }) {
-   const key  = `${method}_${section}`;
-   const html = iframeHtml[key];
+function PaymentIframe({ method, section, iframeHtml, iframeLoading, iframeError }) {
+   const key     = `${method}_${section}`;
+   const html    = iframeHtml[key];
+   const loading = iframeLoading[key];
+   const error   = iframeError[key];
 
-   if (iframeLoading && !html) {
+   if (loading) {
       return (
          <div className="mb-4 text-center py-4">
             <div className="spinner-border spinner-border-sm text-secondary" role="status" />
@@ -478,7 +487,20 @@ function PaymentIframe({ method, section, iframeHtml, iframeLoading }) {
          </div>
       );
    }
-   if (!html) return null;
+
+   if (error || !html) {
+      return (
+         <div className="mb-4 p-3 text-center border rounded">
+            <p className="small text-muted mb-2">Payment form could not be loaded.</p>
+            <button
+               className="btn btn-sm btn-outline-secondary"
+               onClick={() => window.location.reload()}
+            >
+               Retry
+            </button>
+         </div>
+      );
+   }
 
    return (
       <iframe

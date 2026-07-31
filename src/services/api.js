@@ -5,8 +5,12 @@ const JRNY    = `${WP_BASE}/jrny/v1`;
 const LEASE   = `${WP_BASE}/lease-html-sign/v1`;
 
 const TOKEN_KEY  = 'jrny_jwt';
-const CLIENT_KEY = 'jrny_client';
 const NONCE_KEY  = 'jrny_nonce';
+
+function clientKey() {
+  const sub = getUserSub();
+  return sub ? `jrny_client_${sub}` : 'jrny_client';
+}
 
 // ─── TOKEN ────────────────────────────────────────────────────────────────────
 export function saveToken(token) {
@@ -97,7 +101,7 @@ export async function wpLogin(username, password) {
   saveToken(data.token);
 
   if (data.client_data) {
-    localStorage.setItem(CLIENT_KEY, JSON.stringify(data.client_data));
+    localStorage.setItem(clientKey(), JSON.stringify(data.client_data));
   }
 
   return { success: true, token: data.token, user: data.user, client_data: data.client_data };
@@ -131,7 +135,7 @@ export async function getNonce() {
 export async function getClientData() {
   const res  = await apiFetch(`${JRNY}/client-data`, { method: 'GET' });
   const data = await res.json();
-  if (data.success) localStorage.setItem(CLIENT_KEY, JSON.stringify(data.data));
+  if (data.success) localStorage.setItem(clientKey(), JSON.stringify(data.data));
   return data;
 }
 
@@ -249,7 +253,7 @@ export async function requestLeaseExtension({ client_id, start_date, end_date, c
 // ─── CACHED CLIENT ────────────────────────────────────────────────────────────
 export function getCachedClient() {
   try {
-    const raw = localStorage.getItem(CLIENT_KEY);
+    const raw = localStorage.getItem(clientKey());
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;

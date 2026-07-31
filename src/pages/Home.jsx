@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import { useNavigate } from "react-router-dom";
 import { useSteps } from "../context/StepContext";
-import { applyForm, getCachedClient, getToken } from "../services/api";
+import { applyForm, getCachedClient, getToken, getUserSub } from "../services/api";
 import { toast } from "react-toastify";
 
 const EMPLOYMENT_OPTIONS = ["Employed", "Self-Employed", "Student", "Other"];
@@ -18,34 +18,33 @@ function getEmailFromToken() {
 
 export default function Home() {
   const navigate = useNavigate();
-  const { completeStep, completedSteps, clientLoading } = useSteps();
+  const { completeStep, completedSteps } = useSteps();
 
   const alreadySubmitted = completedSteps.includes(1);
 
-  const cached = getCachedClient();
-  const tokenEmail = getEmailFromToken();
-  const cachedEmail = cached?.email || tokenEmail || '';
-
-  const [submitting, setSubmitting] = useState(false);
+  // Read client data scoped to the current user — never stale from a previous user
+  const [cachedEmail, setCachedEmail] = useState(() => getEmailFromToken());
   const [form, setForm] = useState({
-    name:              cached?.name              || "",
-    email:             cachedEmail,
-    phone:             cached?.phone             || "",
-    date_of_birth:     cached?.date_of_birth     || "",
-    current_address:   cached?.current_address   || "",
-    employment_status: cached?.employment_status || "",
-    monthly_income:    cached?.monthly_income    != null ? String(cached.monthly_income) : "",
-    move_in_date:      cached?.move_in_date      || "",
-    message:           cached?.message           || "",
+    name:              "",
+    email:             getEmailFromToken(),
+    phone:             "",
+    date_of_birth:     "",
+    current_address:   "",
+    employment_status: "",
+    monthly_income:    "",
+    move_in_date:      "",
+    message:           "",
   });
 
-  // Re-populate form if client data loads asynchronously (e.g. after WP redirect login)
+  // Populate form from user-scoped cached client data after mount
   useEffect(() => {
     const client = getCachedClient();
     if (!client) return;
+    const email = client.email || getEmailFromToken() || '';
+    setCachedEmail(email);
     setForm(prev => ({
       name:              prev.name              || client.name              || "",
-      email:             prev.email             || client.email             || "",
+      email:             email,
       phone:             prev.phone             || client.phone             || "",
       date_of_birth:     prev.date_of_birth     || client.date_of_birth     || "",
       current_address:   prev.current_address   || client.current_address   || "",
@@ -54,7 +53,11 @@ export default function Home() {
       move_in_date:      prev.move_in_date      || client.move_in_date      || "",
       message:           prev.message           || client.message           || "",
     }));
-  }, [completedSteps]);
+  // Re-run when completedSteps changes (background fetch in StepContext just finished)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedSteps, getUserSub()]);
+
+  const [submitting, setSubmitting] = useState(false);
 
   const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
@@ -91,16 +94,6 @@ export default function Home() {
     }
   };
 
-  // Wait for async client-data fetch before deciding which screen to show.
-  // Return a blank content area (inside PageLayout so header/logout still render)
-  // to prevent a flash of the form for users who already submitted.
-  if (clientLoading) {
-    return (
-      <PageLayout page="Home">
-        <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 bg-field" />
-      </PageLayout>
-    );
-  }
 
   // Already submitted — show read-only summary, no form
   if (alreadySubmitted) {

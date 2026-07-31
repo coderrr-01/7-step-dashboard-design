@@ -27,7 +27,7 @@ function deriveStepsFromClient(client) {
   const paymentStatus = client.payment_status || '';
   const signedLease   = client.signed_lease   || '';
 
-  const hasSubmitted = !!leaseStatus || !!client.email;
+  const hasSubmitted = !!leaseStatus;
   if (hasSubmitted) steps.push(1, 2, 3);
 
   const map = {
