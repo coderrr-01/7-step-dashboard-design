@@ -56,7 +56,7 @@ export default function PaymentScreen() {
          return next;
       });
       const method = methodNames[activePayment];
-      if (method && method !== 'cash' && method !== 'revolut') {
+      if (method && method !== 'cash') {
          loadPaymentUI(method, activeStep === 'Rent' ? 'rent' : 'deposit', true);
       }
    };
@@ -66,9 +66,10 @@ export default function PaymentScreen() {
    // Load iframe when method or step changes
    useEffect(() => {
       const method = methodNames[activePayment];
-      // Revolut uses a native checkout button below.  Its hosted checkout URL
-      // is created by the authenticated REST endpoint, not an iframe form.
-      if (!method || method === 'cash' || method === 'revolut') return;
+      // Revolut keeps its native checkout button below; the iframe is loaded so
+      // the shared payment-history table (same one Stripe uses) is ready to show
+      // once a Revolut payment is confirmed.
+      if (!method || method === 'cash') return;
       loadPaymentUI(method, activeStep === 'Rent' ? 'rent' : 'deposit');
    }, [activePayment, activeStep]);
 
@@ -540,23 +541,29 @@ export default function PaymentScreen() {
                                  <SettingsBox />
                                  <ChevronTabs />
                                  {activeStep === 'Security' && depositPaid ? (
-                                    <div className="d-flex gap-2 align-items-stretch">
-                                       <div className="form-control bg-light d-flex align-items-center justify-content-center fw-bold">
-                                          {depositAmount}
+                                    <>
+                                       <div className="d-flex gap-2 align-items-stretch">
+                                          <div className="form-control bg-light d-flex align-items-center justify-content-center fw-bold">
+                                             {depositAmount}
+                                          </div>
+                                          <button className="btn btn-success px-4 fw-bold" type="button" disabled>
+                                             &#10003; Deposit Paid
+                                          </button>
                                        </div>
-                                       <button className="btn btn-success px-4 fw-bold" type="button" disabled>
-                                          &#10003; Deposit Paid
-                                       </button>
-                                    </div>
+                                       <PaymentIframe method="revolut" section="deposit" iframeHtml={iframeHtml} iframeLoading={iframeLoading} iframeError={iframeError} />
+                                    </>
                                  ) : activeStep === 'Rent' && rentPaid ? (
-                                    <div className="d-flex gap-2 align-items-stretch">
-                                       <div className="form-control bg-light d-flex align-items-center justify-content-center fw-bold">
-                                          {rentAmount}
+                                    <>
+                                       <div className="d-flex gap-2 align-items-stretch">
+                                          <div className="form-control bg-light d-flex align-items-center justify-content-center fw-bold">
+                                             {rentAmount}
+                                          </div>
+                                          <button className="btn btn-success px-4 fw-bold" type="button" disabled>
+                                             &#10003; Rent Paid
+                                          </button>
                                        </div>
-                                       <button className="btn btn-success px-4 fw-bold" type="button" disabled>
-                                          &#10003; Rent Paid
-                                       </button>
-                                    </div>
+                                       <PaymentIframe method="revolut" section="rent" iframeHtml={iframeHtml} iframeLoading={iframeLoading} iframeError={iframeError} />
+                                    </>
                                  ) : (
                                     <div className="d-flex gap-2 align-items-stretch">
                                        <div className="form-control bg-light d-flex align-items-center justify-content-center fw-bold">
