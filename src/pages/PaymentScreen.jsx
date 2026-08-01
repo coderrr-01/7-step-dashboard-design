@@ -18,9 +18,9 @@ export default function PaymentScreen() {
    const [iframeError, setIframeError]       = useState({}); // per-key error map
 
    // Fetch payment UI HTML from WP for current method+section
-   const loadPaymentUI = async (method, section) => {
+   const loadPaymentUI = async (method, section, force = false) => {
       const key = `${method}_${section}`;
-      if (iframeHtml[key]) return; // already loaded
+      if (!force && iframeHtml[key]) return; // already loaded
       setIframeLoading(prev => ({ ...prev, [key]: true }));
       setIframeError(prev => ({ ...prev, [key]: false }));
       try {
@@ -40,6 +40,20 @@ export default function PaymentScreen() {
          setIframeError(prev => ({ ...prev, [key]: true }));
       } finally {
          setIframeLoading(prev => ({ ...prev, [key]: false }));
+      }
+   };
+
+   // After a payment is confirmed, drop the cached iframe HTML for that section
+   // and reload whatever method is on screen so the UI reflects the latest DB state.
+   const reloadPaymentUI = (section) => {
+      setIframeHtml(prev => {
+         const next = { ...prev };
+         Object.keys(next).forEach(k => { if (k.endsWith(`_${section}`)) delete next[k]; });
+         return next;
+      });
+      const method = methodNames[activePayment];
+      if (method && method !== 'cash' && method !== 'revolut') {
+         loadPaymentUI(method, activeStep === 'Rent' ? 'rent' : 'deposit', true);
       }
    };
 
@@ -88,6 +102,7 @@ export default function PaymentScreen() {
       if (client?.deposit_paid && !depositPaidNow) {
          setDepositPaidNow(true);
          if (storageKey) localStorage.setItem(storageKey, '1');
+         reloadPaymentUI('deposit');
       }
    }, [client?.deposit_paid, storageKey]);
 
@@ -96,6 +111,7 @@ export default function PaymentScreen() {
       if (client?.rent_paid && !rentPaidNow) {
          setRentPaidNow(true);
          if (rentStorageKey) localStorage.setItem(rentStorageKey, '1');
+         reloadPaymentUI('rent');
       }
    }, [client?.rent_paid, rentStorageKey]);
 
@@ -169,7 +185,7 @@ export default function PaymentScreen() {
             res = await submitRevolutPayment({ type, client_id: clientId, amount });
          }
 
-         if (res?.success) {
+          if (res?.success) {
             if (type === 'deposit') {
                toast.success('Security deposit recorded! Pending verification.');
                setDepositPaidNow(true);
@@ -181,6 +197,7 @@ export default function PaymentScreen() {
                toast.success('Rent payment recorded! Pending verification.');
                completeStep(7);
             }
+            reloadPaymentUI(type);
             refetch();
          } else {
             toast.error(res?.message || 'Payment failed. Please try again.');
@@ -250,18 +267,19 @@ export default function PaymentScreen() {
                setPollingType(null);
                setSubmitting(false);
                toast.success(pollingType === 'deposit' ? 'Security deposit paid successfully!' : 'Rent payment received successfully!');
-               if (pollingType === 'deposit') {
-                  setDepositPaidNow(true);
-                  setDepositMethod(2); // Revolut index
-                  if (storageKey)       localStorage.setItem(storageKey, '1');
-                  if (storageMethodKey) localStorage.setItem(storageMethodKey, String(2));
-                  setActiveStep("Rent");
-               } else {
-                  setRentPaidNow(true);
-                  if (rentStorageKey) localStorage.setItem(rentStorageKey, '1');
-                  completeStep(7);
-               }
-               refetch();
+                if (pollingType === 'deposit') {
+                   setDepositPaidNow(true);
+                   setDepositMethod(2); // Revolut index
+                   if (storageKey)       localStorage.setItem(storageKey, '1');
+                   if (storageMethodKey) localStorage.setItem(storageMethodKey, String(2));
+                   setActiveStep("Rent");
+                } else {
+                   setRentPaidNow(true);
+                   if (rentStorageKey) localStorage.setItem(rentStorageKey, '1');
+                   completeStep(7);
+                }
+                reloadPaymentUI(pollingType);
+                refetch();
                return;
             }
 
