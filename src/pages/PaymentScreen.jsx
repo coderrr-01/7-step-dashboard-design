@@ -33,6 +33,10 @@ export default function PaymentScreen() {
                if (storageKey) localStorage.setItem(storageKey, '1');
                if (storageMethodKey) localStorage.setItem(storageMethodKey, String(paymentMethods.findIndex(m => m.name.toLowerCase() === method)));
             }
+            if (res.rent_paid && !rentPaidNow) {
+               setRentPaidNow(true);
+               if (rentStorageKey) localStorage.setItem(rentStorageKey, '1');
+            }
          } else {
             setIframeError(prev => ({ ...prev, [key]: true }));
          }
