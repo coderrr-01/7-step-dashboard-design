@@ -238,6 +238,16 @@ export async function createRevolutCheckout(type) {
   return res.json();
 }
 
+export async function getRevolutStatus(type) {
+  const params = new URLSearchParams();
+  if (type) params.set('type', type);
+  const res = await apiFetch(`${JRNY}/revolut-status?${params.toString()}`, {
+    method: 'GET',
+    cache: 'no-store',
+  });
+  return res.json();
+}
+
 // ─── ACH PAYMENT ─────────────────────────────────────────────────────────────
 export async function submitAchPayment({ type, amount, txn_id, account_number }) {
   const nonce = await getNonce();

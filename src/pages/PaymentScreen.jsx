@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import BankDeposite from "../pages/Partial-element/BankDeposite";
 import { useClientData } from "../hooks/useClientData";
-import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getPaymentUI } from "../services/api";
+import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getRevolutStatus, getPaymentUI } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
@@ -12,6 +12,7 @@ export default function PaymentScreen() {
    const [activeStep, setActiveStep]       = useState("Security");
    const [activePayment, setActivePayment] = useState(0);
    const [submitting, setSubmitting]       = useState(false);
+   const [pollingType, setPollingType]     = useState(null);
    const [iframeHtml, setIframeHtml]         = useState({});
    const [iframeLoading, setIframeLoading]   = useState({}); // per-key loading map
    const [iframeError, setIframeError]       = useState({}); // per-key error map
@@ -62,6 +63,7 @@ export default function PaymentScreen() {
    // Persist deposit-paid state across refresh per client
    const storageKey       = client?.id ? `jrny_deposit_paid_${client.id}` : null;
    const storageMethodKey = client?.id ? `jrny_deposit_method_${client.id}` : null;
+   const rentStorageKey   = client?.id ? `jrny_rent_paid_${client.id}` : null;
 
    const [depositPaidNow, setDepositPaidNow] = useState(() => {
       if (!storageKey) return false;
@@ -75,6 +77,12 @@ export default function PaymentScreen() {
       return v !== null ? parseInt(v, 10) : null;
    });
 
+   // Persist rent-paid state across refresh per client
+   const [rentPaidNow, setRentPaidNow] = useState(() => {
+      if (!rentStorageKey) return false;
+      return localStorage.getItem(rentStorageKey) === '1';
+   });
+
    // Sync from Zoho data once loaded
    useEffect(() => {
       if (client?.deposit_paid && !depositPaidNow) {
@@ -82,6 +90,14 @@ export default function PaymentScreen() {
          if (storageKey) localStorage.setItem(storageKey, '1');
       }
    }, [client?.deposit_paid, storageKey]);
+
+   // Sync rent-paid state from Zoho data once loaded
+   useEffect(() => {
+      if (client?.rent_paid && !rentPaidNow) {
+         setRentPaidNow(true);
+         if (rentStorageKey) localStorage.setItem(rentStorageKey, '1');
+      }
+   }, [client?.rent_paid, rentStorageKey]);
 
    const paymentMethods = [
       { name: "Stripe",  icon: "credit_card"          },
@@ -92,6 +108,7 @@ export default function PaymentScreen() {
    ];
 
    const depositPaid = depositPaidNow || !!client?.deposit_paid;
+   const rentPaid    = rentPaidNow    || !!client?.rent_paid;
 
    // After deposit paid: only show the method used + Cash (index 4)
    const visibleMethods = depositPaid && depositMethod !== null
@@ -178,6 +195,15 @@ export default function PaymentScreen() {
    const handleRevolutCheckout = async () => {
       const type = activeStep === 'Rent' ? 'rent' : 'deposit';
 
+      // Open a blank tab synchronously inside the click handler so popup
+      // blockers allow it; navigate it to Revolut once we have the URL.
+      let checkoutTab = null;
+      try {
+         checkoutTab = window.open('', '_blank');
+      } catch {
+         checkoutTab = null;
+      }
+
       setSubmitting(true);
       try {
          const result = await createRevolutCheckout(type);
@@ -185,14 +211,81 @@ export default function PaymentScreen() {
             throw new Error(result?.message || 'Unable to start Revolut checkout.');
          }
 
-         // The dashboard is embedded by WordPress. Revolut forbids being
-         // displayed in an iframe, so navigate the outer browser window.
-         window.top.location.href = result.checkout_url;
+         if (checkoutTab) {
+            checkoutTab.location.href = result.checkout_url;
+            // Poll WordPress so this tab reflects the payment the moment it completes.
+            setPollingType(type);
+            toast.info('Revolut checkout opened in a new tab. Complete the payment there, then return to this tab.');
+         } else {
+            // Fallback (popup blocked): navigate the current tab instead.
+            window.top.location.href = result.checkout_url;
+         }
       } catch (error) {
          toast.error(error?.message || 'Unable to start Revolut checkout.');
+         if (checkoutTab) { try { checkoutTab.close(); } catch {} }
          setSubmitting(false);
+         setPollingType(null);
       }
    };
+
+   // While a Revolut checkout is open in another tab, poll WordPress until the
+   // order is verified as paid/failed (or the polling window times out).
+   useEffect(() => {
+      if (!pollingType) return;
+
+      let stopped = false;
+      let attempts = 0;
+      const MAX_ATTEMPTS = 75; // 75 x 4s = 5 minutes
+      const interval = setInterval(tick, 4000);
+
+      async function tick() {
+         attempts += 1;
+         try {
+            const res = await getRevolutStatus(pollingType);
+            if (stopped) return;
+
+            const paid = pollingType === 'deposit' ? res?.deposit_paid : res?.rent_paid;
+            if (paid) {
+               clearInterval(interval);
+               setPollingType(null);
+               setSubmitting(false);
+               toast.success(pollingType === 'deposit' ? 'Security deposit paid successfully!' : 'Rent payment received successfully!');
+               if (pollingType === 'deposit') {
+                  setDepositPaidNow(true);
+                  setDepositMethod(2); // Revolut index
+                  if (storageKey)       localStorage.setItem(storageKey, '1');
+                  if (storageMethodKey) localStorage.setItem(storageMethodKey, String(2));
+                  setActiveStep("Rent");
+               } else {
+                  setRentPaidNow(true);
+                  if (rentStorageKey) localStorage.setItem(rentStorageKey, '1');
+                  completeStep(7);
+               }
+               refetch();
+               return;
+            }
+
+            if (attempts >= MAX_ATTEMPTS) {
+               clearInterval(interval);
+               setPollingType(null);
+               setSubmitting(false);
+               toast.info('Payment is still pending verification. Please check back later.');
+            }
+         } catch (e) {
+            if (stopped) return;
+            if (attempts >= MAX_ATTEMPTS) {
+               clearInterval(interval);
+               setPollingType(null);
+               setSubmitting(false);
+            }
+         }
+      }
+
+      tick(); // check immediately in case the webhook already marked it paid
+
+      return () => { stopped = true; clearInterval(interval); };
+   // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [pollingType, storageKey, storageMethodKey, rentStorageKey]);
 
    // Shared chevron tabs used in every payment method panel
    const ChevronTabs = () => (
@@ -424,19 +517,41 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 <div className="d-flex gap-2 align-items-stretch">
-                                    <div className="form-control bg-light d-flex align-items-center justify-content-center fw-bold">
-                                       {activeStep === 'Rent' ? rentAmount : depositAmount}
+                                 {activeStep === 'Security' && depositPaid ? (
+                                    <div className="d-flex gap-2 align-items-stretch">
+                                       <div className="form-control bg-light d-flex align-items-center justify-content-center fw-bold">
+                                          {depositAmount}
+                                       </div>
+                                       <button className="btn btn-success px-4 fw-bold" type="button" disabled>
+                                          &#10003; Deposit Paid
+                                       </button>
                                     </div>
-                                    <button
-                                       className="btn btn-dark px-4 fw-bold"
-                                       type="button"
-                                       onClick={handleRevolutCheckout}
-                                       disabled={submitting}
-                                    >
-                                       {submitting ? 'Opening Revolut...' : 'Pay Now'}
-                                    </button>
-                                 </div>
+                                 ) : activeStep === 'Rent' && rentPaid ? (
+                                    <div className="d-flex gap-2 align-items-stretch">
+                                       <div className="form-control bg-light d-flex align-items-center justify-content-center fw-bold">
+                                          {rentAmount}
+                                       </div>
+                                       <button className="btn btn-success px-4 fw-bold" type="button" disabled>
+                                          &#10003; Rent Paid
+                                       </button>
+                                    </div>
+                                 ) : (
+                                    <div className="d-flex gap-2 align-items-stretch">
+                                       <div className="form-control bg-light d-flex align-items-center justify-content-center fw-bold">
+                                          {activeStep === 'Rent' ? rentAmount : depositAmount}
+                                       </div>
+                                       <button
+                                          className="btn btn-dark px-4 fw-bold"
+                                          type="button"
+                                          onClick={handleRevolutCheckout}
+                                          disabled={submitting}
+                                       >
+                                          {submitting
+                                             ? pollingType ? 'Payment in progress...' : 'Opening Revolut...'
+                                             : 'Pay Now'}
+                                       </button>
+                                    </div>
+                                 )}
                               </>
                            )}
 
