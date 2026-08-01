@@ -185,9 +185,9 @@ export default function PaymentScreen() {
             throw new Error(result?.message || 'Unable to start Revolut checkout.');
          }
 
-         // A top-level redirect is required by Revolut and avoids popup and
-         // cross-origin iframe restrictions.
-         window.location.assign(result.checkout_url);
+         // The dashboard is embedded by WordPress. Revolut forbids being
+         // displayed in an iframe, so navigate the outer browser window.
+         window.top.location.href = result.checkout_url;
       } catch (error) {
          toast.error(error?.message || 'Unable to start Revolut checkout.');
          setSubmitting(false);
