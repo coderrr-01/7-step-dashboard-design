@@ -133,7 +133,7 @@ export async function getNonce() {
 
 // ─── CLIENT DATA ──────────────────────────────────────────────────────────────
 export async function getClientData() {
-  const res  = await apiFetch(`${JRNY}/client-data`, { method: 'GET' });
+  const res  = await apiFetch(`${JRNY}/client-data`, { method: 'GET', cache: 'no-store' });
   const data = await res.json();
   if (data.success) localStorage.setItem(clientKey(), JSON.stringify(data.data));
   return data;
@@ -262,6 +262,7 @@ export function getCachedClient() {
 
 // ─── PAYMENT UI (iframe HTML from WP shortcodes) ─────────────────────────────
 export async function getPaymentUI(method, section) {
-  const res = await apiFetch(`${JRNY}/payment-ui?method=${encodeURIComponent(method)}&section=${encodeURIComponent(section)}`, { method: 'GET' });
+  const params = new URLSearchParams({ method, section, _: String(Date.now()) });
+  const res = await apiFetch(`${JRNY}/payment-ui?${params.toString()}`, { method: 'GET', cache: 'no-store' });
   return res.json();
 }
