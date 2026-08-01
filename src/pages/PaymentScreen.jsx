@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import BankDeposite from "../pages/Partial-element/BankDeposite";
 import { useClientData } from "../hooks/useClientData";
-import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, getPaymentUI } from "../services/api";
+import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getPaymentUI } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
@@ -47,7 +47,9 @@ export default function PaymentScreen() {
    // Load iframe when method or step changes
    useEffect(() => {
       const method = methodNames[activePayment];
-      if (!method || method === 'cash') return;
+      // Revolut uses a native checkout button below.  Its hosted checkout URL
+      // is created by the authenticated REST endpoint, not an iframe form.
+      if (!method || method === 'cash' || method === 'revolut') return;
       loadPaymentUI(method, activeStep === 'Rent' ? 'rent' : 'deposit');
    }, [activePayment, activeStep]);
 
@@ -169,6 +171,25 @@ export default function PaymentScreen() {
       } catch (e) {
          toast.error(e.message || 'Network error. Please try again.');
       } finally {
+         setSubmitting(false);
+      }
+   };
+
+   const handleRevolutCheckout = async () => {
+      const type = activeStep === 'Rent' ? 'rent' : 'deposit';
+
+      setSubmitting(true);
+      try {
+         const result = await createRevolutCheckout(type);
+         if (!result?.success || !result?.checkout_url) {
+            throw new Error(result?.message || 'Unable to start Revolut checkout.');
+         }
+
+         // A top-level redirect is required by Revolut and avoids popup and
+         // cross-origin iframe restrictions.
+         window.location.assign(result.checkout_url);
+      } catch (error) {
+         toast.error(error?.message || 'Unable to start Revolut checkout.');
          setSubmitting(false);
       }
    };
@@ -403,7 +424,19 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 <PaymentIframe method="revolut" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} iframeError={iframeError} />
+                                 <div className="d-flex gap-2 align-items-stretch">
+                                    <div className="form-control bg-light d-flex align-items-center justify-content-center fw-bold">
+                                       {activeStep === 'Rent' ? rentAmount : depositAmount}
+                                    </div>
+                                    <button
+                                       className="btn btn-dark px-4 fw-bold"
+                                       type="button"
+                                       onClick={handleRevolutCheckout}
+                                       disabled={submitting}
+                                    >
+                                       {submitting ? 'Opening Revolut...' : 'Pay Now'}
+                                    </button>
+                                 </div>
                               </>
                            )}
 
@@ -431,6 +464,7 @@ export default function PaymentScreen() {
                                     <p className="mb-0">You can pay by cash directyle at our office: <b>211E 43rd Street</b></p>
                                  </div>
                                  <ChevronTabs />
+                                 <AmountInput />
                                  {!depositPaid && activeStep === "Security" && (
                                     <p className="small text-warning d-flex align-items-center gap-1 mb-3">
                                        <span className="material-symbols-outlined fs-6">info</span>

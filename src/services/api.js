@@ -230,6 +230,14 @@ export async function submitRevolutPayment({ type, client_id, amount }) {
   return res.json();
 }
 
+export async function createRevolutCheckout(type) {
+  const res = await apiFetch(`${JRNY}/revolut-checkout`, {
+    method: 'POST',
+    body: JSON.stringify({ type }),
+  });
+  return res.json();
+}
+
 // ─── ACH PAYMENT ─────────────────────────────────────────────────────────────
 export async function submitAchPayment({ type, amount, txn_id, account_number }) {
   const nonce = await getNonce();
