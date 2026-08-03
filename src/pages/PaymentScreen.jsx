@@ -587,15 +587,80 @@ export default function PaymentScreen() {
                            {/* ── BANK ── */}
                            {activePayment === 3 && (
                               <>
-                                 {/* <div className="paymentmethod_title">
+                                 <div className="paymentmethod_title">
                                     <h3>Bank pay</h3>
                                     <div className="borderline"></div>
                                  </div>
-                                 <SettingsBox />
-                                 <ChevronTabs />
-                                 <PaymentIframe method="bank" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} iframeError={iframeError} /> */}
-                                 <BankDeposite/>
+                                 <div className="p-4 mb-4 payment-settings-box">
+                                    <div className="form-check d-flex gap-3 mb-4">
+                                       <input defaultChecked={true} className="form-check-input mt-1" id="recurringCheck" type="checkbox" />
+                                       <label className="form-check-label" htmlFor="recurringCheck">
+                                          <span className="d-block fw-bold mb-1">Recurring Monthly Automatic Payment</span>
+                                          <span className="d-block small text-muted">Your subsequent rent payments will be automatically charged using this method.</span>
+                                       </label>
+                                    </div>
+                                    <div className="form-check d-flex gap-3">
+                                       <input defaultChecked={true} className="form-check-input mt-1" id="saveMethodCheck" type="checkbox" />
+                                       <label className="form-check-label fw-bold small" htmlFor="saveMethodCheck">
+                                          Save your preferred payment method for future transactions
+                                       </label>
+                                    </div>
+                                 </div>
+                                 <div className="chevron-tabs-container mb-4">
+
+                                    <div
+                                       className={`chevron-tab ${activeStep === "Security" ? "active" : "inactive"
+                                          }`}
+                                       onClick={() => setActiveStep("Security")}
+                                       style={{ cursor: "pointer" }}
+                                    >
+                                       <div className="step-num">01</div>
+
+                                       <div className="lh-1">
+                                          <span className="text-uppercase fw-bold d-block mb-1 chevron-step-label">
+                                             Process Step
+                                          </span>
+
+                                          <span className="fw-bold small">
+                                             Security Deposit
+                                          </span>
+                                       </div>
+                                    </div>
+
+
+                                    <div
+                                       className={`chevron-tab ${activeStep === "Rent" ? "active" : "inactive"
+                                          }`}
+                                       onClick={() => setActiveStep("Rent")}
+                                       style={{ cursor: "pointer" }}
+                                    >
+                                       <div className="step-num">02</div>
+
+                                       <div className="lh-1">
+                                          <span className="text-uppercase fw-bold d-block mb-1 chevron-step-label">
+                                             Upcoming
+                                          </span>
+
+                                          <span className="fw-bold small">
+                                             Pay Rent
+                                          </span>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 {activeStep === "Security" && (
+                                    <div className="mb-4">
+                                       <BankDeposite rentTitle="Security Deposit" />
+                                    </div>
+                                 )}
+
+
+                                 {activeStep === "Rent" && (
+                                    <div className="mb-4">
+                                       <BankDeposite rentTitle="Rent Deposit" />
+                                    </div>
+                                 )}
                               </>
+
                            )}
 
                            {/* ── CASH ── */}
