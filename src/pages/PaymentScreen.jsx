@@ -16,6 +16,13 @@ export default function PaymentScreen() {
    const [iframeHtml, setIframeHtml]         = useState({});
    const [iframeLoading, setIframeLoading]   = useState({}); // per-key loading map
    const [iframeError, setIframeError]       = useState({}); // per-key error map
+   const methodNames = ['stripe', 'paypal', 'revolut', 'bank', 'cash'];
+
+   const methodIndexFor = (method) => {
+      const normalized = String(method || '').trim().toLowerCase();
+      if (!normalized) return -1;
+      return paymentMethods.findIndex(m => m.name.toLowerCase() === normalized);
+   };
 
    // Fetch payment UI HTML from WP for current method+section
    const loadPaymentUI = async (method, section, force = false) => {
@@ -29,9 +36,12 @@ export default function PaymentScreen() {
             setIframeHtml(prev => ({ ...prev, [key]: res.html }));
             if (res.deposit_paid && !depositPaidNow) {
                setDepositPaidNow(true);
-               setDepositMethod(paymentMethods.findIndex(m => m.name.toLowerCase() === method));
+               const paidMethodIndex = methodIndexFor(res.deposit_method) >= 0
+                  ? methodIndexFor(res.deposit_method)
+                  : methodIndexFor(method);
+               setDepositMethod(paidMethodIndex >= 0 ? paidMethodIndex : null);
                if (storageKey) localStorage.setItem(storageKey, '1');
-               if (storageMethodKey) localStorage.setItem(storageMethodKey, String(paymentMethods.findIndex(m => m.name.toLowerCase() === method)));
+               if (storageMethodKey && paidMethodIndex >= 0) localStorage.setItem(storageMethodKey, String(paidMethodIndex));
             }
             if (res.rent_paid && !rentPaidNow) {
                setRentPaidNow(true);
@@ -60,8 +70,6 @@ export default function PaymentScreen() {
          loadPaymentUI(method, activeStep === 'Rent' ? 'rent' : 'deposit', true);
       }
    };
-
-   const methodNames = ['stripe', 'paypal', 'revolut', 'bank', 'cash'];
 
    // Load iframe when method or step changes
    useEffect(() => {
@@ -106,10 +114,15 @@ export default function PaymentScreen() {
    useEffect(() => {
       if (client?.deposit_paid && !depositPaidNow) {
          setDepositPaidNow(true);
+         const paidMethodIndex = methodIndexFor(client?.deposit_method);
+         if (paidMethodIndex >= 0) {
+            setDepositMethod(paidMethodIndex);
+            if (storageMethodKey) localStorage.setItem(storageMethodKey, String(paidMethodIndex));
+         }
          if (storageKey) localStorage.setItem(storageKey, '1');
          reloadPaymentUI('deposit');
       }
-   }, [client?.deposit_paid, storageKey]);
+   }, [client?.deposit_paid, client?.deposit_method, storageKey, storageMethodKey]);
 
    // Sync rent-paid state from Zoho data once loaded
    useEffect(() => {
@@ -118,7 +131,7 @@ export default function PaymentScreen() {
          if (rentStorageKey) localStorage.setItem(rentStorageKey, '1');
          reloadPaymentUI('rent');
       }
-   }, [client?.rent_paid, rentStorageKey]);
+   }, [client?.rent_paid, client?.rent_method, rentStorageKey]);
 
    const paymentMethods = [
       { name: "Stripe",  icon: "credit_card"          },
