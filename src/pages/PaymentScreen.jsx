@@ -587,13 +587,14 @@ export default function PaymentScreen() {
                            {/* ── BANK ── */}
                            {activePayment === 3 && (
                               <>
-                                 <div className="paymentmethod_title">
+                                 {/* <div className="paymentmethod_title">
                                     <h3>Bank pay</h3>
                                     <div className="borderline"></div>
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 <PaymentIframe method="bank" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} iframeError={iframeError} />
+                                 <PaymentIframe method="bank" section={activeStep === 'Rent' ? 'rent' : 'deposit'} iframeHtml={iframeHtml} iframeLoading={iframeLoading} iframeError={iframeError} /> */}
+                                 <BankDeposite/>
                               </>
                            )}
 
@@ -605,7 +606,7 @@ export default function PaymentScreen() {
                                     <div className="borderline"></div>
                                  </div>
                                  <div className="p-4 mb-4 payment-settings-box">
-                                    <p className="mb-0">You can pay by cash directyle at our office: <b>211E 43rd Street</b></p>
+                                    <p className="mb-0">You can pay by cash directly at our office: <b>211E 43rd Street</b></p>
                                  </div>
                                  <ChevronTabs />
                                  <AmountInput />
