@@ -141,6 +141,17 @@ export default function PaymentScreen() {
       { name: "Cash",    icon: "payments"              },
    ];
 
+   // Restore the last successful gateway for the current step so rent opens on
+   // the same method that completed the deposit.
+   useEffect(() => {
+      if (clientLoading) return;
+
+      const preferredIndex = depositMethod ?? methodIndexFor(client?.deposit_method || client?.rent_method);
+      if (preferredIndex >= 0 && activePayment !== preferredIndex) {
+         setActivePayment(preferredIndex);
+      }
+   }, [activeStep, clientLoading, client?.deposit_method, client?.rent_method, depositMethod]);
+
    const depositPaid = depositPaidNow || !!client?.deposit_paid;
    const rentPaid    = rentPaidNow    || !!client?.rent_paid;
 
