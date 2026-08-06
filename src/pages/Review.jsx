@@ -369,8 +369,8 @@ export default function Review() {
                         </div>
                      </div>
 
-                     {/* Desktop Button */}
-                     <div className="d-none d-md-block">
+                     {/* Continue — visible on all viewports (desktop & mobile) */}
+                     <div>
                         <button
                            className="btn btn-jrny-dark w-100 shadow-lg"
                            onClick={handleNext}
@@ -383,17 +383,6 @@ export default function Review() {
                               Checking automatically every 15 seconds.
                            </p>
                         )}
-                     </div>
-
-                     {/* Mobile Loader */}
-                     <div className="d-flex d-md-none justify-content-center">
-                        <div className="verification-loader">
-                           <div className="loader-ring"></div>
-                           <div className="loader-content">
-                              <span className="loader-dot"></span>
-                              <p>{approved ? 'Approved!' : 'Verification in Progress...'}</p>
-                           </div>
-                        </div>
                      </div>
                   </div>
 
@@ -408,4 +397,3 @@ export default function Review() {
       </PageLayout>
    );
 }
-
