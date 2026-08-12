@@ -111,10 +111,28 @@ position: absolute;
   padding: 20px;
   position: relative;
   z-index: 2;
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.nav-panel.open .timeline-item {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.nav-panel.open .timeline-item:nth-child(1) { transition-delay: 0.05s; }
+.nav-panel.open .timeline-item:nth-child(2) { transition-delay: 0.1s; }
+.nav-panel.open .timeline-item:nth-child(3) { transition-delay: 0.15s; }
+.nav-panel.open .timeline-item:nth-child(4) { transition-delay: 0.2s; }
+.nav-panel.open .timeline-item:nth-child(5) { transition-delay: 0.25s; }
+.nav-panel.open .timeline-item:nth-child(6) { transition-delay: 0.3s; }
+.nav-panel.open .timeline-item:nth-child(7) { transition-delay: 0.35s; }
+.nav-panel.open .timeline-item:nth-child(8) { transition-delay: 0.4s; }
+.nav-panel.open .timeline-item:nth-child(9) { transition-delay: 0.45s; }
+
 .timeline-item-active {
-  background-color: var(--surface-container-high);
+  background-color: rgba(187, 154, 126, 0.08);
   border-left: 4px solid var(--primary);
   padding: 20px;
 }
@@ -193,8 +211,16 @@ position: absolute;
 .nav-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 999;
+  background: rgba(10, 8, 5, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 2140;
+  animation: navOverlayIn 0.3s ease both;
+}
+
+@keyframes navOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* panel */
@@ -205,24 +231,12 @@ position: absolute;
   width: 380px;
   height: 100vh;
   transform: translateX(108%);
-  /* IMPORTANT */
-  transition: transform 0.3s ease;
-  z-index: 1000;
-  box-shadow: -10px 0 25px rgba(0, 0, 0, 0.15);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 2150;
+  box-shadow: -18px 0 50px rgba(0, 0, 0, 0.28);
   overflow: auto;
 }
 
-/* .timeline-item{
-    padding: 15px;
-    border-radius: 0;
-}
-.timeline-item.active{
-background: #ffff;
-    padding: 15px;
-    border-radius: 0;
-    border-left: 1px solid #ebebeb;
-    border-color: #b8924a;;
-} */
 /* open state */
 .nav-panel.open {
   transform: translateX(0);

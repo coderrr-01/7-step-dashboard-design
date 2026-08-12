@@ -18,10 +18,30 @@
         overflow-y: hidden;
     }
 }
+@media (max-width: 1480px) {
+  .top-header-section .gap-5{
+    gap: 20px !important;
+  }
+  .top-header-section a{
+    font-size:16px
+  }
+}
 
 @media (max-width: 1370px) {
     .heading-hero {
         font-size: 48px;
+    }
+      .top-header-section .gap-5{
+    gap: 14px !important;
+  }
+  .top-header-section a{
+    font-size:16px
+  }
+}
+
+@media (max-width: 1370px) {
+     .top-header-section a {
+        font-size: 15px;
     }
 }
 @media (max-width: 1210px) {
@@ -137,72 +157,6 @@
 @media only screen and (max-width:767px) {
     .verification-card{
         padding: 25px;
-    }
-
-    /* Fix container padding on mobile */
-    .container-fluid.px-lg-5 {
-        padding-left: 16px !important;
-        padding-right: 16px !important;
-    }
-
-    /* Fix row gutters on mobile */
-    .row.g-5 {
-        --bs-gutter-x: 1rem;
-        --bs-gutter-y: 1.5rem;
-    }
-
-    /* Fix checkout card layout */
-    .checkout-card .row.g-3 {
-        --bs-gutter-x: 0.5rem;
-    }
-
-    /* Fix chevron tabs on mobile */
-    .chevron-tabs-container {
-        flex-direction: column;
-    }
-    .chevron-tab.active {
-        clip-path: none;
-    }
-    .chevron-tab.inactive {
-        padding-left: 1.25rem;
-        margin-left: 0;
-        clip-path: none;
-    }
-    .chevron-tabs-container .chevron-tab:nth-child(2) {
-        clip-path: none;
-    }
-
-    /* Fix payment tiles wrapping */
-    .checkout-card .row.g-3.mb-4 {
-        flex-wrap: wrap;
-    }
-    .checkout-card .col {
-        flex: 0 0 auto;
-        width: 33.333%;
-    }
-
-    /* Fix auth-card sticky on mobile */
-    .auth-card {
-        position: static;
-    }
-    .summary-card {
-        position: static;
-    }
-
-    /* Fix white-document padding */
-    .white-document {
-        padding: 24px 16px;
-    }
-
-    /* Fix property img size */
-    .property-img {
-        width: 64px;
-        height: 64px;
-    }
-
-    /* Fix heading-lead-wide */
-    .heading-lead-wide {
-        font-size: 14px;
     }
 
    
@@ -409,27 +363,10 @@
 @media only screen and (max-width:576px) {
     .checkout-card .row.g-3.mb-4 {
         flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        overflow: auto;
     }
 
     .checkout-card .payment-tile {
-        padding: 10px 6px;
-        min-width: 60px;
-    }
-
-    .checkout-card .col {
-        flex: 0 0 auto;
-        width: auto;
-    }
-
-    /* Fix doc preview on very small screens */
-    .doc-preview-area {
-        padding: 10px;
-    }
-
-    /* Fix bank deposit form */
-    .deposit-card .payment-form {
-        grid-template-columns: 1fr;
+        padding: 14px;
     }
 }

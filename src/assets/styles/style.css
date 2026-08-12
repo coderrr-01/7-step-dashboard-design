@@ -245,8 +245,8 @@ body.page-view-room h3 {
 
 /* Heading utilities */
 .heading-hero {
-  font-size: 60px;
-    font-weight: 700;
+  font-size: 30px;
+    font-weight: 700 !important;
     line-height: 1.2;
     color: var(--jrny-gold) !important;
     margin-bottom: 1rem;
@@ -346,17 +346,34 @@ body.page-view-room h3 {
 /* =====================
    Layout
 ===================== */
-.bg-field {
-    background-color: var(--jrny-surface);
+body .bg-field {
+    background-color:#f6f3ec !important
 }
-
+.home-page-bg{
+    background-color:#f6f3ec !important
+    
+}
+.premium-chat-input{
+    border:none !important;
+        background: none !important;
+        outline:none !important
+}
+.premium-chat-input:focus{
+background-color: unset !important;
+    border-color: unset !important;
+    color: #000 !important;
+        box-shadow: unset !important;
+}
 .container-narrow {
     max-width: 1400px;
 }
-
-.stepper-container-fluid {
-    background-color: var(--jrny-surface);
+body .stepper-container-fluid{
+      background-color: #f6f3ec !important;
 }
+
+/* .stepper-container-fluid {
+    background-color: var(--jrny-surface);
+} */
 /* .main-container {
     max-width: 1200px;
     margin: 40px auto;
@@ -399,9 +416,9 @@ body.page-view-room h3 {
     border-bottom: 1px solid var(--outline-variant);
 }
 
-.step-header .heading-lead-wide {
+/* .step-header .heading-lead-wide {
     max-width: 600px;
-}
+} */
 
 /* =====================
    Header / Navigation
@@ -871,7 +888,7 @@ body.page-residence-agreement .form-check-label {
 }
 
 .signature-input {
-    border: none;
+    border: none !important;
     border-bottom: 1px solid var(--outline-variant);
     background: transparent;
     font-family: var(--font-serif);
@@ -952,6 +969,10 @@ body.page-residence-agreement .form-check-label {
     overflow: hidden;
     font-family: 'Barlow' !important;
 }
+.checkout-card h3{
+    font-size:20px;
+    font-weight: 600;
+}
 
 .residency-card {
     background-color: var(--er-card-bg);
@@ -971,7 +992,7 @@ body.page-residence-agreement .form-check-label {
 
 .parchment-card .calendar-widget {
     border: unset;
-    padding: 0px;
+    padding: 20px;
     margin: 0px 0px 30px;
     background: unset;
 }
@@ -1059,7 +1080,7 @@ body.page-residence-agreement .form-check-label {
     gap: 10px;
 }
 .paymentmethod_title h3 {
-    font-size: 18px;
+    font-size: 16px;
     font-family: 'Barlow' !important;
     position: relative;
     margin: 0px;
@@ -1119,6 +1140,21 @@ background-color: #b8924a;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #e3e3e3;
+}
+.chat-header  h3{
+    margin: 0px;
+    font-size: 20px;
+}
+.close-btn{
+        background: #be9b7d;
+    border: none;
+    border-radius: 50px;
+    width: 30px;
+    height: 30px;
+    color: #fff;
+}
+.amount_pay input{
+    border:none !important
 }
 
 .agent-status {
@@ -1199,10 +1235,13 @@ background-color: #b8924a;
     display: flex;
     align-items: center;
 }
+.typeform-progress-label{
+    display: none !important;
+}
 
 .chat-input {
     background: transparent;
-    border: none;
+    border: none !important;
     flex-grow: 1;
     font-size: 14px;
     font-style: italic;
@@ -2066,7 +2105,7 @@ background-color: #b8924a;
 
 .residence-title {
     color: var(--er-gold);
-    font-size: 30px;
+    font-size: 20px;
     margin: 0px 0px 8px !important;
         font-family: 'Barlow';
 }
@@ -2792,13 +2831,13 @@ body.page-room-search .page-description {
     /* flex: 1; */
     overflow-x: auto;
     overflow-y: hidden;
-    background-color: #ffd229;
+    /* background-color: #ffd229; */
 }
 .desktopview-stepper.payment-active {
     overflow-x: auto;
     overflow-y: hidden;
-    background-color: #ffd229;
-    border-radius: 50px 0 0 50px;
+    /* background-color: #ffd229; */
+    border-radius: 16px 0 0 16px;
 }
 
 .desktopview-stepper::-webkit-scrollbar {
@@ -2808,13 +2847,18 @@ body.page-room-search .page-description {
     display: flex;
     align-items: center;
     height: 56px;
+    background: #000;
     position: relative;
     white-space: nowrap;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    background: linear-gradient(to right, #000 0% 93%, #ffd229 90% 100%);
+    background: linear-gradient(to right, #000 0%, #000 90%, #ded8c9 90%, #ded7c9 100%);
+    /* Firefox */
     scrollbar-width: thin;
-    scrollbar-color: #b9934c #ffffff;
+        scrollbar-color: #b9934c #ffffff;
+}
+.footer-bg{
+    padding: 50px 0px;
 }
 .stepper-container::-webkit-scrollbar {
     height: 4px;
@@ -2848,7 +2892,7 @@ body.page-room-search .page-description {
     font-weight: 700;
     text-transform: uppercase;
     color: #005d39;
-    background: #ffd229;
+    background: #e0dacc;
     margin-right: -27px;
     z-index: 1;
     transition: .25s;
@@ -2899,8 +2943,9 @@ width: calc(100% + 1px);
 =========================== */
 
 .stepper-item.active{
-
-    color:#ffd229;
+    color: #fff !important;
+    font-weight: 700;
+    background: #be9b7c;
 
 }
 
@@ -2908,25 +2953,6 @@ width: calc(100% + 1px);
 
     background:#0b6c3d;
 
-}
-
-/* ===========================
-   Completed
-=========================== */
-.stepper-item.completed {
-    color: #ffd229;
-}
-.stepper-item.completed::after {
-    background: #0b6c3d;
-    opacity: 0.6;
-}
-
-/* ===========================
-   Locked
-=========================== */
-.stepper-item.locked {
-    cursor: not-allowed !important;
-    pointer-events: none;
 }
 
 /* ===========================
@@ -2999,11 +3025,11 @@ width: calc(100% + 1px);
 }
 .top-header-section{
     padding: 10px;
-    background: #f5ecda;
+    /* background: #f5ecda; */
     border-radius: 5px;
 }
 .top-header-section a{
-      font-size: 19px;
+      font-size: 17px;
     /* background: #fff; */
     padding: 4px 12px;
     font-weight: 600;
@@ -3085,19 +3111,7 @@ width: calc(100% + 1px);
 
 /* DESKTOP NAV */
 
-.close-btn {
-    position: absolute;
-    left: 0px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #000;
-    font-size: 22px;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-}
+
 
 
 .desktop-nav a:hover::after {
