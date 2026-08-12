@@ -1,0 +1,515 @@
+/* ===== Room Search · Map experience ===== */
+
+.rs-bg-field {
+  background: #f7f4ee;
+}
+
+/* ---------- Location Search ---------- */
+.rs-dd-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b6458;
+}
+.rs-dd-loading .spin {
+  display: inline-block;
+  animation: rsSpin 0.9s linear infinite;
+}
+
+.rs-loc-error {
+  display: block;
+  margin-top: 6px;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  color: #b23b2e;
+  background: rgba(178, 59, 46, 0.06);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.dropdown-mock-menu li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.location-search {
+  position: relative;
+  width: 100%;
+  z-index: 2000;
+}
+
+.location-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1.5px solid #e0dacc;
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 6px 20px -12px rgba(30, 24, 18, 0.25);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.location-search-box.is-open {
+  border-color: #bb9a7e;
+  box-shadow: 0 0 0 3px rgba(187, 154, 126, 0.18);
+}
+
+.location-search-icon {
+  color: #bb9a7e;
+  font-size: 16px;
+  display: flex;
+}
+
+.location-search-input {
+  flex: 1;
+  border: none !important;
+  outline: none;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111 !important;
+  padding: 0;
+  min-width: 0;
+}
+.location-search-input::placeholder {
+  color: #9b9383 !important;
+}
+
+.location-clear {
+  border: none;
+  background: #f0e9dc;
+  color: #6b6252;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.location-clear:hover {
+  background: #111;
+  color: #fff;
+}
+
+/* Suggestions panel */
+.location-suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e0dacc;
+  border-radius: 16px;
+  box-shadow: 0 24px 55px rgba(17, 17, 17, 0.16);
+  padding: 8px;
+  z-index: 2000;
+  animation: rsDropIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes rsDropIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.location-popular-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #b8924a;
+  padding: 8px 12px 4px;
+}
+
+.location-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.location-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+.location-list li:hover,
+.location-list li.active {
+  background: rgba(187, 154, 126, 0.12);
+}
+.location-list-icon {
+  color: #bb9a7e;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.location-list-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.location-list-text strong {
+  font-family: "Poppins", sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111;
+}
+.location-list-text small {
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  color: #8a8171;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.location-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  color: #6b6458;
+  padding: 12px;
+}
+.location-status.is-error {
+  color: #b23b2e;
+  background: rgba(178, 59, 46, 0.06);
+  border-radius: 10px;
+}
+
+/* ---------- Map ---------- */
+.property-map-wrap {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #e0dacc;
+  box-shadow: 0 18px 40px -18px rgba(17, 17, 17, 0.28);
+  background: #f0ece3;
+  height: 380px;
+}
+.property-map {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+}
+.set-location-data{
+  position: relative;
+  z-index: 99;
+}
+.rs-reset-btn {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: #111;
+  border: 1px solid #e0dacc;
+  border-radius: 12px;
+  padding: 9px 14px;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(17, 17, 17, 0.14);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.rs-reset-btn:hover {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+  transform: translateY(-2px);
+}
+
+.rs-map-loading {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(17, 17, 17, 0.92);
+  color: #fff;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: "Poppins", sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+/* Leaflet zoom control restyle */
+.property-map .leaflet-control-zoom {
+  border: 1px solid #e0dacc;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(17, 17, 17, 0.14);
+}
+.property-map .leaflet-control-zoom a {
+  background: #fff;
+  color: #111;
+  border-bottom: 1px solid #ece5d8;
+  font-family: "Poppins", sans-serif;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.property-map .leaflet-control-zoom a:hover {
+  background: #111;
+  color: #fff;
+}
+
+/* ---------- Pins ---------- */
+.rs-marker-wrap {
+  background: transparent;
+  border: none;
+}
+
+.rs-location-pin {
+  width: 46px;
+  height: 46px;
+  position: relative;
+  background: linear-gradient(140deg, #c9a45c, #b8924a 55%, #a87f3f);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 10px 22px rgba(184, 146, 74, 0.55);
+  animation: rsPinDrop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.rs-location-pin::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  background: #fff;
+  border-radius: 50%;
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rs-pin-dot {
+  position: absolute;
+  inset: 0;
+  transform: rotate(45deg);
+  background: radial-gradient(circle at center, #b8924a 30%, transparent 32%);
+  z-index: 2;
+}
+@keyframes rsPinDrop {
+  0%   { transform: rotate(-45deg) translateY(-14px); opacity: 0; }
+  60%  { transform: rotate(-45deg) translateY(2px); opacity: 1; }
+  100% { transform: rotate(-45deg); }
+}
+
+.rs-room-pin {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #bb9a7e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 8px 18px rgba(17, 17, 17, 0.22);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.rs-room-pin:hover,
+.rs-room-pin.is-open {
+  background: #111;
+  border-color: #111;
+  transform: scale(1.15);
+  box-shadow: 0 12px 24px rgba(17, 17, 17, 0.35);
+}
+
+/* ---------- Popups ---------- */
+.property-map .leaflet-popup-content-wrapper {
+  border-radius: 16px;
+  padding: 0;
+  box-shadow: 0 20px 45px rgba(17, 17, 17, 0.24);
+  overflow: hidden;
+}
+.property-map .leaflet-popup-content {
+  margin: 0;
+  width: 260px !important;
+}
+.property-map .leaflet-popup-close-button {
+  z-index: 5;
+  color: #fff !important;
+  background: rgba(0, 0, 0, 0.4);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 8px;
+  right: 8px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.rs-location-popup {
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rs-location-popup-icon {
+  font-size: 15px;
+}
+
+.rs-room-popup {
+  font-family: "Poppins", sans-serif;
+}
+.rs-room-popup-img {
+  height: 130px;
+  background-size: cover;
+  background-position: center;
+  background-color: #f0e9dc;
+}
+.rs-room-popup-body {
+  padding: 14px 16px 16px;
+}
+.rs-room-popup-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+}
+.rs-room-popup-meta {
+  margin-top: 3px;
+}
+.rs-popup-loc {
+  font-size: 12px;
+  color: #8a8171;
+}
+.rs-room-popup-price {
+  margin-top: 10px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #111;
+}
+.rs-room-popup-price em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 500;
+  color: #8a8171;
+}
+.rs-room-popup-avail {
+  font-size: 12px;
+  color: #6b6458;
+  margin: 2px 0 12px;
+}
+.rs-room-popup-btn {
+  display: block;
+  text-align: center;
+  background: #111;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 10px 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+.rs-room-popup-btn:hover {
+  background: #b8924a;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ---------- Results header ---------- */
+.rs-results-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.rs-results-title {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  color: #111;
+  font-size: 20px;
+  letter-spacing: -0.3px;
+}
+.rs-results-title .rs-loc-tag {
+  color: #b8924a;
+}
+.rs-results-count {
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8a8171;
+  background: #fff;
+  border: 1px solid #e0dacc;
+  border-radius: 999px;
+  padding: 6px 14px;
+  white-space: nowrap;
+}
+
+.rs-empty-state {
+  background: #fff;
+  border: 1px dashed #d8d0bf;
+  border-radius: 20px;
+  padding: 48px 20px;
+  text-align: center;
+}
+.rs-empty-state-icon {
+  font-size: 34px;
+  color: #b8924a;
+  margin-bottom: 8px;
+}
+.rs-empty-state h4 {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 6px;
+}
+.rs-empty-state p {
+  color: #8a8171;
+  margin-bottom: 0;
+}
+
+.spin {
+  animation: rsSpin 0.9s linear infinite;
+}
+@keyframes rsSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 991px) {
+  .property-map-wrap {
+    height: 420px;
+  }
+}
+@media (max-width: 575px) {
+  .property-map-wrap {
+    height: 340px;
+    border-radius: 16px;
+  }
+  .rs-reset-btn {
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}

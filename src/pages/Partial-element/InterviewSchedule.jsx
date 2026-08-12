@@ -1,27 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Calendar from "./Calendar";
 import Timeslot from "./Timeslot";
 import { useNavigate } from 'react-router-dom';
 import tourImg from "../../assets/images/tour-img.png";
 import interviewImg from "../../assets/images/interview-img.png";
-
-const WP_BASE = 'https://wordpress-1608288-6566160.cloudwaysapps.com/wp-json/jrny/v1';
-
-function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedDate, confirmedTime, meetLink, submitting, roomName }) {
+function InterviewSchedule({ interview_progress, datatext }) {
     const [activeTab, setActiveTab] = useState("schedule");
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedTime, setSelectedTime] = useState(null);
-    const [bookedSlots, setBookedSlots] = useState([]);
-    const [error, setError] = useState('');
-
-    // Fetch booked slots whenever selected date changes
-    useEffect(() => {
-        if (!selectedDate) return;
-        fetch(`${WP_BASE}/booked-slots?date=${encodeURIComponent(selectedDate.value)}`)
-            .then(r => r.json())
-            .then(data => { if (data.success) setBookedSlots(data.booked || []); })
-            .catch(() => {});
-    }, [selectedDate]);
     const contentMap = {
         securePlaneblock: {
             img: tourImg,
@@ -49,7 +33,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
         <div>
             {/* Tabs */}
             <div className="scheduling-tabs">
-                <div className={`tab-item ${activeTab === "schedule" ? "active" : ""}`} onClick={() => activeTab === "schedule" && setActiveTab("schedule")}>
+                <div className={`tab-item ${activeTab === "schedule" ? "active" : ""}`} onClick={() => setActiveTab("schedule")}>
                     <i className="bi bi-calendar3 fs-5"></i>
                     {
                         datatext === "securePlaneblock"
@@ -60,8 +44,9 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                     }
                 </div>
                 <div
-                    className={`tab-item ${activeTab === "confirm" ? "active" : ""}`}
-                    style={{ cursor: 'default' }}
+                    className={
+                        `tab-item ${activeTab === "confirm" ? "active" : ""}`
+                    }
                 >
                     <i className="bi bi-check-circle fs-5"></i>
                     CONFIRMED!
@@ -73,32 +58,19 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                         <div className="tab_schedule_room">
                             <div className="row">
                                 <div className="col-md-6 pe-md-4">
-                                    <Calendar onSelectDate={(d) => { setSelectedDate(d); setError(''); }} />
+                                    <Calendar />
                                 </div>
                                 {/* Slots */}
                                 <div className="col-md-6 ps-md-2 mt-4 mt-md-0">
                                     <h6 className="slots-heading">
-                                        AVAILABLE SLOTS FOR {selectedDate ? selectedDate.label : 'TODAY'}
+                                        AVAILABLE SLOTS FOR OCT 10
                                     </h6>
-                                    <Timeslot selectedTime={selectedTime} onSelectTime={(t) => { setSelectedTime(t); setError(''); }} bookedSlots={bookedSlots} />
-                                    {error && (
-                                        <p className="text-danger small mb-2">{error}</p>
-                                    )}
+                                    <Timeslot />
                                     <button
                                         className="btn btn-gold mb-2"
-                                        disabled={submitting}
-                                        onClick={() => {
-                                            if (!selectedDate) { setError('Please select a date.'); return; }
-                                            if (!selectedTime) { setError('Please select a time slot.'); return; }
-                                            setError('');
-                                            if (onConfirm) {
-                                                onConfirm(selectedDate, selectedTime, () => setActiveTab("confirm"));
-                                            } else {
-                                                setActiveTab("confirm");
-                                            }
-                                        }}
+                                        onClick={() => setActiveTab("confirm")}
                                     >
-                                        {submitting ? 'Booking...' : 'Confirm Time Slot'}
+                                        Confirm Time Slot
                                     </button>
                                     <div className="divider-text">
                                         OR
@@ -138,7 +110,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                                 Date
                                             </span>
                                             <span className="detail-value">
-                                                {confirmedDate || (selectedDate ? selectedDate.label : 'Oct 14, 2024')}
+                                                Oct 14, 2024
                                             </span>
                                         </div>
                                         <div className="detail-row">
@@ -146,7 +118,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                                 Time
                                             </span>
                                             <span className="detail-value">
-                                                {confirmedTime || selectedTime || '02:00 PM'}
+                                                02:00 PM
                                             </span>
                                         </div>
                                         <div className="detail-row">
@@ -154,22 +126,14 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                                 Room
                                             </span>
                                             <span className="detail-value">
-                                                {roomName || 'The Victorian Premier'}
+                                                The Victorian Premier
                                             </span>
                                         </div>
                                     </div>
-                                    {meetLink && (
-                                        <a href={meetLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp mb-3 d-inline-block">
-                                            <i className="bi bi-camera-video me-2"></i>
-                                            Join Google Meet
-                                        </a>
-                                    )}
-                                    {!meetLink && (
-                                        <button type="button" className="btn btn-whatsapp mb-3" onClick={interview_progress}>
-                                            <i className="bi bi-whatsapp me-2"></i>
-                                            Interview with Najat
-                                        </button>
-                                    )}
+                                    <button type="button" className="btn btn-whatsapp mb-3" onClick={interview_progress}>
+                                        <i className="bi bi-whatsapp me-2"></i>
+                                        Interview with Najat
+                                    </button>
                                     <button
                                         type="button"
                                         className="btn btn-black"

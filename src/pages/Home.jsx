@@ -1,320 +1,107 @@
-import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
-import { useNavigate } from "react-router-dom";
-import { useSteps } from "../context/StepContext";
-import { applyForm, getCachedClient, getToken, getUserSub } from "../services/api";
-import { toast } from "react-toastify";
+import ChatCard from "./Partial-element/Chatcard";
+import { Link } from "react-router-dom";
+import {
+  FaFilePen,
+  FaArrowRight,
+  FaShieldHalved,
+  FaCircleCheck,
+  FaUserCheck,
+} from "react-icons/fa6";
+import "../assets/styles/home-style.css";
 
-const EMPLOYMENT_OPTIONS = ["Employed", "Self-Employed", "Student", "Other"];
+const overviewFields = [
+  { label: "Full Name", value: "John Smith" },
+  { label: "Email", value: "simonramsey@gmail.com" },
+  { label: "Phone", value: "+1 (212) 555-0100" },
+  { label: "Date of Birth", value: "12 Mar 1992" },
+  { label: "Move-in Date", value: "01 Oct 2026" },
+  { label: "Current Address", value: "123 Main St, New York, NY 10001" },
+];
 
-function getEmailFromToken() {
-  try {
-    const token = getToken();
-    if (!token) return '';
-    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-    return payload.email || '';
-  } catch { return ''; }
+const sectionItems = [
+  { name: "Personal Information", status: "ok", label: "Completed" },
+  { name: "Contact Details", status: "ok", label: "Completed" },
+  { name: "Employment & Income", status: "pending", label: "Pending" },
+  { name: "Supporting Documents", status: "pending", label: "Pending" },
+];
+
+function OverviewPanel() {
+  return (
+    <aside className="home-overview">
+      <div className="home-overview-head">
+        <span className="home-overview-icon">
+          <FaFilePen />
+        </span>
+        <div>
+          <h2 className="home-overview-title">Application Overview</h2>
+          <p className="home-overview-section">Personal Details</p>
+        </div>
+      </div>
+
+      <div className="home-overview-note">
+        <span className="home-overview-note-icon">
+          <FaShieldHalved />
+        </span>
+        <p>
+          You are completing the <strong>Personal Details</strong> section. Our
+          systems will verify this information against your records.
+        </p>
+      </div>
+
+      {/* <div className="home-overview-fields">
+        {overviewFields.map((f) => (
+          <div className="home-overview-field" key={f.label}>
+            <span className="home-overview-label">{f.label}</span>
+            <span className="home-overview-value">{f.value}</span>
+          </div>
+        ))}
+      </div> */}
+
+      {/* <ul className="home-overview-list">
+        {sectionItems.map((item) => (
+          <li
+            key={item.name}
+            className={`home-overview-item is-${item.status}`}
+          >
+            <span className="home-overview-item-icon">
+              {item.status === "ok" ? <FaCircleCheck /> : <span className="home-overview-pending-dot"></span>}
+            </span>
+            <span className="home-overview-item-name">{item.name}</span>
+            <span className="home-overview-item-label">{item.label}</span>
+          </li>
+        ))}
+      </ul> */}
+
+      <div className="home-overview-verified">
+        <span className="home-overview-verified-dot"></span>
+        <span className="home-overview-verified-label">Visa Status</span>
+        <span className="home-overview-verified-value">Verified</span>
+      </div>
+
+      <Link to="/review" className="home-overview-cta">
+        Continue Application
+        <FaArrowRight />
+      </Link>
+    </aside>
+  );
 }
 
 export default function Home() {
-  const navigate = useNavigate();
-  const { completeStep, completedSteps } = useSteps();
-
-  const alreadySubmitted = completedSteps.includes(1);
-
-  // Read client data scoped to the current user — never stale from a previous user
-  const [cachedEmail, setCachedEmail] = useState(() => getEmailFromToken());
-  const [form, setForm] = useState({
-    name:              "",
-    email:             getEmailFromToken(),
-    phone:             "",
-    date_of_birth:     "",
-    current_address:   "",
-    employment_status: "",
-    monthly_income:    "",
-    move_in_date:      "",
-    message:           "",
-  });
-
-  // Populate form from user-scoped cached client data after mount
-  useEffect(() => {
-    const client = getCachedClient();
-    if (!client) return;
-    const email = client.email || getEmailFromToken() || '';
-    setCachedEmail(email);
-    setForm(prev => ({
-      name:              prev.name              || client.name              || "",
-      email:             email,
-      phone:             prev.phone             || client.phone             || "",
-      date_of_birth:     prev.date_of_birth     || client.date_of_birth     || "",
-      current_address:   prev.current_address   || client.current_address   || "",
-      employment_status: prev.employment_status || client.employment_status || "",
-      monthly_income:    prev.monthly_income    || (client.monthly_income != null ? String(client.monthly_income) : ""),
-      move_in_date:      prev.move_in_date      || client.move_in_date      || "",
-      message:           prev.message           || client.message           || "",
-    }));
-  // Re-run when completedSteps changes (background fetch in StepContext just finished)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completedSteps, getUserSub()]);
-
-  const [submitting, setSubmitting] = useState(false);
-
-  const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name || !form.phone || !form.email) {
-      toast.error("Full name, email and phone are required.");
-      return;
-    }
-    setSubmitting(true);
-    try {
-      const res = await applyForm({
-        name:              form.name,
-        email:             form.email,
-        phone:             form.phone,
-        date_of_birth:     form.date_of_birth,
-        current_address:   form.current_address,
-        employment_status: form.employment_status,
-        monthly_income:    parseFloat(form.monthly_income) || 0,
-        move_in_date:      form.move_in_date,
-        message:           form.message,
-      });
-      if (res.success) {
-        toast.success("Application submitted successfully!");
-        completeStep(1);
-        navigate("/review");
-      } else {
-        toast.error(res.message || "Submission failed. Please try again.");
-      }
-    } catch (err) {
-      toast.error(err.message || "Network error. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-
-  // Already submitted — show read-only summary, no form
-  if (alreadySubmitted) {
-    return (
-      <PageLayout page="Home">
-        <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 bg-field">
-          <div className="container container-narrow homepage-screen">
-            <div className="row g-5">
-              <div className="col-lg-8">
-                <div className="mb-5">
-                  <h1 className="display-4 serif-heading heading-hero hero-title mb-3">Application Submitted</h1>
-                  <p className="lead text-secondary heading-lead">Your application has already been submitted.</p>
-                </div>
-                <div className="p-4 rounded-3 border application-view-highlight mb-4">
-                  <p className="mb-1"><strong>Email:</strong> {cachedEmail}</p>
-                  <p className="mb-0 text-muted small">This step is complete. Your application is under review.</p>
-                </div>
-                <button className="btn btn-jrny-dark shadow-lg" onClick={() => navigate('/review')}>
-                  View Review Status
-                </button>
-              </div>
-            </div>
-          </div>
-        </main>
-      </PageLayout>
-    );
-  }
-
   return (
     <PageLayout page="Home">
-      <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 bg-field">
-        <div className="container container-narrow homepage-screen">
-          <div className="row g-5">
-            <div className="col-lg-8">
-              <div className="mb-5">
-                <h1 className="display-4 serif-heading heading-hero hero-title mb-3">
-                  Apply to Stay with Journey
-                </h1>
-                <p className="lead text-secondary heading-lead">
-                  Fill in your details below to begin your application.
-                </p>
-              </div>
+      <main className="home-page-bg">
+        <div className="home-ambient">
+          <span className="home-blob home-blob-1"></span>
+          <span className="home-blob home-blob-2"></span>
+        </div>
 
-              <form onSubmit={handleSubmit} noValidate>
-                <div className="row g-3">
-                  {/* Full Name */}
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-uppercase text-muted">
-                      Full Name <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={form.name}
-                      onChange={set("name")}
-                      placeholder="John Smith"
-                      required
-                    />
-                  </div>
-
-                  {/* Email — pre-filled from JWT, readonly */}
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-uppercase text-muted">
-                      Email <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      value={form.email}
-                      onChange={cachedEmail ? undefined : set("email")}
-                      readOnly={!!cachedEmail}
-                      placeholder="john@example.com"
-                      required
-                    />
-                  </div>
-
-                  {/* Phone */}
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-uppercase text-muted">
-                      Phone <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      className="form-control"
-                      value={form.phone}
-                      onChange={set("phone")}
-                      placeholder="+1 (212) 555-0100"
-                      required
-                    />
-                  </div>
-
-                  {/* Date of Birth */}
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-uppercase text-muted">
-                      Date of Birth
-                    </label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      value={form.date_of_birth}
-                      onChange={set("date_of_birth")}
-                    />
-                  </div>
-
-                  {/* Desired Move-in Date */}
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-uppercase text-muted">
-                      Desired Move-in Date
-                    </label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      value={form.move_in_date}
-                      onChange={set("move_in_date")}
-                    />
-                  </div>
-
-                  {/* Current Address */}
-                  <div className="col-12">
-                    <label className="form-label fw-bold small text-uppercase text-muted">
-                      Current Address
-                    </label>
-                    <textarea
-                      className="form-control"
-                      rows={2}
-                      value={form.current_address}
-                      onChange={set("current_address")}
-                      placeholder="123 Main St, New York, NY 10001"
-                    />
-                  </div>
-
-                  {/* Employment Status */}
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-uppercase text-muted">
-                      Employment Status
-                    </label>
-                    <select
-                      className="form-select"
-                      value={form.employment_status}
-                      onChange={set("employment_status")}
-                    >
-                      <option value="">Select...</option>
-                      {EMPLOYMENT_OPTIONS.map((o) => (
-                        <option key={o} value={o}>{o}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Monthly Income */}
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-uppercase text-muted">
-                      Monthly Income ($)
-                    </label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      value={form.monthly_income}
-                      onChange={set("monthly_income")}
-                      placeholder="5000"
-                      min="0"
-                    />
-                  </div>
-
-                  {/* Message */}
-                  <div className="col-12">
-                    <label className="form-label fw-bold small text-uppercase text-muted">
-                      Message (Optional)
-                    </label>
-                    <textarea
-                      className="form-control"
-                      rows={3}
-                      value={form.message}
-                      onChange={set("message")}
-                      placeholder="Tell us anything relevant about your application..."
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-4">
-                  <button
-                    type="submit"
-                    className="btn btn-jrny-dark w-100 shadow-lg"
-                    disabled={submitting}
-                  >
-                    {submitting ? "Submitting..." : "Submit Application"}
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            {/* Right sidebar — unchanged layout */}
-            <div className="col-lg-4">
-              <div className="d-flex flex-column gap-4 revrese-column">
-                <div className="application-view">
-                  <div className="d-flex gap-3 mb-4 align-items-center">
-                    <div className="p-3 rounded-3 badges-icon">
-                      <svg fill="none" height="24" stroke="currentColor" viewBox="0 0 24 24" width="24">
-                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h4 className="serif-heading h5 mb-1">Application Overview</h4>
-                    </div>
-                  </div>
-                  <div className="p-3 mb-4 rounded-3 border application-view-highlight">
-                    <p>
-                      You are completing the{" "}
-                      <span className="fw-bold text-dark">Personal Details</span> section.
-                      Our systems will verify this information against your records.
-                    </p>
-                  </div>
-                  <div className="d-flex justify-content-between verified-status align-items-center pt-3">
-                    <span className="text-label-uppercase">Visa Status</span>
-                    <div className="d-flex align-items-center gap-1">
-                      <div className="verified-dot"></div>
-                      <span className="text-verified">Verified</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="home-layout">
+          <div className="home-chat-column">
+            <ChatCard />
+          </div>
+          <div className="home-overview-column">
+            <OverviewPanel />
           </div>
         </div>
       </main>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../../assets/styles/calendar-style.css"
 
 
-function Calendar({ onSelectDate }) {
+function Calendar() {
 
 
   const [currentDate, setCurrentDate] = useState(
@@ -145,13 +145,19 @@ const today = new Date();
 
         >
 
-          {
-            months[month]
-          } {year}
+          <span className="month-name">
 
+            {months[month]}
+
+          </span>
+
+          <span className="month-year">
+
+            {year}
+
+          </span>
 
         </button>
-
 
 
 
@@ -160,7 +166,7 @@ const today = new Date();
 
           <button
 
-            className="border rounded p-1 bg-white"
+            className="calendar-nav-btn"
 
             onClick={() => {
 
@@ -179,9 +185,10 @@ const today = new Date();
 
 
 
+
           <button
 
-            className="border rounded p-1 bg-white"
+            className="calendar-nav-btn"
 
             onClick={() => {
 
@@ -337,32 +344,28 @@ const today = new Date();
 
 ${date === "" ? "muted" : ""}
 
+${date !== "" && (startDay + index) % 7 === 0 ? "weekend" : ""}
+
+${date !== "" && (startDay + index) % 7 === 6 ? "weekend" : ""}
+
 ${selectedDate === date ? "active" : ""}
+
+${date !== "" && date === today.getDate() && month === today.getMonth() && year === today.getFullYear() ? "today" : ""}
 
 `
 
               }
 
 
-              onClick={() => {
-                if (!date) return;
-                setSelectedDate(date);
-                if (onSelectDate) {
-                  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-                  const yr = currentDate.getFullYear();
-                  const mo = currentDate.getMonth();
-                  const label = `${months[mo]} ${date}, ${yr}`;
-                  // Format for WP plugin: dd/mm/yyyy
-                  const padded = String(date).padStart(2,'0');
-                  const moPadded = String(mo + 1).padStart(2,'0');
-                  onSelectDate({ label, value: `${padded}/${moPadded}/${yr}` });
-                }
-              }}
+              onClick={() => date && setSelectedDate(date)}
 
             >
 
 
               {date}
+
+
+              {date !== "" && <span className="date-marker"></span>}
 
 
             </div>

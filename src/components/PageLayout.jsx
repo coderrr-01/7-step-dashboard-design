@@ -4,7 +4,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 
 const steps = [
-  ["APPLY", "/apply"],
+  ["APPLY", "/"],
   ["REVIEW", "/review"],
   ["ROOM SEARCH", "/room-search"],
   ["INTERVIEW", "/interview"],
@@ -16,7 +16,7 @@ const steps = [
 export default function PageLayout({ children }) {
   const { pathname } = useLocation();
   useEffect(() => {
-    document.body.className = `page-${pathname === "/apply" ? "index" : pathname.slice(1)}`;
+    document.body.className = `page-${pathname === "/" ? "index" : pathname.slice(1)}`;
     return () => { document.body.className = ""; };
   }, [pathname]);
 

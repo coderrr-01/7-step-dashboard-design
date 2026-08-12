@@ -1,0 +1,75 @@
+// Mock verification data matching the expected future API response shape.
+// Replace with a real API fetch later — the UI reads the same fields.
+
+export const verificationData = {
+  applicationId: "APP-10245",
+  status: "in-progress", // pending | in-progress | action-required | completed | failed
+  progress: 62,
+  submittedAt: "2026-08-10T10:42:00",
+  lastUpdated: "2026-08-10T10:45:00",
+  estimatedTime: "24–48 hours",
+
+  // The application form the user submitted — every field below gets verified.
+  applicant: {
+    fullName: "John Smith",
+    email: "simonramsey@gmail.com",
+    phone: "+1 (212) 555-0100",
+    dateOfBirth: "12 Mar 1992",
+    moveInDate: "01 Oct 2026",
+    currentAddress: "123 Main St, New York, NY 10001",
+    employmentStatus: "Employed",
+    monthlyIncome: "$5,000",
+    message: "Looking forward to staying with JRNY.",
+  },
+
+  // High-level progress steps
+  steps: [
+    { name: "Application Submitted", status: "done" },
+    { name: "Details Verified", status: "active" },
+    { name: "Application Approved", status: "pending" },
+  ],
+
+  // Verification checklist — one item per submitted form field
+  checklist: [
+    { name: "Full Name", status: "verified" },
+    { name: "Email Address", status: "verified" },
+    { name: "Phone Number", status: "verified" },
+    { name: "Date of Birth", status: "under-review" },
+    { name: "Move-in Date", status: "under-review" },
+    { name: "Current Address", status: "under-review" },
+    { name: "Employment Status", status: "pending" },
+    { name: "Monthly Income", status: "pending" },
+  ],
+
+  // Live-feeling activity timeline
+  activity: [
+    { title: "Application submitted", time: "Today, 10:42 AM", status: "done" },
+    { title: "Personal details received", time: "Today, 10:43 AM", status: "done" },
+    { title: "Contact details verified", time: "Today, 10:44 AM", status: "done" },
+    { title: "Verifying your details", time: "In progress", status: "active" },
+    { title: "Verification complete", time: "Pending", status: "pending" },
+  ],
+
+  currentlyReviewing: {
+    title: "Your Personal Details",
+    description: "Checking your submitted details and information...",
+  },
+
+  actionRequired: {
+    missingDocument: "Proof of Address",
+    description: "We need a little more information from you.",
+  },
+
+  failed: {
+    description: "Some of your submitted details could not be verified.",
+  },
+};
+
+export const formatDate = (iso) => {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};

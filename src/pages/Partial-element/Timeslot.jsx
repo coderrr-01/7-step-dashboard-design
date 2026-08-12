@@ -1,15 +1,8 @@
 import { useState } from "react";
 
-function Timeslot({ selectedTime: externalTime, onSelectTime, bookedSlots = [] }) {
+function Timeslot() {
 
-    const [internalTime, setInternalTime] = useState("10:30 AM");
-    const selectedTime = externalTime !== undefined ? externalTime : internalTime;
-
-    const handleSelect = (time) => {
-        if (bookedSlots.includes(time)) return;
-        setInternalTime(time);
-        if (onSelectTime) onSelectTime(time);
-    };
+    const [selectedTime, setSelectedTime] = useState("10:30 AM");
 
 
     const timeSlots = [
@@ -36,16 +29,22 @@ function Timeslot({ selectedTime: externalTime, onSelectTime, bookedSlots = [] }
                         <div
 
                             className={
-                                bookedSlots.includes(time)
-                                    ? "slot-btn booked"
-                                    : selectedTime === time
-                                    ? "slot-btn selected"
-                                    : "slot-btn"
+                                selectedTime === time
+                                    ?
+                                    "slot-btn selected"
+                                    :
+                                    "slot-btn"
                             }
 
-                            onClick={() => handleSelect(time)}
-                            style={{ cursor: bookedSlots.includes(time) ? 'not-allowed' : 'pointer', opacity: bookedSlots.includes(time) ? 0.45 : 1 }}
-                            title={bookedSlots.includes(time) ? 'This slot is already booked' : ''}
+
+                            onClick={() => {
+
+                                console.log("clicked", time);
+
+                                setSelectedTime(time);
+
+                            }}
+
 
                         >
 

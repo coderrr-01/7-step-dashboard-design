@@ -3,7 +3,7 @@ import PageLayout from "../components/PageLayout";
 export default function ResidenceAgreement() {
   return (
     <PageLayout page="ResidenceAgreement">
-          <main className="flex-grow-1">
+          <main className="flex-grow-1 ">
               <div className="pdf-viewer-container">
                   <div className="pdf-toolbar">
                       <div className="d-flex align-items-center">

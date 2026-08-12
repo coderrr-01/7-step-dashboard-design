@@ -2,7 +2,7 @@ const stepsConfig = [
   {
     number: 1,
     label: "APPLY",
-    path: "/apply",
+    path: "/",
     description: "Identity verification and profile setup completed.",
   },
   {
