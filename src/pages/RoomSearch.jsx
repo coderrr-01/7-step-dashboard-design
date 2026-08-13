@@ -2,11 +2,12 @@ import PageLayout from "../components/PageLayout";
 import { FaAngleDown, FaCompass } from "react-icons/fa6";
 import { IoLocationSharp } from "react-icons/io5";
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import PropertyMap from "../components/roomSearch/PropertyMap";
 import { roomsData } from "../components/roomSearch/roomsData";
 import { searchLocations } from "../components/roomSearch/geocode";
 import "../components/roomSearch/roomSearch.css";
+import { useSteps } from "../context/StepContext";
 
 const locationwise = [
    "London",
@@ -18,6 +19,8 @@ const locationwise = [
 ];
 
 export default function RoomSearch() {
+   const navigate = useNavigate();
+   const { completeStep } = useSteps();
    const [roomAccomadtion, setroomAccomadtion] = useState(false);
    const [selected, setSelected] = useState("All Tiers");
    const [locationPrefereance, setlocationPrefereance] = useState(false);
@@ -92,17 +95,24 @@ export default function RoomSearch() {
       setLocError("");
    };
 
+   const handleViewRoom = (room) => {
+      completeStep(3);
+      // Store selected room for ViewRoom / Interview / SecureBooking pages
+      localStorage.setItem('jrny_selected_room', JSON.stringify(room));
+      navigate('/view-room');
+   };
+
    return (
       <PageLayout page="RoomSearch">
          <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 bg-field py-5 px-lg-5">
             <div className="container container-narrow">
                <section className="mb-4 ">
-                  <div class="row">
-                     <div class="col-lg-12">
-                        <h1 class="display-4 serif-heading heading-hero mb-3 hero-title">Room Selection</h1>
-                        <p class="mb-0 text-muted fs-5 heading-lead-wide">Search by location on the map below and explore exclusive rooms available near your preferred area.</p>
-                     </div>
-                  </div>
+                   <div className="row">
+                      <div className="col-lg-12">
+                         <h1 className="display-4 serif-heading heading-hero mb-3 hero-title">Room Selection</h1>
+                         <p className="mb-0 text-muted fs-5 heading-lead-wide">Search by location on the map below and explore exclusive rooms available near your preferred area.</p>
+                      </div>
+                   </div>
                </section>
 
                {/* Filters */}
@@ -238,7 +248,7 @@ export default function RoomSearch() {
                                     <span className="rent-label">Monthly Rent</span>
                                     <span className="rent-amount">${room.price.toLocaleString()}</span> <span className="rent-period">/mo</span>
                                  </div>
-                                 <Link to="/view-room"> <button className="btn btn-gold">View Room</button></Link>
+                                  <button className="btn btn-gold" onClick={() => handleViewRoom(room)}>View Room</button>
                               </div>
                            </div>
                         </div>

@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { getClientData, getUserSub, getToken } from '../services/api';
 
 export const STEP_PATHS = {
-  1: '/apply',
+  1: '/',
   2: '/review',
   3: '/room-search',
   4: '/interview',

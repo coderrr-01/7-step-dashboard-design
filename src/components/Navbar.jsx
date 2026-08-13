@@ -4,12 +4,14 @@ import Navigator from "../pages/Partial-element/Navigator";
 import { FaHome } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa6";
 import stepsConfig from "../config/stepsConfig";
+import { useSteps } from "../context/StepContext";
 
 const steps = stepsConfig.map(({ label, path, number }) => [label, path, number]);
 
 export default function Navbar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { canAccessStep, completedSteps } = useSteps();
 
   const [open, setOpen] = useState(false);
 
@@ -30,6 +32,31 @@ export default function Navbar() {
   const homepageNavigate = () => {
     navigate("/");
   }
+
+  const handleStepClick = (step, e) => {
+    if (!canAccessStep(step[2])) {
+      e.preventDefault();
+      return; // locked — do nothing
+    }
+  };
+
+  const getStepClass = (step) => {
+    const isActive    = activePath === step[1];
+    const isCompleted = completedSteps.includes(step[2]);
+    const isLocked    = !canAccessStep(step[2]);
+    const isFirst     = step[2] === 1;
+    const isLast      = step[2] === steps.length;
+
+    return [
+      'stepper-item',
+      isActive    ? 'active'    : '',
+      isCompleted ? 'completed' : '',
+      isLocked    ? 'locked'    : '',
+      isFirst     ? 'first'     : '',
+      isLast      ? 'last'      : '',
+    ].filter(Boolean).join(' ');
+  };
+
   return (
     <div className="stepper-container-fluid p-0">
       <div className="stepper-row">
@@ -48,23 +75,25 @@ export default function Navbar() {
         <div className={`desktopview-stepper ${pathname === "/payment-screen" ? "payment-active" : ""
           }`}>
           <div className="stepper-container">
-            {steps.map(([label, path], index) => (
-              <Link
-                key={path}
-                to={path}
-                className={`stepper-item 
-                  ${activePath === path ? "active" : ""}
-                  ${index === 0 ? "first" : ""}
-                  ${index === steps.length - 1 ? "last" : ""}
-                `}
-              >
-                <span>{label}</span>
+            {steps.map((step) => {
+              const isLocked = !canAccessStep(step[2]);
+              return (
+                <Link
+                  key={step[1]}
+                  to={step[1]}
+                  onClick={(e) => handleStepClick(step, e)}
+                  className={getStepClass(step)}
+                  style={{ cursor: isLocked ? 'not-allowed' : 'pointer', userSelect: 'none' }}
+                  title={isLocked ? `Complete step ${step[2] - 1} first` : step[0]}
+                >
+                  <span>{step[0]}</span>
 
-                {index !== steps.length - 1 && (
-                  <div className="step-separator"></div>
-                )}
-              </Link>
-            ))}
+                  {step[2] !== steps.length && (
+                    <div className="step-separator"></div>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         </div>
 
@@ -79,26 +108,6 @@ export default function Navbar() {
               {activeLabel}
             </div>
 
-            {/* {open && (
-              <div className="dropdown-list">
-                {steps.map(([label, path, number]) => {
-                  const isActive = activePath === path;
-
-                  return (
-                    <div
-                      key={path}
-                      className={`dropdown-item ${isActive ? "active" : ""}`}
-                      onClick={() => {
-                        navigate(path);
-                        setOpen(false);
-                      }}
-                    >
-                      {label} {String(number).padStart(2, "0")}/07
-                    </div>
-                  );
-                })}
-              </div>
-            )} */}
           </div>
         </div>
 

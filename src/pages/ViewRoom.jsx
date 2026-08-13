@@ -1,8 +1,37 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import Calendar from "./Partial-element/Calendar";
 import { IoArrowBack } from "react-icons/io5";
+import { useState, useEffect } from "react";
+
 export default function ViewRoom() {
+   const navigate = useNavigate();
+   const [room, setRoom] = useState(null);
+   const [mainImg, setMainImg] = useState(0);
+
+   useEffect(() => {
+      const saved = localStorage.getItem('jrny_selected_room');
+      if (saved) {
+         try { setRoom(JSON.parse(saved)); }
+         catch { navigate('/room-search'); }
+      } else {
+         navigate('/room-search');
+      }
+   }, []);
+
+   if (!room) return null;
+
+   // Support both the new catalogue shape and the old WP /rooms shape
+   const images = room.images?.length
+      ? room.images
+      : [room.img || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCVfkL8eMoD4BRwoPZpU7RgLDUjbRLK3wH-XAdz6WV0kl6Du2f9yQcpOr7eTdjNWMDhmvQdihD1BrYLZgDmUp9Merj2fIgvWSZUw-NdZ1sgTwt2VceIiSimt_tDdNm1rYmGz2h9qJ9tbVt9bPdhcHml9lpYH4CDHeaEbDuKUxGcOpdkL-_Ln2Ic_GlPSiFdKp3y1dZcnAE25vyKoB_qYXoxj61V68bMgd6i5d4CcYyruqknzYFDsyh5Qg'];
+   const roomType = room.room_type || room.tier || 'King Studio Suite';
+   const roomNumber = room.roomNumber || (room.unit_number ? `Unit ${room.unit_number}` : 'Suite 402');
+   const roomName = room.name || 'Victorian Premier';
+   const roomDesc = room.description || room.desc || 'Bespoke 750 sq. ft. living space with high ceilings and crown molding.';
+   const monthlyRent = Number(room.price ?? room.monthly_rent ?? 3450).toLocaleString('en-US', { minimumFractionDigits: 2 });
+   const holdingDeposit = (Number(room.price ?? room.monthly_rent ?? 3450) * 0.5).toLocaleString('en-US', { minimumFractionDigits: 2 });
+
    return (
       <PageLayout page="ViewRoom">
          <main className="container-fluid py-5 px-lg-5 flex-grow-1 bg-field">
@@ -19,7 +48,7 @@ export default function ViewRoom() {
                         <div className="col-12">
                            <div className="parchment-card p-4">
                               <div className="position-relative mb-4">
-                                 <img alt="Main" className="w-100 gallery-main shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVfkL8eMoD4BRwoPZpU7RgLDUjbRLK3wH-XAdz6WV0kl6Du2f9yQcpOr7eTdjNWMDhmvQdihD1BrYLZgDmUp9Merj2fIgvWSZUw-NdZ1sgTwt2VceIiSimt_tDdNm1rYmGz2h9qJ9tbVt9bPdhcHml9lpYH4CDHeaEbDuKUxGcOpdkL-_Ln2Ic_GlPSiFdKp3y1dZcnAE25vyKoB_qYXoxj61V68bMgd6i5d4CcYyruqknzYFDsyh5Qg" />
+                                  <img alt="Main" className="w-100 gallery-main shadow-sm" src={images[mainImg]} />
                                    <Link to="/Viewphoto"><button className="view-all-btn btn d-flex align-items-center gap-2">
                                     <span className="material-symbols-outlined fs-6">
 <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -31,23 +60,25 @@ export default function ViewRoom() {
                                  </Link>
                               </div>
                               <div className="row g-3">
-                                 <div className="col-lg-3 col-sm-6 col-6">
-                                    <img alt="Thumb 1" className="w-100 gallery-thumb" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7Q3CdiGRwdBG8HWtZvXCVWXWmRHZBOstII4Jgo6FQvGT0Ql5JemmGTgTl2GsWkOANqLnbpaXhlQNTWdnk7ArfQPW6wGvRvRFHMXl0H4H2cCG0IJ9tjtHNyyd-FUG2p-BgLf8Al43mnF10pkE8EIav0ilF1I2a-aH8Cwybs1cZZfqI8rTktq2N5ShXrhKlnkaUjAd2OpHmgrmwtqksWo2OvjMbbuA9GfylXXMMRLPh58RRy0r0MvKCMw" />
-                                 </div>
-                                 <div className="col-lg-3 col-sm-6 col-6">
-                                    <img alt="Thumb 2" className="w-100 gallery-thumb" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD3YjfCUyQf6xWAULB9ipz3qNLYBUccUZvhYJZWJZoQGTxlCMqgC9dcqOcXYnwrNNI_BU4CnWcrUzn2LmpNC6h-hGQqCOkgZ0LrRHojwWeEIbYR4PipDc13iFmMOoZQyI5bP-2XW-Tvt_6cYAQqX28n4HeI6aKTSx_4-nOj742wr0sMzoRsn0WbQwYNgJpWNXC28iTdj1Zjx_J--6wt-TUoDGeqIkZt1Oxf4zTh-1Z6MoCujUfvzbj7g" />
-                                 </div>
-                                 <div className="col-lg-3 col-sm-6 col-6">
-                                    <img alt="Thumb 3" className="w-100 gallery-thumb" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAAnKKJlX04DibLty1NMMB7p05jEv-Qua_IiNDn-12KOze1BasommYL2kVqMmz1NfQA-gezn9ZYL3s_wVKjOjpoGs1q-SjwilRa58ngt9VvdUCOV1mY-R4q6ajQ0djQp34YvHFsJvZsFApF-niY6EbpQg8Dl1u7zXrQmJ5k9vl_7N6W6V2h33WPLvOZUGvkfNEzElefoyG9vbx1m2iIXH0ZV-5kCSy4ZLBrcKbpJNn3o4hCTGqfcE7Tg" />
-                                 </div>
-                                 <div className="col-lg-3 col-sm-6 col-6">
-                                    <div className="position-relative h-100">
-                                       <img alt="Thumb 4" className="w-100 gallery-thumb opacity-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpgJuSmi_ip3SDUMTI2h9ppRyXcPsRqNVRdFXRgtcwD6zKXqJ5Oxz5Ao5WW6ZFwUY9P7dDZEK0LO0VvQimgZcBSutnm0whTNCsZfPGstPTJzFKvy-UpMH49C0HGL6WdRPwVXDLuaQGVPQs2bLbGHdymvQteOFrp51gbrsredui_Gq4H6uzTDaLnWYPzrtG4gdDYi3Wva_3vqqGv8UMgKWrQhpJ1tHhW3huY_2tLnLYWXlSOEUVa9NCjQ" />
-                                       <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                                          <span className="fw-bold text-dark more-photos-label">+12 More</span>
-                                       </div>
-                                    </div>
-                                 </div>
+                                  <div className="col-lg-3 col-sm-6 col-6">
+                                     <img alt="Thumb 1" className="w-100 gallery-thumb" src={images[0]} onClick={() => setMainImg(0)} style={{ cursor: 'pointer' }} />
+                                  </div>
+                                  <div className="col-lg-3 col-sm-6 col-6">
+                                     <img alt="Thumb 2" className="w-100 gallery-thumb" src={images[1] || images[0]} onClick={() => setMainImg(1)} style={{ cursor: 'pointer' }} />
+                                  </div>
+                                  <div className="col-lg-3 col-sm-6 col-6">
+                                     <img alt="Thumb 3" className="w-100 gallery-thumb" src={images[2] || images[0]} onClick={() => setMainImg(2)} style={{ cursor: 'pointer' }} />
+                                  </div>
+                                  <div className="col-lg-3 col-sm-6 col-6">
+                                     <div className="position-relative h-100">
+                                        <img alt="Thumb 4" className="w-100 gallery-thumb opacity-50" src={images[3] || images[0]} />
+                                        {images.length > 3 && (
+                                           <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                              <span className="fw-bold text-dark more-photos-label">+{images.length - 3} More</span>
+                                           </div>
+                                        )}
+                                     </div>
+                                  </div>
                               </div>
                            </div>
                         </div>
@@ -61,10 +92,10 @@ export default function ViewRoom() {
 <path d="M23.4131 12.1141V7.81879H16.3803V12.1141H23.4131ZM13.6197 12.1141V7.81879H6.58685V12.1141H13.6197ZM26.2394 12.1141C26.9844 12.1141 27.6307 12.4049 28.1784 12.9866C28.7261 13.5682 29 14.2394 29 15V22.1812H27.1596L26.2394 25H24.7934L23.8732 22.1812H6.12676L5.20657 25H3.76056L2.84038 22.1812H1V15C1 14.2394 1.27387 13.5682 1.8216 12.9866C2.36933 12.4049 3.01565 12.1141 3.76056 12.1141V7.81879C3.76056 7.05817 4.04538 6.39821 4.61502 5.83893C5.18466 5.27964 5.84194 5 6.58685 5H23.4131C24.1581 5 24.8153 5.27964 25.385 5.83893C25.9546 6.39821 26.2394 7.05817 26.2394 7.81879V12.1141Z" fill="#B8924A"/>
 </svg>
 </span>
-                                 <div>
-                                    <div className="fw-bold mb-1">King Studio Suite</div>
-                                    <div className="small text-muted">Bespoke 750 sq. ft. living space with high ceilings and crown molding.</div>
-                                 </div>
+                                  <div>
+                                     <div className="fw-bold mb-1">{roomType}</div>
+                                     <div className="small text-muted">{roomDesc}</div>
+                                  </div>
                               </div>
                               <div className="d-flex mb-4">
                                  <span className="material-symbols-outlined text-primary me-3">
@@ -114,10 +145,10 @@ export default function ViewRoom() {
 </svg>
 
 </span>
-                                 <div>
-                                    <div className="fw-bold mb-1">Victorian Premier Wing</div>
-                                    <div className="small text-muted">Located on the 12th floor with panoramic northern views of the park.</div>
-                                 </div>
+                                  <div>
+                                     <div className="fw-bold mb-1">{roomName}</div>
+                                     <div className="small text-muted">{room.location || 'Located on the 12th floor with panoramic northern views of the park.'}</div>
+                                  </div>
                               </div>
                               <div className="d-flex mb-4">
                                  <span className="material-symbols-outlined text-primary me-3">
@@ -234,21 +265,21 @@ export default function ViewRoom() {
                               <span className="small text-muted text-uppercase fw-bold summary-label">Unit Specification</span>
                               <a className="small text-primary text-decoration-underline" href="#">Change</a>
                            </div>
-                           <div className="h6 fw-bold mb-0">Victorian Premier, Suite 402</div>
-                        </div>
-                        <div className="mb-4">
-                           <span className="small text-muted text-uppercase fw-bold d-block mb-1 summary-label">Agreement Type</span>
-                           <div className="h6 mb-0">Annual Lease [Fixed Term]</div>
-                        </div>
-                        <hr className="my-4 opacity-10" />
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                           <span className="fw-bold">Monthly Residency Rate</span>
-                           <span className="h5 mb-0 fw-bold text-primary">$3,450.00</span>
-                        </div>
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                           <span className="fw-bold">Holding Deposit (50%)</span>
-                           <span className="h5 mb-0 fw-bold text-muted">$1,725.00</span>
-                        </div>
+                            <div className="h6 fw-bold mb-0">{roomName}, {roomNumber}</div>
+                         </div>
+                         <div className="mb-4">
+                            <span className="small text-muted text-uppercase fw-bold d-block mb-1 summary-label">Agreement Type</span>
+                            <div className="h6 mb-0">Annual Lease [Fixed Term]</div>
+                         </div>
+                         <hr className="my-4 opacity-10" />
+                         <div className="d-flex justify-content-between align-items-center mb-3">
+                            <span className="fw-bold">Monthly Residency Rate</span>
+                            <span className="h5 mb-0 fw-bold text-primary">${monthlyRent}</span>
+                         </div>
+                         <div className="d-flex justify-content-between align-items-center mb-4">
+                            <span className="fw-bold">Holding Deposit (50%)</span>
+                            <span className="h5 mb-0 fw-bold text-muted">${holdingDeposit}</span>
+                         </div>
                         <div className="d-grid gap-3 mb-4">
                            <button className="btn btn-primary-elite">Lock In Residency</button>
                            <Link to="/interview"><button className="btn btn-outline-elite">Schedule Interview</button></Link>

@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Calendar from "./Calendar";
 import Timeslot from "./Timeslot";
 import { useNavigate } from 'react-router-dom';
 import tourImg from "../../assets/images/tour-img.png";
 import interviewImg from "../../assets/images/interview-img.png";
-function InterviewSchedule({ interview_progress, datatext }) {
+
+const WP_BASE = 'https://wordpress-1608288-6566160.cloudwaysapps.com/wp-json/jrny/v1';
+
+function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedDate, confirmedTime, meetLink, submitting, roomName }) {
     const [activeTab, setActiveTab] = useState("schedule");
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedTime, setSelectedTime] = useState(null);
+    const [bookedSlots, setBookedSlots] = useState([]);
+    const [error, setError] = useState('');
     const contentMap = {
         securePlaneblock: {
             img: tourImg,
@@ -25,6 +32,26 @@ function InterviewSchedule({ interview_progress, datatext }) {
     const content = contentMap[datatext] || contentMap.interview;
     const navigate = useNavigate();
 
+    useEffect(() => {
+        if (!selectedDate) return;
+        fetch(`${WP_BASE}/booked-slots?date=${encodeURIComponent(selectedDate.value)}`)
+            .then(r => r.json())
+            .then(data => { if (data.success) setBookedSlots(data.booked || []); })
+            .catch(() => {});
+    }, [selectedDate]);
+
+    const handleConfirmClick = () => {
+        if (!selectedDate || !selectedTime) {
+            setError('Please select a date and time slot.');
+            return;
+        }
+        setError('');
+        if (onConfirm) {
+            onConfirm(selectedDate, selectedTime, () => setActiveTab("confirm"));
+        } else {
+            setActiveTab("confirm");
+        }
+    };
 
     const leasebtn = () => {
         navigate('/document-sign');
@@ -58,19 +85,25 @@ function InterviewSchedule({ interview_progress, datatext }) {
                         <div className="tab_schedule_room">
                             <div className="row">
                                 <div className="col-md-6 pe-md-4">
-                                    <Calendar />
+                                    <Calendar onSelectDate={(d) => { setSelectedDate(d); setError(''); }} />
                                 </div>
                                 {/* Slots */}
                                 <div className="col-md-6 ps-md-2 mt-4 mt-md-0">
                                     <h6 className="slots-heading">
-                                        AVAILABLE SLOTS FOR OCT 10
+                                        AVAILABLE SLOTS FOR {selectedDate ? selectedDate.label : 'TODAY'}
                                     </h6>
-                                    <Timeslot />
+                                    <Timeslot
+                                        selectedTime={selectedTime}
+                                        onSelectTime={(t) => { setSelectedTime(t); setError(''); }}
+                                        bookedSlots={bookedSlots}
+                                    />
+                                    {error && <p className="text-danger small mb-2">{error}</p>}
                                     <button
                                         className="btn btn-gold mb-2"
-                                        onClick={() => setActiveTab("confirm")}
+                                        onClick={handleConfirmClick}
+                                        disabled={submitting}
                                     >
-                                        Confirm Time Slot
+                                        {submitting ? 'Booking...' : 'Confirm Time Slot'}
                                     </button>
                                     <div className="divider-text">
                                         OR
@@ -110,7 +143,7 @@ function InterviewSchedule({ interview_progress, datatext }) {
                                                 Date
                                             </span>
                                             <span className="detail-value">
-                                                Oct 14, 2024
+                                                {confirmedDate || (selectedDate ? selectedDate.label : 'Oct 14, 2024')}
                                             </span>
                                         </div>
                                         <div className="detail-row">
@@ -118,7 +151,7 @@ function InterviewSchedule({ interview_progress, datatext }) {
                                                 Time
                                             </span>
                                             <span className="detail-value">
-                                                02:00 PM
+                                                {confirmedTime || selectedTime || '02:00 PM'}
                                             </span>
                                         </div>
                                         <div className="detail-row">
@@ -126,14 +159,21 @@ function InterviewSchedule({ interview_progress, datatext }) {
                                                 Room
                                             </span>
                                             <span className="detail-value">
-                                                The Victorian Premier
+                                                {roomName || 'The Victorian Premier'}
                                             </span>
                                         </div>
                                     </div>
-                                    <button type="button" className="btn btn-whatsapp mb-3" onClick={interview_progress}>
-                                        <i className="bi bi-whatsapp me-2"></i>
-                                        Interview with Najat
-                                    </button>
+                                    {meetLink ? (
+                                        <a href={meetLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp mb-3 d-inline-block">
+                                            <i className="bi bi-whatsapp me-2"></i>
+                                            Join Google Meet
+                                        </a>
+                                    ) : (
+                                        <button type="button" className="btn btn-whatsapp mb-3" onClick={interview_progress}>
+                                            <i className="bi bi-whatsapp me-2"></i>
+                                            Interview with Najat
+                                        </button>
+                                    )}
                                     <button
                                         type="button"
                                         className="btn btn-black"

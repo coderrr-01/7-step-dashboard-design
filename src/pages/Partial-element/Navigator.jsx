@@ -5,15 +5,17 @@ import "../../assets/styles/Navigator-style.css"
 import { FaLock, FaUnlock } from "react-icons/fa";
 import { FaCompass } from "react-icons/fa6";
 import stepsConfig from "../../config/stepsConfig";
+import { useSteps } from "../../context/StepContext";
 
 export default function Navigator({ activeStep = 1, totalSteps = 7, title }) {
   const [open, setOpen] = useState(false);
+  const { completedSteps, canAccessStep } = useSteps();
 
   const getStepState = (stepNumber) => {
-    if (stepNumber < activeStep) return "completed";
+    if (completedSteps.includes(stepNumber)) return "completed";
     if (stepNumber === activeStep) return "active";
-    if (stepNumber === activeStep + 1) return "inactive";
-    return "muted";
+    if (!canAccessStep(stepNumber)) return "muted";
+    return "inactive";
   };
 
   const getTimelineClass = (state) => {
@@ -48,6 +50,8 @@ export default function Navigator({ activeStep = 1, totalSteps = 7, title }) {
         return "Completed";
       case "active":
         return "Active";
+      case "muted":
+        return "Locked";
       default:
         return "Upcoming";
     }
@@ -90,7 +94,7 @@ export default function Navigator({ activeStep = 1, totalSteps = 7, title }) {
                     <div key={step.number} className={getTimelineClass(state)}>
                       <div className="timeline-icon-wrapper">
                         <div className="timeline-icon">
-                          {state === "active" ? <FaUnlock /> : <FaLock />}
+                          {state === "completed" || state === "active" ? <FaUnlock /> : <FaLock />}
                         </div>
                       </div>
                       <div>
