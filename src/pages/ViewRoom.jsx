@@ -22,15 +22,41 @@ export default function ViewRoom() {
    if (!room) return null;
 
    // Support both the new catalogue shape and the old WP /rooms shape
-   const images = room.images?.length
+   const rawImages = Array.isArray(room.images)
       ? room.images
+      : typeof room.images === 'string'
+         ? room.images.split(',').map((u) => u.trim()).filter(Boolean)
+         : [];
+   const images = rawImages.length
+      ? rawImages
       : [room.img || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCVfkL8eMoD4BRwoPZpU7RgLDUjbRLK3wH-XAdz6WV0kl6Du2f9yQcpOr7eTdjNWMDhmvQdihD1BrYLZgDmUp9Merj2fIgvWSZUw-NdZ1sgTwt2VceIiSimt_tDdNm1rYmGz2h9qJ9tbVt9bPdhcHml9lpYH4CDHeaEbDuKUxGcOpdkL-_Ln2Ic_GlPSiFdKp3y1dZcnAE25vyKoB_qYXoxj61V68bMgd6i5d4CcYyruqknzYFDsyh5Qg'];
    const roomType = room.room_type || room.tier || 'King Studio Suite';
    const roomNumber = room.roomNumber || (room.unit_number ? `Unit ${room.unit_number}` : 'Suite 402');
    const roomName = room.name || 'Victorian Premier';
-   const roomDesc = room.description || room.desc || 'Bespoke 750 sq. ft. living space with high ceilings and crown molding.';
-   const monthlyRent = Number(room.price ?? room.monthly_rent ?? 3450).toLocaleString('en-US', { minimumFractionDigits: 2 });
-   const holdingDeposit = (Number(room.price ?? room.monthly_rent ?? 3450) * 0.5).toLocaleString('en-US', { minimumFractionDigits: 2 });
+   const roomDesc = room.size_sq_ft
+      ? `${room.size_sq_ft} sq. ft. living space`
+      : (room.description || room.desc || 'Bespoke 750 sq. ft. living space with high ceilings and crown molding.');
+   const rentValue = Number(room.monthly_rent ?? room.price ?? 3450);
+   const monthlyRent = rentValue.toLocaleString('en-US', { minimumFractionDigits: 2 });
+   const holdingDeposit = (room.security_deposit != null ? Number(room.security_deposit) * 0.5 : rentValue * 0.5).toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+   const bathroomInfo = room.bathroom_info || 'Carrara marble vanity with heated flooring and rainfall shower.';
+   const workstationInfo = room.workstation_info || 'Built-in mahogany desk with high-speed fiber optic connectivity.';
+   const buildingName = room.building_name || roomName;
+   const buildingFloor = room.floor ? `Floor ${room.floor} with panoramic northern views of the park.` : 'Located on the 12th floor with panoramic northern views of the park.';
+   const commonAreas = room.common_areas || 'Access to the private library, gourmet kitchen, and grand salon.';
+   const buildingHeritage = room.building_heritage || 'A 1920s landmark meticulously restored for modern institutional living.';
+   const agreementType = room.agreement_type || 'Annual Lease [Fixed Term]';
+
+   const defaultAmenities = ['Climate Control', 'Giga-Fiber Wifi', 'Daily Housekeeping', '24/7 Concierge'];
+   const rawAmenities = Array.isArray(room.amenities)
+      ? room.amenities
+      : typeof room.amenities === 'string'
+         ? room.amenities.split(',').map((a) => a.trim()).filter(Boolean)
+         : [];
+   const amenityList = rawAmenities.length
+      ? rawAmenities.concat(defaultAmenities).slice(0, Math.max(rawAmenities.length, defaultAmenities.length))
+      : defaultAmenities;
 
    return (
       <PageLayout page="ViewRoom">
@@ -114,8 +140,8 @@ export default function ViewRoom() {
 
 </span>
                                  <div>
-                                    <div className="fw-bold mb-1">En-suite Bathroom</div>
-                                    <div className="small text-muted">Carrara marble vanity with heated flooring and rainfall shower.</div>
+                                     <div className="fw-bold mb-1">En-suite Bathroom</div>
+                                     <div className="small text-muted">{bathroomInfo}</div>
                                  </div>
                               </div>
                               <div className="d-flex">
@@ -128,8 +154,8 @@ export default function ViewRoom() {
 </svg>
 </span>
                                  <div>
-                                    <div className="fw-bold mb-1">Integrated Workstation</div>
-                                    <div className="small text-muted">Built-in mahogany desk with high-speed fiber optic connectivity.</div>
+                                     <div className="fw-bold mb-1">Integrated Workstation</div>
+                                     <div className="small text-muted">{workstationInfo}</div>
                                  </div>
                               </div>
                            </div>
@@ -146,8 +172,8 @@ export default function ViewRoom() {
 
 </span>
                                   <div>
-                                     <div className="fw-bold mb-1">{roomName}</div>
-                                     <div className="small text-muted">{room.location || 'Located on the 12th floor with panoramic northern views of the park.'}</div>
+                                     <div className="fw-bold mb-1">{buildingName}</div>
+                                     <div className="small text-muted">{buildingFloor}</div>
                                   </div>
                               </div>
                               <div className="d-flex mb-4">
@@ -157,8 +183,8 @@ export default function ViewRoom() {
 </svg>
 </span>
                                  <div>
-                                    <div className="fw-bold mb-1">Shared Common Areas</div>
-                                    <div className="small text-muted">Access to the private library, gourmet kitchen, and grand salon.</div>
+                                     <div className="fw-bold mb-1">Shared Common Areas</div>
+                                     <div className="small text-muted">{commonAreas}</div>
                                  </div>
                               </div>
                               <div className="d-flex">
@@ -168,8 +194,8 @@ export default function ViewRoom() {
 </svg>
 </span>
                                  <div>
-                                    <div className="fw-bold mb-1">Building A Heritage</div>
-                                    <div className="small text-muted">A 1920s landmark meticulously restored for modern institutional living.</div>
+                                     <div className="fw-bold mb-1">Building A Heritage</div>
+                                     <div className="small text-muted">{buildingHeritage}</div>
                                  </div>
                               </div>
                            </div>
@@ -185,7 +211,7 @@ export default function ViewRoom() {
 <path d="M19.486 16.4789V4.50704C19.486 3.66197 19.2874 2.89906 18.8902 2.21831C18.493 1.53756 17.9556 0.997653 17.278 0.598592C16.6005 0.199531 15.8411 0 15 0C14.1589 0 13.3995 0.199531 12.722 0.598592C12.0444 0.997653 11.507 1.53756 11.1098 2.21831C10.7126 2.89906 10.514 3.66197 10.514 4.50704V16.4789C9.62617 17.1831 8.90187 18.0634 8.34112 19.1197C7.78037 20.1761 7.5 21.3146 7.5 22.5352C7.5 23.8967 7.83879 25.1526 8.51636 26.3028C9.19393 27.4531 10.1051 28.3568 11.25 29.0141C12.3949 29.6714 13.6449 30 15 30C16.3551 30 17.6051 29.6714 18.75 29.0141C19.8949 28.3568 20.8061 27.4531 21.4836 26.3028C22.1612 25.1526 22.5 23.8967 22.5 22.5352C22.5 21.3146 22.2196 20.1761 21.6589 19.1197C21.0981 18.0634 20.3738 17.1831 19.486 16.4789ZM13.528 13.5211V4.50704C13.528 4.08451 13.6682 3.72066 13.9486 3.41549C14.229 3.11033 14.5794 2.95775 15 2.95775C15.4206 2.95775 15.771 3.11033 16.0514 3.41549C16.3318 3.72066 16.472 4.08451 16.472 4.50704V5.98592H15V7.46479H16.472V9.01408V10.493H15V11.9718H16.472V13.5211H13.528Z" fill="#B8924A"/>
 </svg>
 </span></div>
-                                    <span className="amenity-text">Climate Control</span>
+                                     <span className="amenity-text">{amenityList[0]}</span>
                                  </div>
                                  <div className="col-6 col-md-3">
                                     <div className="amenity-icon"><span className="material-symbols-outlined">
@@ -193,7 +219,7 @@ export default function ViewRoom() {
 <path d="M4.69484 4.67337C7.82473 1.55779 11.5931 0 16 0C20.4069 0 24.1753 1.55779 27.3052 4.67337C30.4351 7.78894 32 11.5829 32 16.0553C32 18.9698 31.2864 21.6709 29.8592 24.1583C28.4319 26.6457 26.4914 28.593 24.0376 30L22.385 27.2111C24.338 26.0553 25.903 24.4849 27.0798 22.5C28.2567 20.5151 28.8451 18.3668 28.8451 16.0553C28.8451 12.5377 27.5931 9.52261 25.0892 7.01005C22.5853 4.49749 19.5556 3.24121 16 3.24121C12.4444 3.24121 9.41471 4.49749 6.9108 7.01005C4.40689 9.52261 3.15493 12.5377 3.15493 16.0553C3.15493 18.4171 3.73083 20.5779 4.88263 22.5377C6.03443 24.4975 7.58685 26.0553 9.53991 27.2111L7.96244 30C5.50861 28.593 3.56808 26.6457 2.14085 24.1583C0.713615 21.6709 0 18.9698 0 16.0553C0 11.5829 1.56495 7.78894 4.69484 4.67337ZM25.615 16.0553C25.615 17.8141 25.1768 19.4347 24.3005 20.9171C23.4241 22.3995 22.2598 23.5678 20.8075 24.4221L19.23 21.6332C21.3333 20.3769 22.385 18.5176 22.385 16.0553C22.385 14.2965 21.759 12.7889 20.507 11.5327C19.2551 10.2764 17.7527 9.64824 16 9.64824C14.2473 9.64824 12.7449 10.2764 11.493 11.5327C10.241 12.7889 9.61502 14.2965 9.61502 16.0553C9.61502 18.5176 10.6667 20.3769 12.77 21.6332L11.1925 24.4221C9.74022 23.5678 8.5759 22.3995 7.69953 20.9171C6.82316 19.4347 6.38498 17.8141 6.38498 16.0553C6.38498 13.392 7.32394 11.1181 9.20188 9.23367C11.0798 7.34925 13.3459 6.40704 16 6.40704C18.6541 6.40704 20.9202 7.34925 22.7981 9.23367C24.6761 11.1181 25.615 13.392 25.615 16.0553ZM13.7465 13.8317C14.3975 13.2035 15.1487 12.8894 16 12.8894C16.8513 12.8894 17.6025 13.2035 18.2535 13.8317C18.9045 14.4598 19.23 15.201 19.23 16.0553C19.23 16.9095 18.9045 17.6633 18.2535 18.3166C17.6025 18.9698 16.8513 19.2965 16 19.2965C15.1487 19.2965 14.3975 18.9698 13.7465 18.3166C13.0955 17.6633 12.77 16.9095 12.77 16.0553C12.77 15.201 13.0955 14.4598 13.7465 13.8317Z" fill="#B8924A"/>
 </svg>
 </span></div>
-                                    <span className="amenity-text">Giga-Fiber Wifi</span>
+                                     <span className="amenity-text">{amenityList[1]}</span>
                                  </div>
                                  <div className="col-6 col-md-3">
                                     <div className="amenity-icon"><span className="material-symbols-outlined">
@@ -206,7 +232,7 @@ export default function ViewRoom() {
 <path d="M34.768 34.1701C34.9136 34.2028 35.0647 34.2029 35.2104 34.1703C35.356 34.1377 35.4927 34.0733 35.6105 33.9816C35.7283 33.89 35.8244 33.7734 35.8918 33.6402C35.9593 33.507 35.9964 33.3606 36.0006 33.2114V32.5005C36.0007 32.2821 35.9579 32.0658 35.8743 31.8639C35.7908 31.6621 35.6683 31.4787 35.5139 31.3242C35.3594 31.1697 35.176 31.0472 34.9742 30.9637C34.7723 30.8802 34.556 30.8373 34.3375 30.8375H30.2485V4.27477C30.2432 3.83542 30.065 3.41584 29.7525 3.10701C29.4399 2.79818 29.0183 2.62499 28.5789 2.625C28.1395 2.62501 27.7178 2.79821 27.4053 3.10705C27.0928 3.4159 26.9146 3.83548 26.9094 4.27483V30.8375H23.5899C23.1325 30.7979 22.6718 30.8354 22.2268 30.9484C21.9117 31.0675 21.6405 31.2799 21.4494 31.5572C21.2582 31.8346 21.1563 32.1637 21.1572 32.5005V33.2114C21.1573 33.4645 21.2574 33.7074 21.4358 33.8869C21.6142 34.0665 21.8563 34.1683 22.1094 34.1701C25.1651 34.1688 34.768 34.1701 34.768 34.1701Z" fill="#B8924A"/>
 </svg>
 </span></div>
-                                    <span className="amenity-text">Daily Housekeeping</span>
+                                     <span className="amenity-text">{amenityList[2]}</span>
                                  </div>
                                  <div className="col-6 col-md-3">
                                     <div className="amenity-icon"><span className="material-symbols-outlined">
@@ -214,9 +240,19 @@ export default function ViewRoom() {
 <path d="M31.3732 15.3906C31.3732 13.099 30.973 11.0156 30.1725 9.14062C29.3721 7.26562 28.2746 5.63802 26.8803 4.25781C25.4859 2.8776 23.8979 1.82292 22.1162 1.09375C20.3345 0.364583 18.4624 0 16.5 0C14.5376 0 12.6784 0.364583 10.9225 1.09375C9.16667 1.82292 7.57864 2.86458 6.15845 4.21875C4.73826 5.57292 3.62793 7.20052 2.82746 9.10156C2.027 11.0026 1.62676 13.125 1.62676 15.4688C1.11033 15.7292 0.710094 16.1198 0.426056 16.6406C0.142019 17.1615 0 17.7344 0 18.3594V21.6406C0 22.5781 0.32277 23.3724 0.96831 24.0234C1.61385 24.6745 2.37559 25 3.25352 25H4.95775V14.8438C4.95775 13.2292 5.25469 11.7188 5.84859 10.3125C6.44249 8.90625 7.26878 7.66927 8.32747 6.60156C9.38615 5.53385 10.6127 4.70052 12.007 4.10156C13.4014 3.5026 14.8991 3.20312 16.5 3.20312C18.1009 3.20312 19.5986 3.5026 20.993 4.10156C22.3873 4.70052 23.6138 5.53385 24.6725 6.60156C25.7312 7.66927 26.5575 8.90625 27.1514 10.3125C27.7453 11.7188 28.0423 13.2292 28.0423 14.8438V26.6406H14.8732V30H28.0423C28.9718 30 29.7594 29.6745 30.4049 29.0234C31.0505 28.3724 31.3732 27.5781 31.3732 26.6406V24.6094C31.838 24.349 32.2254 23.9844 32.5352 23.5156C32.8451 23.0469 33 22.5 33 21.875V18.0469C33 17.474 32.8451 16.9531 32.5352 16.4844C32.2254 16.0156 31.838 15.651 31.3732 15.3906ZM9.91549 16.6406C9.91549 16.1719 10.0704 15.7812 10.3803 15.4688C10.6901 15.1562 11.0775 15 11.5423 15C12.007 15 12.3944 15.1562 12.7042 15.4688C13.0141 15.7812 13.169 16.1719 13.169 16.6406C13.169 17.1094 13.0141 17.513 12.7042 17.8516C12.3944 18.1901 12.007 18.3594 11.5423 18.3594C11.0775 18.3594 10.6901 18.1901 10.3803 17.8516C10.0704 17.513 9.91549 17.1094 9.91549 16.6406ZM19.831 16.6406C19.831 16.1719 19.9859 15.7812 20.2958 15.4688C20.6056 15.1562 20.993 15 21.4577 15C21.9225 15 22.3099 15.1562 22.6197 15.4688C22.9296 15.7812 23.0845 16.1719 23.0845 16.6406C23.0845 17.1094 22.9296 17.513 22.6197 17.8516C22.3099 18.1901 21.9225 18.3594 21.4577 18.3594C20.993 18.3594 20.6056 18.1901 20.2958 17.8516C19.9859 17.513 19.831 17.1094 19.831 16.6406ZM26.4155 13.3594C26.1573 11.7969 25.5634 10.3776 24.6338 9.10156C23.7042 7.82552 22.5423 6.82292 21.1479 6.09375C19.7535 5.36458 18.23 5 16.5775 5C15.338 5 14.0986 5.2474 12.8592 5.74219C11.6197 6.23698 10.5094 6.95312 9.52817 7.89062C8.54695 8.82812 7.78521 9.96094 7.24296 11.2891C6.7007 12.6172 6.48122 14.1146 6.58451 15.7812C8.65024 14.8958 10.4061 13.5938 11.8521 11.875C13.2981 10.1562 14.2277 8.17708 14.6408 5.9375C15.3638 7.39583 16.3192 8.6849 17.507 9.80469C18.6948 10.9245 20.0505 11.7969 21.5739 12.4219C23.0974 13.0469 24.7113 13.3594 26.4155 13.3594Z" fill="#B8924A"/>
 </svg>
 </span></div>
-                                    <span className="amenity-text">24/7 Concierge</span>
-                                 </div>
-                              </div>
+                                     <span className="amenity-text">{amenityList[3]}</span>
+                                  </div>
+                                  {amenityList.slice(4).map((amenity, i) => (
+                                     <div className="col-6 col-md-3" key={i}>
+                                        <div className="amenity-icon"><span className="material-symbols-outlined">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2l2.4 6.6H21l-5.4 4 2 6.6-5.6-4-5.6 4 2-6.6-5.4-4h6.6z" fill="#B8924A"/>
+</svg>
+                                        </span></div>
+                                        <span className="amenity-text">{amenity}</span>
+                                     </div>
+                                  ))}
+                               </div>
                            </div>
                         </div>
                         {/* Calendar */}
@@ -269,7 +305,7 @@ export default function ViewRoom() {
                          </div>
                          <div className="mb-4">
                             <span className="small text-muted text-uppercase fw-bold d-block mb-1 summary-label">Agreement Type</span>
-                            <div className="h6 mb-0">Annual Lease [Fixed Term]</div>
+                               <div className="h6 mb-0">{agreementType}</div>
                          </div>
                          <hr className="my-4 opacity-10" />
                          <div className="d-flex justify-content-between align-items-center mb-3">
