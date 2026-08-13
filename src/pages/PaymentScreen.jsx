@@ -449,8 +449,8 @@ export default function PaymentScreen() {
                               <span className="fw-medium">{depositAmount}</span>
                            </div>
                            <div className="d-flex justify-content-between small mb-4">
-                              <span className="text-muted">Administrative Fee</span>
-                              <span className="fw-medium">$ 0.00</span>
+                              <span className="text-muted">Rent Amount</span>
+                              <span className="fw-medium">${rentAmount}</span>
                            </div>
                            <hr className="my-4 opacity-10" />
                            <div className="d-flex justify-content-between align-items-baseline pt-2">
