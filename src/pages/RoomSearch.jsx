@@ -4,6 +4,7 @@ import { IoLocationSharp } from "react-icons/io5";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PropertyMap from "../components/roomSearch/PropertyMap";
+import { roomsData } from "../components/roomSearch/roomsData";
 import { normalizeRooms } from "../components/roomSearch/roomNormalization";
 import { searchLocations } from "../components/roomSearch/geocode";
 import { getRooms } from "../services/api";
@@ -30,6 +31,7 @@ export default function RoomSearch() {
    const [locError, setLocError] = useState("");
 
    // Dynamic Zoho rooms. Static catalogue is only the offline/loading seed.
+   const [rooms, setRooms] = useState(roomsData);
    const [roomsLoading, setRoomsLoading] = useState(true);
 
    useEffect(() => {
