@@ -228,9 +228,9 @@ export default function DocumentSign() {
                 <a className="ds-header-btn" href={pdfUrl} target="_blank" rel="noreferrer">
                   <FaDownload /> Download PDF
                 </a>
-                <button className="ds-header-btn" onClick={() => window.print()}>
+                {/* <button className="ds-header-btn" onClick={() => window.print()}>
                   <FaPrint /> Print
-                </button>
+                </button> */}
               </div>
             </div>
 

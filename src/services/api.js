@@ -6,6 +6,7 @@ const LEASE   = `${WP_BASE}/lease-html-sign/v1`;
 
 const TOKEN_KEY  = 'jrny_jwt';
 const NONCE_KEY  = 'jrny_nonce';
+const LOGOUT_TOKEN_KEY = 'jrny_logout_token';
 
 function clientKey() {
   const sub = getUserSub();
@@ -35,6 +36,19 @@ export function isLoggedIn() {
   }
 }
 
+// Session-scoped marker for the exact token the user explicitly logged out of.
+// Used by main.jsx to ignore a stale ?token / window.jrnyData on the reload
+// that follows logout, while still allowing a fresh token to auto-login.
+export function getLoggedOutToken() {
+  try {
+    return sessionStorage.getItem(LOGOUT_TOKEN_KEY) || null;
+  } catch { return null; }
+}
+
+export function clearLoggedOutToken() {
+  try { sessionStorage.removeItem(LOGOUT_TOKEN_KEY); } catch {}
+}
+
 // ─── USER SUB ─────────────────────────────────────────────────────────────────
 export function getUserSub() {
   try {
@@ -48,6 +62,13 @@ export function getUserSub() {
 }
 
 export function logout() {
+  // Remember the token being explicitly logged out so a stale ?token or
+  // window.jrnyData cannot silently restore the session on the next reload.
+  const token = getToken();
+  if (token) {
+    try { sessionStorage.setItem(LOGOUT_TOKEN_KEY, token); } catch {}
+  }
+
   // Clear all jrny_ keys EXCEPT the user-scoped steps key so
   // the same user gets their progress back instantly on next login.
   const sub = getUserSub();

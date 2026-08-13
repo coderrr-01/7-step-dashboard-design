@@ -10,15 +10,21 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { StepProvider } from "./context/StepContext";
-import { saveToken } from "./services/api";
+import { saveToken, getLoggedOutToken, clearLoggedOutToken } from "./services/api";
 
 // Auto-login: read JWT from ?token param (WP iframe) or window.jrnyData.
 // This MUST run before StepProvider mounts so stepsKey() finds the token
 // and reads the correct user-scoped localStorage key on first render.
+// The exact token the user explicitly logged out of (see api.js logout) is
+// ignored so a stale session cannot be restored by ?token / window.jrnyData
+// on the reload that follows logout. A fresh/different token still auto-logins.
 const _params = new URLSearchParams(window.location.search);
 const _urlToken = _params.get('token');
-if (_urlToken) saveToken(_urlToken);
-else if (window.jrnyData?.token) saveToken(window.jrnyData.token);
+const _candidateToken = _urlToken || window.jrnyData?.token;
+if (_candidateToken && _candidateToken !== getLoggedOutToken()) {
+  saveToken(_candidateToken);
+  clearLoggedOutToken();
+}
 
 // Read ?step param passed by WP shortcode on refresh e.g. ?step=room-search
 const _step = _params.get('step');
