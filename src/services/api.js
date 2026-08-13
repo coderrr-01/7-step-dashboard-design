@@ -8,6 +8,11 @@ const TOKEN_KEY  = 'jrny_jwt';
 const NONCE_KEY  = 'jrny_nonce';
 const LOGOUT_TOKEN_KEY = 'jrny_logout_token';
 
+// JS-accessible session-ish cookie names this app may own. HttpOnly WordPress
+// auth cookies cannot be cleared here — they are invalidated server-side by
+// the real WP logout (see the jrny_logout handler in the WP dashboard template).
+const SESSION_COOKIE_NAMES = new Set(['token', 'jwt', 'auth', 'session', 'PHPSESSID', 'wordpress_test_cookie']);
+
 function clientKey() {
   const sub = getUserSub();
   return sub ? `jrny_client_${sub}` : 'jrny_client';
@@ -61,6 +66,21 @@ export function getUserSub() {
   } catch { return null; }
 }
 
+// Best-effort removal of any JS-accessible session cookies the app may own.
+// Only the app's own namespace (jrny_*) or known session names are removed —
+// unrelated cookies are never touched.
+function clearSessionCookies() {
+  try {
+    document.cookie.split(';').forEach(c => {
+      const name = (c.split('=')[0] || '').trim();
+      if (!name) return;
+      if (name.indexOf('jrny_') === 0 || SESSION_COOKIE_NAMES.has(name)) {
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+      }
+    });
+  } catch {}
+}
+
 export function logout() {
   // Remember the token being explicitly logged out so a stale ?token or
   // window.jrnyData cannot silently restore the session on the next reload.
@@ -68,6 +88,8 @@ export function logout() {
   if (token) {
     try { sessionStorage.setItem(LOGOUT_TOKEN_KEY, token); } catch {}
   }
+
+  clearSessionCookies();
 
   // Clear all jrny_ keys EXCEPT the user-scoped steps key so
   // the same user gets their progress back instantly on next login.
