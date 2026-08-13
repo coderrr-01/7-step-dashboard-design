@@ -220,7 +220,7 @@ export default function ViewRoom() {
                            </div>
                         </div>
                         {/* Calendar */}
-                        <div className="col-12">
+                        {/* <div className="col-12">
                            <div className="parchment-card">
                               <div className="d-flex justify-content-between align-items-center mb-4">
                                  <h3 className="h5 mb-0 text-primary">Select Preferred Move-in Date</h3>
@@ -253,7 +253,7 @@ export default function ViewRoom() {
                                  <p className="mb-0">Standard institutional residency terms begin on the 1st or 15th of the month. Preferred move-in dates are subject to availability.</p>
                               </div>
                            </div>
-                        </div>
+                        </div> */}
                      </div>
                   </div>
                   {/* Right Column: Sidebar */}

@@ -154,7 +154,7 @@ export default function PaymentScreen() {
       : (selectedRoom?.security_deposit ? parseFloat(selectedRoom.security_deposit) : 0);
    const rawRent = client?.rent_amount
       ? parseFloat(client.rent_amount)
-      : (selectedRoom?.monthly_rent ? parseFloat(selectedRoom.monthly_rent) : 0);
+      : (selectedRoom?.monthly_rent ? parseFloat(selectedRoom.monthly_rent) : (selectedRoom?.price ? parseFloat(selectedRoom.price) : 0));
 
    const depositAmount = `$ ${rawDeposit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
    const rentAmount    = `$ ${rawRent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;

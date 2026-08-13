@@ -27,7 +27,7 @@ const roomPopupHtml = (room) => `
       <div class="rs-room-popup-title">${room.name}</div>
       <div class="rs-room-popup-meta"><span class="rs-popup-loc">${room.location}</span></div>
       <div class="rs-room-popup-price">$${room.price.toLocaleString()} <em>/mo</em></div>
-      <div class="rs-room-popup-avail">Available from ${room.availableFrom}</div>
+      <div class="rs-room-popup-avail">${room.availableFrom ? `Available from ${room.availableFrom}` : 'Available'}</div>
       <a href="/view-room" class="rs-room-popup-btn">View Details</a>
     </div>
   </div>

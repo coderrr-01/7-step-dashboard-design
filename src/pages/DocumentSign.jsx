@@ -26,6 +26,10 @@ export default function DocumentSign() {
   const [signedPdf, setSignedPdf] = useState(
     () => localStorage.getItem("jrny_signed_lease") || ""
   );
+  const [selectedRoom] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('jrny_selected_room') || 'null'); }
+    catch { return null; }
+  });
 
   const canvasRef = useRef(null);
   const drawing = useRef(false);
@@ -157,8 +161,14 @@ export default function DocumentSign() {
       ? client.requested_end_date
       : client?.end_date || "July 31, 2025";
 
-  const rentAmount = client?.rent_amount || "N/A";
-  const deposit = client?.security_deposit || "N/A";
+  // Amounts: prefer the Zoho client record, fall back to the persisted
+  // selected room (which carries the Zoho monthly_rent / security_deposit).
+  const rentAmount =
+    client?.rent_amount ||
+    selectedRoom?.monthly_rent ||
+    selectedRoom?.price ||
+    "N/A";
+  const deposit = client?.security_deposit || selectedRoom?.security_deposit || "N/A";
   const phone = client?.phone || "";
   const email = client?.email || "";
 

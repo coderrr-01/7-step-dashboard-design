@@ -77,19 +77,23 @@ function PropertyMap({ location, rooms, onReset, loadingRooms }) {
   }, [location]);
 
   // Initial view: fit to all room markers so the map is useful on load.
+  // Wait for the dynamic rooms to finish loading so the fit targets the real
+  // room coordinates instead of the static catalogue used as the seed.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady || didInitialFit.current) return;
-    if (rooms.length === 0) return;
+    if (loadingRooms) return;
+    const positioned = rooms.filter((r) => r.lat != null && r.lng != null);
+    if (positioned.length === 0) return;
 
-    const latLngs = rooms.map((r) => [r.lat, r.lng]);
+    const latLngs = positioned.map((r) => [r.lat, r.lng]);
     if (latLngs.length === 1) {
       map.setView(latLngs[0], 13);
     } else {
       map.fitBounds(L.latLngBounds(latLngs), { padding: [50, 50] });
     }
     didInitialFit.current = true;
-  }, [mapReady, rooms]);
+  }, [mapReady, rooms, loadingRooms]);
 
   const handleReset = () => {
     const map = mapRef.current;
@@ -126,18 +130,20 @@ function PropertyMap({ location, rooms, onReset, loadingRooms }) {
       )}
 
       {mapReady &&
-        rooms.map((room, i) => (
-          <PropertyMarker
-            key={room.id}
-            map={mapRef.current}
-            kind="room"
-            position={{
-              lat: room.lat + (i % 2 === 0 ? ROOM_MARKER_JITTER : -ROOM_MARKER_JITTER),
-              lon: room.lng,
-            }}
-            payload={room}
-          />
-        ))}
+        rooms
+          .filter((room) => room.lat != null && room.lng != null)
+          .map((room, i) => (
+            <PropertyMarker
+              key={room.id}
+              map={mapRef.current}
+              kind="room"
+              position={{
+                lat: room.lat + (i % 2 === 0 ? ROOM_MARKER_JITTER : -ROOM_MARKER_JITTER),
+                lon: room.lng,
+              }}
+              payload={room}
+            />
+          ))}
     </div>
   );
 }

@@ -1,11 +1,13 @@
 import PageLayout from "../components/PageLayout";
 import { FaAngleDown, FaCompass } from "react-icons/fa6";
 import { IoLocationSharp } from "react-icons/io5";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PropertyMap from "../components/roomSearch/PropertyMap";
 import { roomsData } from "../components/roomSearch/roomsData";
+import { normalizeRooms } from "../components/roomSearch/roomNormalization";
 import { searchLocations } from "../components/roomSearch/geocode";
+import { getRooms } from "../services/api";
 import "../components/roomSearch/roomSearch.css";
 import { useSteps } from "../context/StepContext";
 
@@ -28,6 +30,31 @@ export default function RoomSearch() {
    const [locSearching, setLocSearching] = useState(false);
    const [locError, setLocError] = useState("");
 
+   // Dynamic Zoho rooms. Static catalogue is only the offline/loading seed.
+   const [rooms, setRooms] = useState(roomsData);
+   const [roomsLoading, setRoomsLoading] = useState(true);
+
+   useEffect(() => {
+      let cancelled = false;
+      getRooms()
+         .then((res) => {
+            if (cancelled) return;
+            if (res?.success && Array.isArray(res.rooms) && res.rooms.length) {
+               setRooms(normalizeRooms(res.rooms));
+            } else {
+               setRooms([]);
+            }
+         })
+         .catch(() => {
+            if (cancelled) return;
+            // Keep the static catalogue as a fallback if Zoho is unreachable.
+         })
+         .finally(() => {
+            if (!cancelled) setRoomsLoading(false);
+         });
+      return () => { cancelled = true; };
+   }, []);
+
    const roomtypeAccomadtion = [
       "All Tiers",
       "Single Room",
@@ -41,7 +68,7 @@ export default function RoomSearch() {
    };
 
    const filteredRooms = useMemo(() => {
-      return roomsData.filter((room) => {
+      return rooms.filter((room) => {
          const tierOk = selected === "All Tiers" || room.tier === selected;
          const locOk =
             !location ||
@@ -50,7 +77,7 @@ export default function RoomSearch() {
                .includes(room.city.toLowerCase());
          return tierOk && locOk;
       });
-   }, [location, selected]);
+   }, [location, selected, rooms]);
 
    const locationType = () => {
       setlocationPrefereance(!locationPrefereance);
@@ -197,6 +224,7 @@ export default function RoomSearch() {
                      location={location}
                      rooms={filteredRooms}
                      onReset={handleReset}
+                     loadingRooms={roomsLoading}
                   />
                </section>
 
