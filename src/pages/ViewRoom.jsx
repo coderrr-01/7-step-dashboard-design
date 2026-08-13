@@ -38,7 +38,8 @@ export default function ViewRoom() {
       : (room.description || room.desc || 'Bespoke 750 sq. ft. living space with high ceilings and crown molding.');
    const rentValue = Number(room.monthly_rent ?? room.price ?? 3450);
    const monthlyRent = rentValue.toLocaleString('en-US', { minimumFractionDigits: 2 });
-   const holdingDeposit = (room.security_deposit != null ? Number(room.security_deposit) * 0.5 : rentValue * 0.5).toLocaleString('en-US', { minimumFractionDigits: 2 });
+   const depositAmt = (room.security_deposit != null ? Number(room.security_deposit) : rentValue ).toLocaleString('en-US', { minimumFractionDigits: 2 });
+   // const holdingDeposit = (room.security_deposit != null ? Number(room.security_deposit) * 0.5 : rentValue * 0.5).toLocaleString('en-US', { minimumFractionDigits: 2 });
 
    const bathroomInfo = room.bathroom_info || 'Carrara marble vanity with heated flooring and rainfall shower.';
    const workstationInfo = room.workstation_info || 'Built-in mahogany desk with high-speed fiber optic connectivity.';
@@ -299,7 +300,7 @@ export default function ViewRoom() {
                         <div className="mb-4">
                            <div className="d-flex justify-content-between align-items-center mb-1">
                               <span className="small text-muted text-uppercase fw-bold summary-label">Unit Specification</span>
-                              <a className="small text-primary text-decoration-underline" href="#">Change</a>
+                              {/* <a className="small text-primary text-decoration-underline" href="#">Change</a> */}
                            </div>
                             <div className="h6 fw-bold mb-0">{roomName}, {roomNumber}</div>
                          </div>
@@ -313,11 +314,11 @@ export default function ViewRoom() {
                             <span className="h5 mb-0 fw-bold text-primary">${monthlyRent}</span>
                          </div>
                          <div className="d-flex justify-content-between align-items-center mb-4">
-                            <span className="fw-bold">Holding Deposit (50%)</span>
-                            <span className="h5 mb-0 fw-bold text-muted">${holdingDeposit}</span>
+                            <span className="fw-bold">Holding Deposit</span>
+                            <span className="h5 mb-0 fw-bold text-muted">${depositAmt}</span>
                          </div>
                         <div className="d-grid gap-3 mb-4">
-                           <button className="btn btn-primary-elite">Lock In Residency</button>
+                           {/* <button className="btn btn-primary-elite">Lock In Residency</button> */}
                            <Link to="/interview"><button className="btn btn-outline-elite">Schedule Interview</button></Link>
                         </div>
                         <p className="text-center small text-muted text-uppercase mb-0 summary-disclaimer">
