@@ -16,7 +16,7 @@ import { verificationData } from "../components/review/verificationData";
 import "../components/review/review.css";
 import { useNavigate } from "react-router-dom";
 import { useSteps } from "../context/StepContext";
-import { getApplicationStatus } from "../services/api";
+import { getApplicationStatus, getUserSub } from "../services/api";
 import { useClientData } from "../hooks/useClientData";
 
 export default function Review() {
@@ -28,6 +28,33 @@ export default function Review() {
    const [loading, setLoading]   = useState(true);
    const pollRef = useRef(null);
 
+   // User-scoped cache key — User A's approval never leaks to User B
+   const statusCacheKey = () => {
+      const sub = getUserSub();
+      return sub ? `jrny_application_status_${sub}` : null;
+   };
+
+   const getCachedApproved = () => {
+      const key = statusCacheKey();
+      if (!key) return false;
+      try {
+         const raw = localStorage.getItem(key);
+         if (!raw) return false;
+         const parsed = JSON.parse(raw);
+         return !!parsed && parsed.status === "Approved";
+      } catch {
+         return false;
+      }
+   };
+
+   const saveCachedApproved = () => {
+      const key = statusCacheKey();
+      if (!key) return;
+      try {
+         localStorage.setItem(key, JSON.stringify({ status: "Approved" }));
+      } catch {}
+   };
+
    const fetchStatus = async () => {
       try {
          const res = await getApplicationStatus();
@@ -36,6 +63,7 @@ export default function Review() {
             setApproved(!!res.approved);
             if (res.approved) {
                clearInterval(pollRef.current);
+               saveCachedApproved();
                completeStep(2);
             }
          }
@@ -44,6 +72,16 @@ export default function Review() {
    };
 
    useEffect(() => {
+      // Already approved for THIS user/application — use cached status,
+      // do not keep polling Zoho for the same approved application.
+      if (getCachedApproved()) {
+         setStatus('Approved');
+         setApproved(true);
+         setLoading(false);
+         completeStep(2);
+         return;
+      }
+
       fetchStatus();
       pollRef.current = setInterval(fetchStatus, 15000);
       return () => clearInterval(pollRef.current);

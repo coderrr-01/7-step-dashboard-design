@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
-import BankDeposite from "../pages/Partial-element/BankDeposite";
 import stripeIcon from "../assets/icons/stripe.svg";
 import paypalIcon from "../assets/icons/paypal.svg";
 import Revoulticon from "../assets/icons/revsult.svg";
@@ -615,16 +614,13 @@ export default function PaymentScreen() {
                                  </div>
                                  <SettingsBox />
                                  <ChevronTabs />
-                                 {activeStep === "Security" && (
-                                    <div className="mb-4">
-                                       <BankDeposite rentTitle="Security Deposit" />
-                                    </div>
-                                 )}
-                                 {activeStep === "Rent" && (
-                                    <div className="mb-4">
-                                       <BankDeposite rentTitle="Rent Deposit" />
-                                    </div>
-                                 )}
+                                 <PaymentIframe
+                                    method="bank"
+                                    section={activeStep === 'Rent' ? 'rent' : 'deposit'}
+                                    iframeHtml={iframeHtml}
+                                    iframeLoading={iframeLoading}
+                                    iframeError={iframeError}
+                                 />
                               </>
                            )}
 
