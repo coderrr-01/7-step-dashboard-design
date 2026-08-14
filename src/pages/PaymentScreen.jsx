@@ -357,7 +357,7 @@ export default function PaymentScreen() {
 
    const SettingsBox = () => (
       <div className="p-4 mb-4 payment-settings-box">
-         <div className="form-check d-flex gap-3 mb-4">
+         <div className="form-check p-0 d-flex gap-3 mb-4">
 
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                <rect x="0.5" y="0.5" width="19" height="19" rx="1.5" fill="#C5A365" stroke="#C5A365" />
@@ -369,7 +369,7 @@ export default function PaymentScreen() {
                <span className="d-block small text-muted">Your subsequent rent payments will be automatically charged using this method.</span>
             </label>
          </div>
-         <div className="form-check d-flex gap-3">
+         <div className="form-check p-0 d-flex gap-3">
 
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                <rect x="0.5" y="0.5" width="19" height="19" rx="1.5" fill="#C5A365" stroke="#C5A365" />
