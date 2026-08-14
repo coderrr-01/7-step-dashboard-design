@@ -382,9 +382,23 @@
     .hero-title{
         font-size:24px !important;
     }
+    .scheduling-section .tab-content{
+        padding:14px
+    }
 }
 
 @media only screen and (max-width:576px) {
+    .scheduling-tabs{
+            overflow: auto;
+    margin: 0px;
+    display: flex;
+    gap: 20px;
+    padding: 0px 20px;
+    }
+    .scheduling-tabs .tab-item{
+    width: max-content;
+    min-width: fit-content;
+    }
     .checkout-card .row.g-3.mb-4 {
         flex-wrap: nowrap;
         overflow: auto;
