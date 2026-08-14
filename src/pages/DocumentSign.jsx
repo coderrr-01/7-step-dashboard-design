@@ -14,6 +14,7 @@ import {
   FaLock,
 } from "react-icons/fa6";
 import "../assets/styles/document-sign-style.css";
+import { Navigate } from "react-router-dom";
 
 export default function DocumentSign() {
   const { client, loading, refetch } = useClientData();
@@ -200,6 +201,10 @@ export default function DocumentSign() {
     name,
   };
 
+   const paymentbtn = () => {
+        Navigate('/payment-screen');
+    }
+
   // ── Already signed — show PDF + extension states ──────────────────────────
   if (!loading && (signedPdf || client?.signed_lease)) {
     const pdfUrl = signedPdf || client.signed_lease;
@@ -233,7 +238,7 @@ export default function DocumentSign() {
               </div>
             </div>
 
-            <div className="ds-layout">
+            <div className="ds-layout d-block">
               <div className="ds-doc-card">
                 <div className="ds-doc-toolbar">
                   <span className="ds-doc-toolbar-title">
@@ -291,6 +296,10 @@ export default function DocumentSign() {
                       </div>
                     )}
                   </div>
+                  <button type="button" onClick={paymentbtn} className="mt-3 ds-view-btn mobile-view-btn">
+                    SECURE PAYMENT NOW
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
                 </div>
               </div>
             </div>
@@ -327,9 +336,9 @@ export default function DocumentSign() {
               <button className="ds-header-btn">
                 <FaDownload /> Download PDF
               </button>
-              <button className="ds-header-btn">
+              {/* <button className="ds-header-btn">
                 <FaPrint /> Print
-              </button>
+              </button> */}
             </div>
           </div>
 

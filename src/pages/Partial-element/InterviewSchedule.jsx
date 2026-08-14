@@ -56,6 +56,9 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
     const leasebtn = () => {
         navigate('/document-sign');
     }
+    const securebtn = () => {
+        navigate('/secure-booking');
+    }
     return (
         <div>
             {/* Tabs */}
@@ -180,6 +183,14 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                         onClick={() => setActiveTab("schedule")}
                                     >
                                         Reschedule
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-black mobile-view-btn"
+                                        onClick={securebtn}
+                                    >
+                                        SECURE BOOKING NOW
+                                        <i className="bi bi-arrow-right"></i>
                                     </button>
                                     <div className="divider-text">
                                         OR
