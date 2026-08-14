@@ -3644,6 +3644,9 @@ width: calc(100% + 1px);
     display:flex;
     flex-direction:column;
 }
+.page-transition.enter .row.g-4>*, .page-transition.enter .row.g-3>*, .page-transition.enter .row.g-5>*{
+    animation: unset !important;
+}
 }
 /* Mobile adjustments */
 @media (max-width: 600px) {
