@@ -3630,6 +3630,13 @@ width: calc(100% + 1px);
     }
 }
 
+
+@media (max-width: 991px) {
+.verification-grid {
+    display:flex;
+    flex-direction:column;
+}
+}
 /* Mobile adjustments */
 @media (max-width: 600px) {
     .verification-house-card {
