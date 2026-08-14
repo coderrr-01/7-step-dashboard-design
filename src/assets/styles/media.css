@@ -56,6 +56,14 @@
         font-size: 15px;
     }
 }
+@media (max-width: 1297px) {
+  .logo-img-wrapper {
+        width: 100px;
+    }
+    .top-header-section .gap-5 {
+        gap: 7px !important;
+    }
+}
 @media (max-width: 1210px) {
     .top-header-section .gap-5{
             gap: 1rem !important;
