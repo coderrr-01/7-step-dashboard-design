@@ -206,20 +206,20 @@ export default function Home() {
                       <input type="tel" className="form-control" value={form.phone} onChange={set("phone")} placeholder="+1 (212) 555-0100" required />
                     </div>
                     <div className="col-md-6">
-                      <label className="form-label fw-bold small text-uppercase text-muted">Date of Birth</label>
-                      <input type="date" className="form-control" value={form.date_of_birth} onChange={set("date_of_birth")} />
+                      <label className="form-label fw-bold small text-uppercase text-muted">Date of Birth <span className="text-danger">*</span> </label>
+                      <input type="date" className="form-control" value={form.date_of_birth} onChange={set("date_of_birth")} required />
                     </div>
                     <div className="col-md-6">
-                      <label className="form-label fw-bold small text-uppercase text-muted">Desired Move-in Date</label>
-                      <input type="date" className="form-control" value={form.move_in_date} onChange={set("move_in_date")} />
+                      <label className="form-label fw-bold small text-uppercase text-muted">Desired Move-in Date <span className="text-danger">*</span> </label>
+                      <input type="date" className="form-control" value={form.move_in_date} onChange={set("move_in_date")} required />
                     </div>
                     <div className="col-12">
-                      <label className="form-label fw-bold small text-uppercase text-muted">Current Address</label>
-                      <textarea className="form-control" rows={2} value={form.current_address} onChange={set("current_address")} placeholder="123 Main St, New York, NY 10001" />
+                      <label className="form-label fw-bold small text-uppercase text-muted">Current Address <span className="text-danger">*</span> </label>
+                      <textarea className="form-control" rows={2} value={form.current_address} onChange={set("current_address")} placeholder="123 Main St, New York, NY 10001" required />
                     </div>
                     <div className="col-md-6">
-                      <label className="form-label fw-bold small text-uppercase text-muted">Employment Status</label>
-                      <select className="form-select" value={form.employment_status} onChange={set("employment_status")}>
+                      <label className="form-label fw-bold small text-uppercase text-muted">Employment Status <span className="text-danger">*</span> </label>
+                      <select className="form-select" value={form.employment_status} onChange={set("employment_status")} required>
                         <option value="">Select...</option>
                         {EMPLOYMENT_OPTIONS.map((o) => (
                           <option key={o} value={o}>{o}</option>
@@ -227,8 +227,8 @@ export default function Home() {
                       </select>
                     </div>
                     <div className="col-md-6">
-                      <label className="form-label fw-bold small text-uppercase text-muted">Monthly Income ($)</label>
-                      <input type="number" className="form-control" value={form.monthly_income} onChange={set("monthly_income")} placeholder="5000" min="0" />
+                      <label className="form-label fw-bold small text-uppercase text-muted">Monthly Income ($)<span className="text-danger">*</span> </label>
+                      <input type="number" className="form-control" value={form.monthly_income} onChange={set("monthly_income")} placeholder="5000" min="0" required />
                     </div>
                     <div className="col-12">
                       <label className="form-label fw-bold small text-uppercase text-muted">Message (Optional)</label>
