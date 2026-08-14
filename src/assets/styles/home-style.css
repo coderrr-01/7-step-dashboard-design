@@ -54,7 +54,7 @@ main.home-page-bg {
 }
 .home-chat-column {
   min-width: 0;
-  display: flex;
+  display: block;
   align-items: stretch;
 }
 .home-chat-column .premium-chat {
