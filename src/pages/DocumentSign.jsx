@@ -14,7 +14,7 @@ import {
   FaLock,
 } from "react-icons/fa6";
 import "../assets/styles/document-sign-style.css";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 export default function DocumentSign() {
   const { client, loading, refetch } = useClientData();
