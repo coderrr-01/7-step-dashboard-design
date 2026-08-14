@@ -22,7 +22,9 @@ export default function Header({ activeLabel }) {
       logout();
       const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
       window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
-      window.location.replace(loginUrl);
+      if (window.parent === window) {
+         window.location.replace(loginUrl);
+      }
    }
 
    // close when click outside
