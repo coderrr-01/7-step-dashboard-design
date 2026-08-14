@@ -373,6 +373,15 @@
     .page-transition.enter main>.container>*, .page-transition.enter main>:not(.container), .page-transition.enter section.step-header, .page-transition.enter .pdf-viewer-container, .page-transition.enter .signature-section{
         animation: unset !important;
     }
+    .property-name, .residence-title, .conf-title , .residence-price{
+        font-size: 16px !important;
+    }
+    .interview-details{
+        gap:10px
+    }
+    .hero-title{
+        font-size:24px !important;
+    }
 }
 
 @media only screen and (max-width:576px) {

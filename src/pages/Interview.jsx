@@ -96,7 +96,7 @@ export default function Interview() {
                               <div className="selected-residence-header">
                                  <span className="selected-badge">SELECTED</span>
                                  <ResidenceSlider />
-                                 <div className="p-3 w-50 d-flex flex-column" data-purpose="residence-details">
+                                 <div className="p-3 w-50 d-flex flex-column interview-details" data-purpose="residence-details">
                                     <div className="d-flex justify-content-between">
                                        <div>
                                           <h4 className="serif-font mb-0 residence-title">{unitLabel}</h4>
