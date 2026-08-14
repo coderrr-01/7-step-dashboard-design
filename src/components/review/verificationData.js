@@ -31,14 +31,14 @@ export const verificationData = {
 
   // Verification checklist — one item per submitted form field
   checklist: [
-    { name: "Full Name", status: "verified" },
-    { name: "Email Address", status: "verified" },
-    { name: "Phone Number", status: "verified" },
+    { name: "Full Name", status: "under-review" },
+    { name: "Email Address", status: "under-review" },
+    { name: "Phone Number", status: "under-review" },
     { name: "Date of Birth", status: "under-review" },
     { name: "Move-in Date", status: "under-review" },
     { name: "Current Address", status: "under-review" },
-    { name: "Employment Status", status: "pending" },
-    { name: "Monthly Income", status: "pending" },
+    { name: "Employment Status", status: "under-review" },
+    { name: "Monthly Income", status: "under-review" },
   ],
 
   // Live-feeling activity timeline
