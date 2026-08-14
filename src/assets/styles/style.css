@@ -3652,16 +3652,16 @@ width: calc(100% + 1px);
 }
 }
 @media (max-width: 767px) {
-    .stepper-dashboard-box{
+    body .stepper-dashboard-box{
         background-color: unset !important;
     }
-    .stepper-dashboard-box .home-nav, .stepper-dashboard-box svg {
+    body .stepper-dashboard-box .home-nav, .stepper-dashboard-box svg {
     color: #000 !important;
 }
-.card-title-row .property-name{
+body .card-title-row .property-name{
     width: auto !important;
 }
-.stepper-row{
+body .stepper-row{
    width: calc(100% - 100px) !important;
 }
 }
