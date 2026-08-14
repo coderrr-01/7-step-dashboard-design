@@ -202,7 +202,7 @@ export default function DocumentSign() {
   };
 
    const paymentbtn = () => {
-        Navigate('/payment-screen');
+      navigate('/payment-screen');
     }
 
   // ── Already signed — show PDF + extension states ──────────────────────────
@@ -298,7 +298,7 @@ export default function DocumentSign() {
                   </div>
                 </div>
               </div>
-              <button type="button" onClick={paymentbtn} className="btn btn-black mt-5 mobile-view-btn">SECURE PAYMENT NOW<i class="bi bi-arrow-right"></i></button>
+              <button type="button" onClick={paymentbtn} className="btn btn-black mt-5 mobile-view-btn">SECURE PAYMENT NOW <i class="bi bi-arrow-right"></i></button>
             </div>
           </div>
         </main>
