@@ -195,7 +195,8 @@
         flex: auto
     }
     .checkout-card h3 {
-        font-size: 20px !important;
+        font-size: 18px !important;
+        font-weight:700
     }
     .img-set-info {
         height: auto;
