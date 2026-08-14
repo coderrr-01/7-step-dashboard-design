@@ -973,6 +973,13 @@ body.page-residence-agreement .form-check-label {
     font-size:20px;
     font-weight: 600;
 }
+.checkout-card .payment-tile.active div img{
+         filter: brightness(0) saturate(100%) invert(75%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(92%) contrast(88%);
+}
+
+.checkout-card .payment-tile.active div img{
+        filter: brightness(0) saturate(100%) invert(68%) sepia(18%) saturate(500%) hue-rotate(345deg) brightness(90%) contrast(85%);
+}
 
 .residency-card {
     background-color: var(--er-card-bg);
@@ -3637,7 +3644,9 @@ width: calc(100% + 1px);
         opacity: 0.6;
     }
 }
-
+.ds-sign-input input{
+    border: 1.5px solid #e6decf !important;
+}
 
 @media (max-width: 991px) {
 .verification-grid {
@@ -3656,7 +3665,10 @@ width: calc(100% + 1px);
         background: unset !important;
     }
    .stepper-row .stepper-dashboard-box .homepage_icon svg {
-    color: #000 !important;
+    color:#b8957a !important
+}
+.mobile-stepper .selected{
+        background: #bc9a7e !important; 
 }
 body .card-title-row .property-name{
     width: auto !important;

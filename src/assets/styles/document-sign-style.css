@@ -181,7 +181,7 @@ main.ds-page-bg {
 
 .ds-doc-paper {
   padding: 48px;
-  min-height: 720px;
+  /* min-height: 720px; */
   background:
     radial-gradient(1200px 500px at 50% -10%, rgba(187, 154, 126, 0.05), transparent 60%);
 }
