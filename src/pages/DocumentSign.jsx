@@ -200,10 +200,11 @@ export default function DocumentSign() {
     unit,
     name,
   };
-
-   const paymentbtn = () => {
-      navigate('/payment-screen');
-    }
+  
+  const navigate = useNavigate();
+  const paymentbtn = () => {
+    navigate('/payment-screen');
+  }
 
   // ── Already signed — show PDF + extension states ──────────────────────────
   if (!loading && (signedPdf || client?.signed_lease)) {
