@@ -205,13 +205,13 @@ export default function DocumentSign() {
     const pdfUrl = signedPdf || client.signed_lease;
     return (
       <PageLayout page="DocumentSign">
-        <main className="ds-page-bg">
+        <main className="ds-page-bg container-fluid px-lg-5 ">
           <div className="ds-ambient">
             <span className="ds-blob ds-blob-1"></span>
             <span className="ds-blob ds-blob-2"></span>
           </div>
 
-          <div className="ds-center">
+          <div className="ds-center container container-narrow ">
             <div className="ds-header">
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 <span className="ds-header-icon">
