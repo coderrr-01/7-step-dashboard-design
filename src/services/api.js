@@ -100,6 +100,29 @@ export function logout() {
     .forEach(k => localStorage.removeItem(k));
 }
 
+// Invalidates the WordPress server-side authentication session (the HttpOnly
+// wordpress_logged_in_* cookie). This MUST complete before redirecting to the
+// login page — otherwise WordPress still sees the user as authenticated and
+// bounces /login straight back to /my-dashboard. Best-effort: the caller
+// redirects regardless of outcome.
+export async function wpServerLogout(token) {
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), 10000) : null;
+  try {
+    await fetch(`${JRNY}/logout`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      ...(controller ? { signal: controller.signal } : {}),
+    });
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 // ─── BASE FETCH ───────────────────────────────────────────────────────────────
 async function apiFetch(url, options = {}) {
   const token = getToken();

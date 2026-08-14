@@ -8,7 +8,7 @@ import { FaFileCircleCheck } from "react-icons/fa6";
 import { FaSackDollar } from "react-icons/fa6";
 import { MdOutlineAddIcCall } from "react-icons/md";
 import { CiSettings } from "react-icons/ci";
-import { logout } from "../services/api";
+import { logout, getToken, wpServerLogout } from "../services/api";
 import { useClientData } from "../hooks/useClientData";
 
 export default function Header({ activeLabel }) {
@@ -19,11 +19,20 @@ export default function Header({ activeLabel }) {
    const userName = client?.name || client?.email || 'Tenant';
 
    function handleLogout() {
+      const token = getToken();
       logout();
       const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
-      window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
       if (window.parent === window) {
-         window.location.replace(loginUrl);
+         // Standalone (not embedded in the WP dashboard iframe): no parent page
+         // exists to perform the real WordPress logout, so invalidate the WP
+         // server-side session first, then go to the login page.
+         wpServerLogout(token)
+            .catch(() => {})
+            .finally(() => window.location.replace(loginUrl));
+      } else {
+         // Embedded: the WP parent page performs the genuine server-side WP
+         // logout (wp-login.php?action=logout) and redirects to the login page.
+         window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
       }
    }
 
