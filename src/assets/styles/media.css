@@ -63,12 +63,15 @@
     .top-header-section .gap-5 {
         gap: 7px !important;
     }
+        .top-header-section a {
+        font-size: 14px;
+    }
 }
-@media (max-width: 1210px) {
+/* @media (max-width: 1210px) {
     .top-header-section .gap-5{
             gap: 1rem !important;
     }
-}
+} */
 @media (max-width:1124px) {
     .user-profile .tracking-widest-sm{
         display: none;
