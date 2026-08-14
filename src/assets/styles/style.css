@@ -3646,7 +3646,9 @@ width: calc(100% + 1px);
 }
 .page-transition.enter .row.g-4>*, .page-transition.enter .row.g-3>*, .page-transition.enter .row.g-5>*{
     animation: unset !important;
-    
+}
+.set-location-data{
+    z-index: unset !important;
 }
 }
 @media (max-width: 767px) {
