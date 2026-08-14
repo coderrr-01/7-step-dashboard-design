@@ -173,6 +173,9 @@
     .secure-payment-details > div{
           margin-bottom: 20px !important;
     }
+    .paymentmethod_title h3{
+        font-size:16px !important;
+    }
 
    
     .desktopview-stepper {
@@ -403,6 +406,9 @@
 }
 
 @media only screen and (max-width:576px) {
+    .chevron-tabs-container{
+        flex-direction: column;
+    }
 
     .checkout-card .payment-tile{
         min-width: 33px;
