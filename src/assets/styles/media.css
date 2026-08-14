@@ -226,7 +226,7 @@
 
     .stepper-row {
         padding: 10px;
-        gap: 14px;
+        gap: 10px;
         width: calc(120% - 100px) !important;
         margin: auto;
         background: #ffd229;
@@ -246,7 +246,7 @@
         background-color: #ffd229;
         display: flex;
         align-items: center;
-        padding: 0px 16px 0px 0px;
+        padding: 0px;
         height: auto;
         margin: auto;
     }
