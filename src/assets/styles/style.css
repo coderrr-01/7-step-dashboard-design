@@ -3646,6 +3646,21 @@ width: calc(100% + 1px);
 }
 .page-transition.enter .row.g-4>*, .page-transition.enter .row.g-3>*, .page-transition.enter .row.g-5>*{
     animation: unset !important;
+    
+}
+}
+@media (max-width: 767px) {
+    .stepper-dashboard-box{
+        background-color: unset !important;
+    }
+    .stepper-dashboard-box .home-nav, .stepper-dashboard-box svg {
+    color: #000 !important;
+}
+.card-title-row .property-name{
+    width: auto !important;
+}
+.stepper-row{
+    width: 100% !important;
 }
 }
 /* Mobile adjustments */
