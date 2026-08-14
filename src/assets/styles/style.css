@@ -1943,7 +1943,12 @@ background-color: #b8924a;
     align-items: baseline;
     margin-bottom: 5px;
 }
-
+.card-title-row .property-name{
+  width: 233px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .property-name {
     font-size: 1.25rem;
     margin: 0;
@@ -1979,6 +1984,9 @@ background-color: #b8924a;
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+.card-footer-custom .btn-gold{
+    width: auto;
 }
 
 .rent-label {
