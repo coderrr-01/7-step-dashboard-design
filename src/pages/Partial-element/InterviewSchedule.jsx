@@ -179,7 +179,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                     )}
                                     <button
                                         type="button"
-                                        className="btn btn-black"
+                                        className="btn btn-black mb-3"
                                         onClick={() => setActiveTab("schedule")}
                                     >
                                         Reschedule

@@ -296,12 +296,9 @@ export default function DocumentSign() {
                       </div>
                     )}
                   </div>
-                  <button type="button" onClick={paymentbtn} className="mt-3 ds-view-btn mobile-view-btn">
-                    SECURE PAYMENT NOW
-                    <i className="bi bi-arrow-right"></i>
-                  </button>
                 </div>
               </div>
+              <button type="button" onClick={paymentbtn} className="btn btn-black mt-5 mobile-view-btn">SECURE PAYMENT NOW<i class="bi bi-arrow-right"></i></button>
             </div>
           </div>
         </main>

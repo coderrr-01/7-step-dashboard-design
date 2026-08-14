@@ -1030,6 +1030,9 @@ body.page-residence-agreement .form-check-label {
     border:none !important;
     box-shadow: none !important;
 }
+.confirmation-card .conf-title{
+    font-size: 20px;
+}
 
 .auth-card {
     background-color: var(--surface-container-low);
