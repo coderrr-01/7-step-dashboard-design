@@ -70,7 +70,14 @@ body .input, select, textarea, .form-control, .form-select{
     padding: 10px;
     color: gray !important;
 }
-.home-layout .row select , textarea{
+.home-layout .row select{
+      border: 1px solid #ece3d2 !important;
+    background-color: #fff !important;
+    border-radius: 10px !important;
+    padding: 10px;
+    color: gray !important;
+}
+.home-layout .row textarea{
       border: 1px solid #ece3d2 !important;
     background-color: #fff !important;
     border-radius: 10px !important;
