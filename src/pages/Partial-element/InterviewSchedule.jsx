@@ -112,7 +112,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                         SIGN LEASE NOW
                                         <i className="bi bi-arrow-right"></i>
                                     </button>
-                                    <div className="text-center mt-2 tour-note">
+                                    <div className="text-center mt-3 tour-note">
                                         Proceeds directly to step 6 (Lease Signing).
                                     </div>
                                 </div>
