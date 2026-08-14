@@ -17,6 +17,10 @@
         overflow-x: auto;
         overflow-y: hidden;
     }
+    .top-header-section .gap-5{
+        gap: 20px !important;
+    }
+
 }
 @media (max-width: 1480px) {
   .top-header-section .gap-5{
