@@ -3660,7 +3660,7 @@ width: calc(100% + 1px);
     width: auto !important;
 }
 .stepper-row{
-    width: 100% !important;
+   width: calc(100% - 100px) !important;
 }
 }
 /* Mobile adjustments */
