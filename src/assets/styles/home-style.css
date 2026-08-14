@@ -50,7 +50,7 @@ main.home-page-bg {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   gap: 28px;
-  align-items: baseline;
+  align-items: normal;
 }
 .home-chat-column {
   min-width: 0;
@@ -61,6 +61,15 @@ main.home-page-bg {
   /* height: calc(100vh - 100px);
   min-height: 300px; */
   flex: 1;
+}
+.input, select, textarea, .form-control, .form-select{
+      caret-color: var(--t-brand);
+    border: 1px solid #ece3d2;
+    color: #000 !important;
+    background-color: #fff !important;
+    border-radius: 10px !important;
+    padding: 10px;
+    color: gray !important;
 }
 .home-overview-column {
   min-width: 0;
@@ -359,6 +368,7 @@ main.home-page-bg {
     0 0 0 1px rgba(187, 154, 126, 0.12),
     0 24px 60px -30px rgba(184, 146, 74, 0.25);
   overflow: hidden;
+  display: none;
 }
 
 /* Header */
@@ -689,8 +699,8 @@ main.home-page-bg {
   border: 1px solid #eee4d3;
   border-radius: 20px;
   padding: 24px;
-  margin-top: 20px;
   box-shadow: 0 8px 28px rgba(90, 60, 20, 0.08);
+  
 }
 .home-submitted {
   background: #fff;
