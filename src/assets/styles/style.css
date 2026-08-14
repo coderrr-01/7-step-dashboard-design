@@ -1025,6 +1025,11 @@ body.page-residence-agreement .form-check-label {
     text-align: center;
     height: 100%;
 }
+.tab_confirm-roomtour .confirmation-card{
+    border-radius:unset !important;
+    border:none !important;
+    box-shadow: none !important;
+}
 
 .auth-card {
     background-color: var(--surface-container-low);
