@@ -973,7 +973,7 @@ body.page-residence-agreement .form-check-label {
     font-size:20px;
     font-weight: 600;
 }
-.checkout-card .payment-tile.active div img{
+.checkout-card .payment-tile div img{
          filter: brightness(0) saturate(100%) invert(75%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(92%) contrast(88%);
 }
 
