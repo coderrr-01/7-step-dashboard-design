@@ -228,7 +228,7 @@ position: absolute;
   position: fixed;
   top: 0;
   right: 0;
-  width: 3200px;
+  width: 320px;
   height: 100vh;
   transform: translateX(108%);
   transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
