@@ -51,7 +51,7 @@ export default function Header({ activeLabel }) {
       <div>
          <div className="desktop-menu">
             <header className="navbar-custom d-flex justify-content-between align-items-center">
-               <div>
+               <div className="logo-img-wrapper">
                  <img src={logo} alt="JRNY Logo" className="navbar-logo" />
                </div>
                <div className="top-header-section">

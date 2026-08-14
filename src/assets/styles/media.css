@@ -37,6 +37,9 @@
   .top-header-section a{
     font-size:16px
   }
+  .logo-img-wrapper{
+    width: 127px;
+  }
 }
 
 @media (max-width: 1370px) {
