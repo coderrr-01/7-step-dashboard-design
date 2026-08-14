@@ -413,7 +413,7 @@ export default function PaymentScreen() {
    return (
       <PageLayout page="PaymentScreen">
          <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">
-            <div className="container container-narrow py-5 px-lg-5">
+            <div className="container container-narrow py-5 px-lg-5 secure-payment-details">
                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
                   <div>
                      <h1 className="display-4 serif-heading heading-hero mb-2 hero-title">

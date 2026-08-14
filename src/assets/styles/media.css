@@ -40,9 +40,6 @@
 }
 
 @media (max-width: 1370px) {
-    .heading-hero {
-        font-size: 48px;
-    }
       .top-header-section .gap-5{
     gap: 14px !important;
   }
@@ -169,6 +166,12 @@
 @media only screen and (max-width:767px) {
     .verification-card{
         padding: 25px;
+    }
+    .secure-payment-details{
+            padding-top: 14px !important;
+    }
+    .secure-payment-details > div{
+          margin-bottom: 20px !important;
     }
 
    
