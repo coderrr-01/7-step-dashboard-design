@@ -210,7 +210,6 @@ export default function DocumentSign() {
             <span className="ds-blob ds-blob-1"></span>
             <span className="ds-blob ds-blob-2"></span>
           </div>
-
           <div className="ds-center container container-narrow ">
             <div className="ds-header">
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
