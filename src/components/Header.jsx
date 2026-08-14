@@ -16,7 +16,7 @@ export default function Header({ activeLabel }) {
    const [open, setOpen] = useState(false);
    const [dropdown, setdropdown] = useState(false);
    const ref = useRef(null);
-   const userName = client?.name || client?.email || 'Tenant';
+   const userName = client?.name || client?.email || 'Loading...';
 
    function handleLogout() {
       const token = getToken();
