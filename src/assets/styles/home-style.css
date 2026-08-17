@@ -782,23 +782,42 @@ body .input, select, textarea, .form-control, .form-select{
   position: relative;
 }
 
-/* ---------- SalesIQ Inline Overrides ---------- */
-#zsiqfloat {
-  position: static !important;
-  bottom: auto !important;
-  right: auto !important;
-  left: auto !important;
-  top: auto !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: auto !important;
-  max-height: 420px !important;
-  overflow-y: auto !important;
-  z-index: auto !important;
-  border: 1px solid #e6decf;
+/* ---------- SalesIQ Chat Trigger Button ---------- */
+.salesiq-start-chat-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+  background: linear-gradient(140deg, #c9a45c, #b8924a 60%, #a87f3f);
+  color: #fff;
+  border: none;
   border-radius: 14px;
-  background: #faf7f0;
+  padding: 16px 24px;
+  font-family: "Poppins", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 12px 28px -8px rgba(184, 146, 74, 0.65);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
-#zsiqfloat * {
-  box-sizing: border-box;
+.salesiq-start-chat-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px -8px rgba(184, 146, 74, 0.8);
+  background: linear-gradient(140deg, #d4af6a, #c9a45c 60%, #b8924a);
+}
+.salesiq-start-chat-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 20px -6px rgba(184, 146, 74, 0.6);
+}
+.salesiq-start-chat-btn svg {
+  flex-shrink: 0;
+}
+.salesiq-chat-hint {
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  color: #a89f8d;
+  text-align: center;
+  margin: 12px 0 0;
 }

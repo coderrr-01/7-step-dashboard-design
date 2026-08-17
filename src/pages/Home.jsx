@@ -126,36 +126,16 @@ export default function Home() {
   }, [completedSteps, getUserSub()]);
 
   useEffect(() => {
-    let moved = false;
-    let intervalId;
-    let observer;
-
-    const moveWidget = () => {
-      const mount = document.getElementById('salesiq-widget-container');
-      const widget = document.getElementById('zsiqfloat');
-      if (!mount || !widget) return false;
-      if (mount.contains(widget)) return true;
-      mount.appendChild(widget);
-      moved = true;
-      return true;
-    };
-
-    if (moveWidget()) return () => {};
-
-    intervalId = setInterval(moveWidget, 300);
-    observer = new MutationObserver(moveWidget);
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    return () => {
-      clearInterval(intervalId);
-      if (observer) observer.disconnect();
-      if (moved) {
-        const widget = document.getElementById('zsiqfloat');
-        if (widget && widget.parentElement !== document.body) {
-          document.body.appendChild(widget);
-        }
+    const hideLauncher = () => {
+      if (window.$zoho && window.$zoho.salesiq && window.$zoho.salesiq.chatbutton) {
+        window.$zoho.salesiq.chatbutton.visible("hide");
+        return true;
       }
+      return false;
     };
+    if (hideLauncher()) return;
+    const id = setInterval(hideLauncher, 500);
+    return () => clearInterval(id);
   }, []);
 
   const [submitting, setSubmitting] = useState(false);
@@ -291,7 +271,23 @@ export default function Home() {
                       <p className="salesiq-section-subtitle">Chat with our support team in real time</p>
                     </div>
                   </div>
-                  <div className="salesiq-widget-mount" id="salesiq-widget-container"></div>
+                  <div className="salesiq-widget-mount" id="salesiq-widget-container">
+                    <button
+                      type="button"
+                      className="salesiq-start-chat-btn"
+                      onClick={() => {
+                        if (window.$zoho && window.$zoho.salesiq && window.$zoho.salesiq.floatwindow) {
+                          window.$zoho.salesiq.floatwindow.open();
+                        }
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                      </svg>
+                      Start Live Chat
+                    </button>
+                    <p className="salesiq-chat-hint">Click above to open the live chat window</p>
+                  </div>
                 </div>
               </>
             )}
