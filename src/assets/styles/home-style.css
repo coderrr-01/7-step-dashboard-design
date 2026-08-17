@@ -781,3 +781,24 @@ body .input, select, textarea, .form-control, .form-select{
   min-height: 60px;
   position: relative;
 }
+
+/* ---------- SalesIQ Inline Overrides ---------- */
+#zsiqfloat {
+  position: static !important;
+  bottom: auto !important;
+  right: auto !important;
+  left: auto !important;
+  top: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 420px !important;
+  overflow-y: auto !important;
+  z-index: auto !important;
+  border: 1px solid #e6decf;
+  border-radius: 14px;
+  background: #faf7f0;
+}
+#zsiqfloat * {
+  box-sizing: border-box;
+}

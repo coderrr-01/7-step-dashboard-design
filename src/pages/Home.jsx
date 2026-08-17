@@ -121,6 +121,39 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completedSteps, getUserSub()]);
 
+  useEffect(() => {
+    let moved = false;
+    let intervalId;
+    let observer;
+
+    const moveWidget = () => {
+      const mount = document.getElementById('salesiq-widget-container');
+      const widget = document.getElementById('zsiqfloat');
+      if (!mount || !widget) return false;
+      if (mount.contains(widget)) return true;
+      mount.appendChild(widget);
+      moved = true;
+      return true;
+    };
+
+    if (moveWidget()) return () => {};
+
+    intervalId = setInterval(moveWidget, 300);
+    observer = new MutationObserver(moveWidget);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      clearInterval(intervalId);
+      if (observer) observer.disconnect();
+      if (moved) {
+        const widget = document.getElementById('zsiqfloat');
+        if (widget && widget.parentElement !== document.body) {
+          document.body.appendChild(widget);
+        }
+      }
+    };
+  }, []);
+
   const [submitting, setSubmitting] = useState(false);
 
   const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
