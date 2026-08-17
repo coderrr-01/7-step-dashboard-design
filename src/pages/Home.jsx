@@ -241,6 +241,21 @@ export default function Home() {
                     </button>
                   </div>
                 </form>
+
+                <div className="salesiq-chat-container" id="salesiq-inline-section">
+                  <div className="salesiq-section-header">
+                    <span className="salesiq-section-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                      </svg>
+                    </span>
+                    <div>
+                      <h3 className="salesiq-section-title">Need Help?</h3>
+                      <p className="salesiq-section-subtitle">Chat with our support team in real time</p>
+                    </div>
+                  </div>
+                  <div className="salesiq-widget-mount" id="salesiq-widget-container"></div>
+                </div>
               </>
             )}
           </div>

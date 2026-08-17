@@ -729,3 +729,55 @@ body .input, select, textarea, .form-control, .form-select{
   padding: 24px;
   box-shadow: 0 8px 28px rgba(90, 60, 20, 0.08);
 }
+
+/* ---------- SalesIQ Chat Section ---------- */
+.salesiq-chat-container {
+  margin-top: 20px;
+  background: #fff;
+  border: 1px solid #eee4d3;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 28px rgba(90, 60, 20, 0.08);
+}
+.salesiq-section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.salesiq-section-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: linear-gradient(140deg, #c9a45c, #b8924a 60%, #a87f3f);
+  color: #fff;
+  font-size: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px -8px rgba(184, 146, 74, 0.65);
+}
+.salesiq-section-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.salesiq-section-title {
+  font-family: "Poppins", sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+.salesiq-section-subtitle {
+  font-family: "Poppins", sans-serif;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #6e685c;
+  margin: 2px 0 0;
+}
+.salesiq-widget-mount {
+  min-height: 60px;
+  position: relative;
+}
