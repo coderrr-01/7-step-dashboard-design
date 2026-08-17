@@ -67,16 +67,20 @@ function OverviewPanel({ client, submitted }) {
         ))}
       </div>
 
-      <div className="home-overview-verified">
-        <span className="home-overview-verified-dot"></span>
-        <span className="home-overview-verified-label">Visa Status</span>
-        <span className="home-overview-verified-value">Verified</span>
-      </div>
+      {client && (  
+        <div className="home-overview-verified">
+          <span className="home-overview-verified-dot"></span>
+          <span className="home-overview-verified-label">Visa Status</span>
+          <span className="home-overview-verified-value">Verified</span>
+        </div>  
+      )}
 
-      <Link to="/review" className="home-overview-cta">
-        {submitted ? "View Review Status" : "Continue Application"}
-        <FaArrowRight />
-      </Link>
+      {client && (
+        <Link to="/review" className="home-overview-cta">
+          {submitted ? "View Review Status" : ""}
+          <FaArrowRight />
+        </Link>
+      )}
     </aside>
   );
 }
