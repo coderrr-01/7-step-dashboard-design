@@ -125,18 +125,18 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completedSteps, getUserSub()]);
 
-  useEffect(() => {
-    const hideLauncher = () => {
-      if (window.$zoho && window.$zoho.salesiq && window.$zoho.salesiq.chatbutton) {
-        window.$zoho.salesiq.chatbutton.visible("hide");
-        return true;
-      }
-      return false;
-    };
-    if (hideLauncher()) return;
-    const id = setInterval(hideLauncher, 500);
-    return () => clearInterval(id);
-  }, []);
+  // useEffect(() => {
+  //   const hideLauncher = () => {
+  //     if (window.$zoho && window.$zoho.salesiq && window.$zoho.salesiq.chatbutton) {
+  //       window.$zoho.salesiq.chatbutton.visible("hide");
+  //       return true;
+  //     }
+  //     return false;
+  //   };
+  //   if (hideLauncher()) return;
+  //   const id = setInterval(hideLauncher, 500);
+  //   return () => clearInterval(id);
+  // }, []);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -259,7 +259,7 @@ export default function Home() {
                   </div>
                 </form>
 
-                <div className="salesiq-chat-container" id="salesiq-inline-section">
+                {/* <div className="salesiq-chat-container" id="salesiq-inline-section">
                   <div className="salesiq-section-header">
                     <span className="salesiq-section-icon">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -288,7 +288,7 @@ export default function Home() {
                     </button>
                     <p className="salesiq-chat-hint">Click above to open the live chat window</p>
                   </div>
-                </div>
+                </div> */}
               </>
             )}
           </div>
