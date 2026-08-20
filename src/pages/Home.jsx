@@ -201,6 +201,7 @@ export default function Home() {
             ) : (
               <>
                 <ChatCard />
+                {/*
                 <form onSubmit={handleSubmit} noValidate className="home-form-card">
                   <h3 className="home-overview-title mb-3">Application Details</h3>
                   <div className="row g-3">
@@ -258,6 +259,7 @@ export default function Home() {
                     </button>
                   </div>
                 </form>
+                */}
 
                 {/* <div className="salesiq-chat-container" id="salesiq-inline-section">
                   <div className="salesiq-section-header">
