@@ -184,8 +184,8 @@ export default function Home() {
           <span className="home-blob home-blob-2"></span>
         </div>
 
-        {/* <div className="home-layout">
-          <div className="home-chat-column">
+        <div className="home-layout">
+          {/* <div className="home-chat-column">
             {alreadySubmitted ? (
               <div className="home-submitted">
                 <div className="home-overview-note mb-3">
@@ -199,10 +199,10 @@ export default function Home() {
                   View Review Status
                 </button>
               </div>
-            ) : ( */}
+            ) : (
               <>
                 <ChatCard />
-                {/*
+                
                 <form onSubmit={handleSubmit} noValidate className="home-form-card">
                   <h3 className="home-overview-title mb-3">Application Details</h3>
                   <div className="row g-3">
@@ -260,9 +260,9 @@ export default function Home() {
                     </button>
                   </div>
                 </form>
-                */}
+               
 
-                {/* <div className="salesiq-chat-container" id="salesiq-inline-section">
+                <div className="salesiq-chat-container" id="salesiq-inline-section">
                   <div className="salesiq-section-header">
                     <span className="salesiq-section-icon">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -291,9 +291,9 @@ export default function Home() {
                     </button>
                     <p className="salesiq-chat-hint">Click above to open the live chat window</p>
                   </div>
-                </div> */}
+                </div>
               </>
-            {/* )}
+            )}
           </div> */}
           <div className="home-overview-column">
             {clientLoading ? (
@@ -311,7 +311,7 @@ export default function Home() {
               <OverviewPanel client={client} submitted={alreadySubmitted} />
             )}
           </div>
-        {/* </div> */}
+        </div>
       </main>
     </PageLayout>
   );
