@@ -44,6 +44,16 @@ export default function Interview() {
          toast.error('Please select a date and time slot.');
          return;
       }
+      // Defensive guard: never submit a past date, even if one is supplied
+      // programmatically. selectedDate.value is "dd/mm/yyyy".
+      const [dd, mm, yyyy] = String(selectedDate.value).split('/').map(Number);
+      const picked = new Date(yyyy, (mm || 1) - 1, dd || 1);
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      if (picked < startOfToday) {
+         toast.error('Please select today or a future date.');
+         return;
+      }
       setSubmitting(true);
       try {
          const res = await bookInterview({

@@ -152,15 +152,16 @@ export default function DocumentSign() {
   const extStatus = client?.extension_status || "";
   const extensionPdf = client?.extension_signed_pdf || "";
 
-  // Use requested dates when extension is Approved
+  // Use requested dates when extension is Approved; otherwise consume the
+  // server-resolved start/end dates from the API (no hardcoded fallbacks).
   const startDate =
     extStatus === "Approved" && client?.requested_start_date
       ? client.requested_start_date
-      : client?.start_date || "September 1, 2024";
+      : client?.start_date || "";
   const endDate =
     extStatus === "Approved" && client?.requested_end_date
       ? client.requested_end_date
-      : client?.end_date || "July 31, 2025";
+      : client?.end_date || "";
 
   // Amounts: prefer the Zoho client record, fall back to the persisted
   // selected room (which carries the Zoho monthly_rent / security_deposit).

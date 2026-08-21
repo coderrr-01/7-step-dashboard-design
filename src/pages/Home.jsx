@@ -34,6 +34,8 @@ function OverviewPanel({ client, submitted }) {
     { label: "Date of Birth", value: client?.date_of_birth || "—" },
     { label: "Move-in Date", value: client?.move_in_date || "—" },
     { label: "Current Address", value: client?.current_address || "—" },
+    { label: "Employment Status", value: client?.employment_status || "—" },
+    { label: "Income", value: client?.monthly_income || "—" },
   ];
 
   return (

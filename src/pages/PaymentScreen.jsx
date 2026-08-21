@@ -161,8 +161,8 @@ export default function PaymentScreen() {
    const clientName = client?.name || 'Julianne Vanes-Harding';
    const clientPhone = client?.phone || '+1 (212) 555-0198';
    const clientEmail = client?.email || 'vanes@global-exec.com';
-   const startDate = client?.start_date || 'September 01, 2024';
-   const endDate = client?.end_date || 'August 31, 2025';
+   const startDate = client?.start_date || '';
+   const endDate = client?.end_date || '';
    const unitLabel = selectedRoom?.name || client?.unit || client?.room_name || 'The Victorian Premier';
 
    const roomMeta = (() => {

@@ -9,6 +9,8 @@ function Calendar({ onSelectDate }) {
     new Date()
   );
 const today = new Date();
+// Midnight boundary for "today" so past-date comparisons ignore the time part.
+const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
   const [selectedDate, setSelectedDate] = useState(
      today.getDate()
@@ -331,7 +333,14 @@ const today = new Date();
 
         {
 
-          dates.map((date, index) => (
+          dates.map((date, index) => {
+
+            // A real date cell is "past" when it falls before today (date-only).
+            const isPast =
+              date !== "" &&
+              new Date(year, month, date) < todayMidnight;
+
+            return (
 
 
             <div
@@ -343,6 +352,8 @@ const today = new Date();
                 `calendar-date
 
 ${date === "" ? "muted" : ""}
+
+${isPast ? "muted" : ""}
 
 ${date !== "" && (startDay + index) % 7 === 0 ? "weekend" : ""}
 
@@ -358,7 +369,7 @@ ${date !== "" && date === today.getDate() && month === today.getMonth() && year 
 
 
               onClick={() => {
-                if (!date) return;
+                if (!date || isPast) return;
                 setSelectedDate(date);
                 if (onSelectDate) {
                   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -383,8 +394,9 @@ ${date !== "" && date === today.getDate() && month === today.getMonth() && year 
 
             </div>
 
+            );
 
-          ))
+          })
 
 
         }
