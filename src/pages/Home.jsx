@@ -184,7 +184,7 @@ export default function Home() {
           <span className="home-blob home-blob-2"></span>
         </div>
 
-        <div className="home-layout">
+        <div className="home-layout d-block">
           {/* <div className="home-chat-column">
             {alreadySubmitted ? (
               <div className="home-submitted">
