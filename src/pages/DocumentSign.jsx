@@ -699,49 +699,49 @@ function ExtensionRequestForm({ client, onSubmitted }) {
     }
   };
 
-  return (
-    <div className="ds-extension-box">
-      <h4 className="ds-extension-title">Request Lease Extension</h4>
-      <p className="ds-extension-sub">
-        Your current lease end date: <strong>{client?.end_date || ""}</strong>
-      </p>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 12 }}>
-          <label className="ds-label">New Start Date</label>
-          <input
-            type="date"
-            className="ds-sign-input"
-            style={{ width: "100%" }}
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            required
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label className="ds-label">New End Date</label>
-          <input
-            type="date"
-            className="ds-sign-input"
-            style={{ width: "100%" }}
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            required
-          />
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <label className="ds-label">Comment</label>
-          <textarea
-            className="ds-sign-input"
-            style={{ width: "100%", resize: "vertical" }}
-            rows={3}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-        </div>
-        <button type="submit" className="ds-sign-btn" style={{ marginTop: 0 }} disabled={submitting}>
-          {submitting ? "Submitting..." : "Submit Extension Request"}
-        </button>
-      </form>
-    </div>
-  );
+  // return (
+  //   <div className="ds-extension-box">
+  //     <h4 className="ds-extension-title">Request Lease Extension</h4>
+  //     <p className="ds-extension-sub">
+  //       Your current lease end date: <strong>{client?.end_date || ""}</strong>
+  //     </p>
+  //     <form onSubmit={handleSubmit}>
+  //       <div style={{ marginBottom: 12 }}>
+  //         <label className="ds-label">New Start Date</label>
+  //         <input
+  //           type="date"
+  //           className="ds-sign-input"
+  //           style={{ width: "100%" }}
+  //           value={startDate}
+  //           onChange={(e) => setStartDate(e.target.value)}
+  //           required
+  //         />
+  //       </div>
+  //       <div style={{ marginBottom: 12 }}>
+  //         <label className="ds-label">New End Date</label>
+  //         <input
+  //           type="date"
+  //           className="ds-sign-input"
+  //           style={{ width: "100%" }}
+  //           value={endDate}
+  //           onChange={(e) => setEndDate(e.target.value)}
+  //           required
+  //         />
+  //       </div>
+  //       <div style={{ marginBottom: 12 }}>
+  //         <label className="ds-label">Comment</label>
+  //         <textarea
+  //           className="ds-sign-input"
+  //           style={{ width: "100%", resize: "vertical" }}
+  //           rows={3}
+  //           value={comment}
+  //           onChange={(e) => setComment(e.target.value)}
+  //         />
+  //       </div>
+  //       <button type="submit" className="ds-sign-btn" style={{ marginTop: 0 }} disabled={submitting}>
+  //         {submitting ? "Submitting..." : "Submit Extension Request"}
+  //       </button>
+  //     </form>
+  //   </div>
+  // );
 }
