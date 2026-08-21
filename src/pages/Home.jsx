@@ -52,10 +52,11 @@ function OverviewPanel({ client, submitted }) {
         <span className="home-overview-note-icon">
           <FaShieldHalved />
         </span>
-        <p>
-          {submitted
+        <p className="home-overview-note-text mt-1">
+          Your application has been submitted and is currently under review.
+          {/* {submitted
             ? "Your application has been submitted and is currently under review."
-            : <>You are completing the <strong>Personal Details</strong> section. Our systems will verify this information against your records.</>}
+            : <>You are completing the <strong>Personal Details</strong> section. Our systems will verify this information against your records.</>} */}
         </p>
       </div>
 
@@ -78,8 +79,7 @@ function OverviewPanel({ client, submitted }) {
 
       {client && (
         <Link to="/review" className="home-overview-cta">
-          {submitted ? "View Review Status" : ""}
-          <FaArrowRight />
+          View Review Status <FaArrowRight />
         </Link>
       )}
     </aside>
