@@ -3,6 +3,7 @@ import ChatCard from "./Partial-element/Chatcard";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSteps } from "../context/StepContext";
+import { useClientData } from "../hooks/useClientData";
 import { applyForm, getCachedClient, getToken, getUserSub } from "../services/api";
 import { toast } from "react-toastify";
 import {
@@ -91,8 +92,9 @@ export default function Home() {
 
   const alreadySubmitted = completedSteps.includes(1);
 
+  const { client, loading: clientLoading } = useClientData();
+
   const [cachedEmail, setCachedEmail] = useState(() => getEmailFromToken());
-  const [client, setClient] = useState(null);
   const [form, setForm] = useState({
     name:              "",
     email:             getEmailFromToken(),
@@ -107,7 +109,6 @@ export default function Home() {
 
   useEffect(() => {
     const cached = getCachedClient();
-    if (cached) setClient(cached);
     if (!cached) return;
     const email = cached.email || getEmailFromToken() || '';
     setCachedEmail(email);
@@ -295,7 +296,20 @@ export default function Home() {
             )}
           </div>
           <div className="home-overview-column">
-            <OverviewPanel client={client} submitted={alreadySubmitted} />
+            {clientLoading ? (
+              <div className="w-100 d-flex justify-content-center align-items-center py-5">
+                <div className="verification-loader">
+                  <div className="loader-ring"></div>
+                  <div className="loader-content">
+                    <span className="loader-dot"></span>
+                    <h6>Loading Application</h6>
+                    <p>Fetching your details, please wait…</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <OverviewPanel client={client} submitted={alreadySubmitted} />
+            )}
           </div>
         </div>
       </main>
