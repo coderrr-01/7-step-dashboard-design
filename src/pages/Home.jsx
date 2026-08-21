@@ -184,7 +184,7 @@ export default function Home() {
           <span className="home-blob home-blob-2"></span>
         </div>
 
-        <div className="home-layout">
+        {/* <div className="home-layout">
           <div className="home-chat-column">
             {alreadySubmitted ? (
               <div className="home-submitted">
@@ -199,7 +199,7 @@ export default function Home() {
                   View Review Status
                 </button>
               </div>
-            ) : (
+            ) : ( */}
               <>
                 <ChatCard />
                 {/*
@@ -293,8 +293,8 @@ export default function Home() {
                   </div>
                 </div> */}
               </>
-            )}
-          </div>
+            {/* )}
+          </div> */}
           <div className="home-overview-column">
             {clientLoading ? (
               <div className="w-100 d-flex justify-content-center align-items-center py-5">
@@ -311,7 +311,7 @@ export default function Home() {
               <OverviewPanel client={client} submitted={alreadySubmitted} />
             )}
           </div>
-        </div>
+        {/* </div> */}
       </main>
     </PageLayout>
   );
