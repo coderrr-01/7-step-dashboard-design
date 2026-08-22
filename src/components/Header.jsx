@@ -61,14 +61,23 @@ export default function Header({ activeLabel }) {
       return () => document.removeEventListener("mousedown", handleClickOutside);
    }, []);
 
-   // Lock background scroll while the mobile drawer is open so the page behind
-   // it doesn't scroll through. JS-only (no CSS change); restores on close.
+   // Lock background scroll while the mobile drawer is open. The page's scroll
+   // container is the root <html> element (body only sets overflow-x), so a
+   // body-only lock had no effect — we must lock document.documentElement (and
+   // body for good measure). JS-only, no CSS change; overflow:hidden preserves
+   // the current scroll position (no jump) and is restored on close.
    useEffect(() => {
-      if (open) {
-         const prev = document.body.style.overflow;
-         document.body.style.overflow = 'hidden';
-         return () => { document.body.style.overflow = prev; };
-      }
+      if (!open) return;
+      const de = document.documentElement;
+      const body = document.body;
+      const prevHtmlOverflow = de.style.overflow;
+      const prevBodyOverflow = body.style.overflow;
+      de.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      return () => {
+         de.style.overflow = prevHtmlOverflow;
+         body.style.overflow = prevBodyOverflow;
+      };
    }, [open]);
    return <>
       <div className="sticky-header">
