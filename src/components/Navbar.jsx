@@ -69,7 +69,7 @@ export default function Navbar() {
         {/* Dashboard */}
         {pathname !== "/payment-screen" && (
           <div className="stepper-dashboard-box">
-            <div className="homepage_icon" onClick={homepageNavigate}>
+            <div className="homepage_icon">
               <FaHome />
               <span className="home-nav">DASHBOARD</span>
             </div>
