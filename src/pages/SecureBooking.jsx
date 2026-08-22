@@ -127,10 +127,10 @@ export default function SecureBooking() {
                                  <div className="residence-price-note">Inclusive of Concierge</div>
                               </div>
                            </div>
-                           <div className="d-flex gap-4 mt-3 residence-features">
+                           {/* <div className="d-flex gap-4 mt-3 residence-features">
                               <span><i className="bi bi-snow2 text-gold me-1"></i> Climate Controlled</span>
                               <span><i className="bi bi-wifi text-gold me-1"></i> Gigabit Fiber</span>
-                           </div>
+                           </div> */}
                            {/* View Room is intentionally not rendered on Secure Booking. */}
                         </div>
                      </div>

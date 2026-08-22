@@ -35,7 +35,10 @@ const _step = _params.get('step');
 // persists across logout — so the user resumes their current step instead of
 // always landing on Home/Apply. Empty progress falls back to Home (Step 1).
 function resumeInitialEntry() {
-  if (_step) return '/' + _step;
+  // Honor an explicit, specific step slug (mid-session refresh deep-links to a
+  // real step). 'apply' is the dashboard root WordPress sends on a fresh login,
+  // so it is treated as "no explicit step" and we resume from saved progress.
+  if (_step && _step !== 'apply') return '/' + _step;
   try {
     const sub = getUserSub();
     const key = sub ? `jrny_completed_steps_${sub}` : 'jrny_completed_steps';

@@ -20,20 +20,33 @@ export default function Header({ activeLabel }) {
 
    function handleLogout() {
       const token = getToken();
-      logout();
+      logout(); // clears the local token and remembers it so ?token cannot auto-restore
       const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
-      if (window.parent === window) {
-         // Standalone (not embedded in the WP dashboard iframe): no parent page
-         // exists to perform the real WordPress logout, so invalidate the WP
-         // server-side session first, then go to the login page.
-         wpServerLogout(token)
-            .catch(() => {})
-            .finally(() => window.location.replace(loginUrl));
-      } else {
-         // Embedded: the WP parent page performs the genuine server-side WP
-         // logout (wp-login.php?action=logout) and redirects to the login page.
-         window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
+
+      // Still notify the WP parent (if embedded) so it can run the genuine
+      // wp-login.php?action=logout — but DO NOT depend on it: the redirect and
+      // server-session invalidation below run regardless of whether the parent
+      // listens. Relying only on this postMessage is why logout appeared to do nothing.
+      if (window.parent !== window) {
+         try { window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*'); } catch { /* ignore */ }
       }
+
+      // Send the whole page (top window, breaking out of the dashboard iframe) to
+      // the login page. Falls back to this frame if top navigation is blocked.
+      const goToLogin = () => {
+         try {
+            if (window.top && window.top !== window) {
+               window.top.location.replace(loginUrl);
+               return;
+            }
+         } catch { /* cross-origin / sandbox: fall through to same-frame redirect */ }
+         window.location.replace(loginUrl);
+      };
+
+      // Invalidate the WordPress server-side session first (best-effort, has its
+      // own timeout), then redirect — so the user cannot re-enter via Back or by
+      // re-visiting a protected route.
+      wpServerLogout(token).catch(() => {}).finally(goToLogin);
    }
 
    // close when click outside
