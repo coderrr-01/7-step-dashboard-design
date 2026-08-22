@@ -28,7 +28,7 @@ function Timeslot({ selectedTime: externalTime, onSelectTime, bookedSlots = [] }
 
     return (
 
-        <div className="row g-2 mb-3">
+        <div className="row g-2">
 
             {
                 timeSlots.map((time) => (

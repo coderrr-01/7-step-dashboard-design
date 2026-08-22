@@ -60,6 +60,16 @@ export default function Header({ activeLabel }) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
    }, []);
+
+   // Lock background scroll while the mobile drawer is open so the page behind
+   // it doesn't scroll through. JS-only (no CSS change); restores on close.
+   useEffect(() => {
+      if (open) {
+         const prev = document.body.style.overflow;
+         document.body.style.overflow = 'hidden';
+         return () => { document.body.style.overflow = prev; };
+      }
+   }, [open]);
    return <>
       <div className="sticky-header">
          <div className="desktop-menu">
