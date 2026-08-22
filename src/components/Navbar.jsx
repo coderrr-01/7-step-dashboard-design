@@ -34,9 +34,14 @@ export default function Navbar() {
   }
 
   const handleStepClick = (step, e) => {
-    if (!canAccessStep(step[2])) {
+    // Forward-only navigation: the header must never move the user between steps.
+    // The user advances only through each page's own Continue/Confirm/Submit
+    // action. Clicking the step you are already on is a harmless no-op; every
+    // other step — a completed one (backward) or a locked one (forward) — is
+    // blocked here so the user always stays on the current active step.
+    if (step[1] !== activePath) {
       e.preventDefault();
-      return; // locked — do nothing
+      return;
     }
   };
 

@@ -184,14 +184,20 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                     >
                                         Reschedule
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="btn btn-black mobile-view-btn"
-                                        onClick={securebtn}
-                                    >
-                                        SECURE BOOKING NOW
-                                        <i className="bi bi-arrow-right"></i>
-                                    </button>
+                                    {/* "Secure Booking Now" belongs only to the Interview
+                                        Booking context. This component is shared: the Secure
+                                        Booking page renders it with datatext="securePlaneblock",
+                                        and in that case the button must not appear. */}
+                                    {datatext !== "securePlaneblock" && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-black mobile-view-btn"
+                                            onClick={securebtn}
+                                        >
+                                            SECURE BOOKING NOW
+                                            <i className="bi bi-arrow-right"></i>
+                                        </button>
+                                    )}
                                     <div className="divider-text">
                                         OR
                                     </div>
