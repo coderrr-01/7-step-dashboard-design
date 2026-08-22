@@ -177,14 +177,31 @@ export default function Review() {
             </div>
 
             <div className="verification-center">
-               <VerificationHeader />
+               
 
                {approved ? (
+                  <>
+                  <header className="verification-hero vg-anim">
+                        <div className="verification-hero-icon">
+                        <span className="verification-orbit-ring r1"></span>
+                        <span className="verification-orbit-ring r2"></span>
+                        <span className="verification-orbit-dot d1"></span>
+                        <span className="verification-orbit-dot d2"></span>
+                        <div className="verification-shield">
+                           <FaShieldHalved />
+                        </div>
+                        <span className="verification-shield-pulse"></span>
+                     </div>
+                  
+                     <span className="verification-eyebrow">Secure Application Review</span>
+                  </header>
                   <VerificationComplete data={data} />
+                  </>
                ) : data.status === "failed" ? (
                   <VerificationFailed data={data} />
                ) : (
                <>
+                  <VerificationHeader />
                   <ApplicationOverview data={data} />
 
                   <div className={`verification-grid ${data.status === "action-required" ? "has-action" : ""}`}>
