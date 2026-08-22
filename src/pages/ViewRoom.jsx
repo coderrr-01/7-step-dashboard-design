@@ -49,15 +49,14 @@ export default function ViewRoom() {
    const buildingHeritage = room.building_heritage || '';
    const agreementType = room.agreement_type || '';
 
-   const defaultAmenities = ['Climate Control', 'Giga-Fiber Wifi', 'Daily Housekeeping', '24/7 Concierge'];
-   const rawAmenities = Array.isArray(room.amenities)
+   const amenityList = Array.isArray(room.amenities)
+   ? room.amenities
+   : typeof room.amenities === 'string'
       ? room.amenities
-      : typeof room.amenities === 'string'
-         ? room.amenities.split(',').map((a) => a.trim()).filter(Boolean)
-         : [];
-   const amenityList = rawAmenities.length
-      ? rawAmenities.concat(defaultAmenities).slice(0, Math.max(rawAmenities.length, defaultAmenities.length))
-      : '';
+         .split(',')
+         .map((a) => a.trim())
+         .filter(Boolean)
+      : [];
 
    return (
       <PageLayout page="ViewRoom">
@@ -72,7 +71,7 @@ export default function ViewRoom() {
                <div className="row g-4">
                   <div className="col-xl-8">
                      <div className="row g-4">
-                        <div className="col-12">
+                        {/* <div className="col-12">
                            <div className="parchment-card p-4">
                               <div className="position-relative mb-4">
                                   <img alt="Main" className="w-100 gallery-main shadow-sm" src={images[mainImg]} />
@@ -107,6 +106,52 @@ export default function ViewRoom() {
                                      </div>
                                   </div>
                               </div>
+                           </div>
+                        </div> */}
+                        {/* Amenities */}
+                        <div className="col-12">
+                           <div className="parchment-card">
+                              <h3 className="h5 mb-4 text-primary">Premium Amenities</h3>
+
+                              {amenityList.length > 0 ? (
+                                 <div className="row text-center">
+
+                                    {amenityList.map((amenity, i) => (
+                                       <div className="col-6 col-md-3 mb-4" key={i}>
+                                          
+                                          <div className="amenity-icon">
+                                             <span className="material-symbols-outlined">
+
+                                                {/* Amenity Icon */}
+                                                <svg
+                                                   width="30"
+                                                   height="30"
+                                                   viewBox="0 0 24 24"
+                                                   fill="none"
+                                                   xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                   <path
+                                                      d="M12 2l2.4 6.6H21l-5.4 4 2 6.6-5.6-4-5.6 4 2-6.6-5.4-4h6.6z"
+                                                      fill="#B8924A"
+                                                   />
+                                                </svg>
+
+                                             </span>
+                                          </div>
+
+                                          <span className="amenity-text">
+                                             {amenity}
+                                          </span>
+
+                                       </div>
+                                    ))}
+
+                                 </div>
+                              ) : (
+                                 <div className="text-muted">
+                                    No amenities available.
+                                 </div>
+                              )}
                            </div>
                         </div>
                         {/* About Sections */}
