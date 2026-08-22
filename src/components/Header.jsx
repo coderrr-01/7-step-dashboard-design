@@ -48,7 +48,7 @@ export default function Header({ activeLabel }) {
       return () => document.removeEventListener("mousedown", handleClickOutside);
    }, []);
    return <>
-      <div>
+      <div className="sticky-header">
          <div className="desktop-menu">
             <header className="navbar-custom d-flex justify-content-between align-items-center">
                <div className="logo-img-wrapper">

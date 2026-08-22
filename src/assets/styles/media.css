@@ -178,6 +178,14 @@
 }
 
 @media only screen and (max-width:767px) {
+    .sticky-header{
+        position: sticky !important;
+        top: 0px;
+        z-index: 999;
+    }
+    .page-transition{
+        overflow-x:unset !important;
+    }
     
 .mobile-view-btn{
     display: block;
