@@ -57,7 +57,7 @@ export default function ViewRoom() {
          : [];
    const amenityList = rawAmenities.length
       ? rawAmenities.concat(defaultAmenities).slice(0, Math.max(rawAmenities.length, defaultAmenities.length))
-      : defaultAmenities;
+      : '';
 
    return (
       <PageLayout page="ViewRoom">
