@@ -7,9 +7,9 @@ function ResidenceSlider() {
 
     const images = [
 
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuAyxb-niOqojyB9NLOCEf03t3XTgG4lYmI46J2ZrJxZgFgrJKNAOVpPP9UCVHlZR3fsDS4PUpumNrdG9E6mZiSzDa1ZSQqT_TqNzbgJc_pAczRGnSBJgq-lGHZA3sz16-L4SoefO_xyCkM_NYsjey-e_moju4s9uHEH3ltiA5efzSfBUAo39zdBglNI1OS9hID5xS3BW_E-Gt3Zhsz66VJEJxPe-d9d4d0unKjAOstgOvMyE0gJmNNMmJtVmUmMBU6UX03edP49RUg8",
+        // "https://lh3.googleusercontent.com/aida-public/AB6AXuAyxb-niOqojyB9NLOCEf03t3XTgG4lYmI46J2ZrJxZgFgrJKNAOVpPP9UCVHlZR3fsDS4PUpumNrdG9E6mZiSzDa1ZSQqT_TqNzbgJc_pAczRGnSBJgq-lGHZA3sz16-L4SoefO_xyCkM_NYsjey-e_moju4s9uHEH3ltiA5efzSfBUAo39zdBglNI1OS9hID5xS3BW_E-Gt3Zhsz66VJEJxPe-d9d4d0unKjAOstgOvMyE0gJmNNMmJtVmUmMBU6UX03edP49RUg8",
 
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuCA4V3fzGFxJRfHod-q3i610fpthD2Ue4VGIGDUje-iPYuVVdhTF9ISMA8pliiKaFrTiBcSdZR99tUouMkDjPEJq7AlRG5GL8uWblUgPopibMVKtg5K3ltNBt_-EWva5iLE2uCGEygHax40C2fDKHRddQUv_dQhbwQD_DLqLe1O952nifBIl5QaWyonzDRKBYcWu_wpXwgQ9Dug7wx2LCyLw5ewlbpMA0tqqKv4mVo6fuavy7TxWhwVlBDwZIsyg_L5joLScmveingP"
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLIVJXsIscLTS8nP6Dbmcv1vsoRkem09JkmvrDOgiZBWN63o7ikKL9Dqs&s=10"
 
     ];
 
