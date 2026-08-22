@@ -177,7 +177,7 @@ export default function Review() {
             </div>
 
             <div className="verification-center">
-               
+               <VerificationHeader />
 
                {approved ? (
                   <VerificationComplete data={data} />
@@ -185,7 +185,6 @@ export default function Review() {
                   <VerificationFailed data={data} />
                ) : (
                <>
-                  <VerificationHeader />
                   <ApplicationOverview data={data} />
 
                   <div className={`verification-grid ${data.status === "action-required" ? "has-action" : ""}`}>
