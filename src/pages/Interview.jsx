@@ -93,8 +93,14 @@ export default function Interview() {
       setMeetLink('');
    };
 
-   const unitLabel = client ? (client.unit ? `Unit ${client.unit}` : roomName) : roomName;
-   const rentLabel = client && client.rent_amount ? `$${client.rent_amount}/mo` : (selectedRoom?.monthly_rent ? `$${selectedRoom.monthly_rent}/mo` : (selectedRoom?.price ? `$${selectedRoom.price}/mo` : ''));
+   // Title/price reflect the SELECTED room first (same source the meta line uses),
+   // falling back to the Zoho client record only when no room is selected.
+   const unitLabel = selectedRoom?.name || (client?.unit ? `Unit ${client.unit}` : roomName);
+   const rentLabel = selectedRoom?.monthly_rent
+      ? `$${Number(selectedRoom.monthly_rent).toLocaleString()}/mo`
+      : (selectedRoom?.price
+         ? `$${Number(selectedRoom.price).toLocaleString()}/mo`
+         : (client?.rent_amount ? `$${client.rent_amount}/mo` : ''));
 
    return (
       <>
@@ -134,10 +140,10 @@ export default function Interview() {
                                           <div className="residence-price-note">Inclusive of Concierge</div>
                                        </div>
                                     </div>
-                                    <div className="d-flex gap-4 mt-3 residence-features">
+                                    {/* <div className="d-flex gap-4 mt-3 residence-features">
                                        <span><i className="bi bi-snow2 text-gold me-1"></i> Climate Controlled</span>
                                        <span><i className="bi bi-wifi text-gold me-1"></i> Gigabit Fiber</span>
-                                    </div>
+                                    </div> */}
                                      <div className="mt-4">
                                        <button className="btn btn-gold mb-2 w-50" onClick={viewroombtn}>Back to View Room</button>
                                     </div>

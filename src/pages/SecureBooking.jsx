@@ -85,8 +85,14 @@ export default function SecureBooking() {
    };
 
    // Dynamic labels — same pattern as Interview
-   const unitLabel = client ? (client.unit ? `Unit ${client.unit}` : roomName) : roomName;
-   const rentLabel = client?.rent_amount ? `$${Number(client.rent_amount).toLocaleString()}/mo` : (selectedRoom?.monthly_rent ? `$${Number(selectedRoom.monthly_rent).toLocaleString()}/mo` : (selectedRoom?.price ? `$${Number(selectedRoom.price).toLocaleString()}/mo` : ''));
+   // Title/price reflect the SELECTED room first (same source the meta line uses),
+   // falling back to the Zoho client record only when no room is selected.
+   const unitLabel = selectedRoom?.name || (client?.unit ? `Unit ${client.unit}` : roomName);
+   const rentLabel = selectedRoom?.monthly_rent
+      ? `$${Number(selectedRoom.monthly_rent).toLocaleString()}/mo`
+      : (selectedRoom?.price
+         ? `$${Number(selectedRoom.price).toLocaleString()}/mo`
+         : (client?.rent_amount ? `$${Number(client.rent_amount).toLocaleString()}/mo` : ''));
 
    return (
       <PageLayout page="SecureBooking">
