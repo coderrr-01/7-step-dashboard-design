@@ -3170,9 +3170,6 @@ width: calc(100% + 1px);
   z-index: 9999;
 }
 
-.mobile-view-btn{
-    display: none;
-}
 .page-transition {
     position: relative !important;
     min-height: 100vh;

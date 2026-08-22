@@ -187,9 +187,6 @@
         overflow-x:unset !important;
     }
     
-.mobile-view-btn{
-    display: block;
-}
     .verification-card{
         padding: 25px;
     }

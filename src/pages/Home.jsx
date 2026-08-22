@@ -181,10 +181,10 @@ export default function Home() {
   return (
     <PageLayout page="Home">
       <main className="home-page-bg">
-        {/* TEMPORARY DIAGNOSTIC — remove after debugging the blank-data issue. */}
+        {/* TEMPORARY DIAGNOSTIC — remove after debugging the blank-data issue.
         <div style={{ background: '#111', color: '#0f0', fontFamily: 'monospace', fontSize: 12, lineHeight: 1.6, padding: '8px 12px', wordBreak: 'break-all', position: 'relative', zIndex: 99999 }}>
           DEBUG · token: {getToken() ? 'YES' : 'NO'} · tokenEmail: {getEmailFromToken() || '(none)'} · loading: {String(clientLoading)} · client: {client ? 'YES' : 'NO'} · clientEmail: {client?.email || '(none)'} · err: {clientError || '(none)'}
-        </div>
+        </div> */}
         <div className="home-ambient">
           <span className="home-blob home-blob-1"></span>
           <span className="home-blob home-blob-2"></span>
