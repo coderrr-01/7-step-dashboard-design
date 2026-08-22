@@ -132,7 +132,13 @@ async function apiFetch(url, options = {}) {
     ...(options.headers || {}),
   };
 
-  const res = await fetch(url, { ...options, credentials: 'include', headers });
+  // Default to sending cookies (credentials: 'include'), but allow a caller to
+  // override — e.g. 'omit' for Bearer-authenticated cross-site GETs. iOS Safari
+  // (WebKit ITP) blocks a cross-site fetch that carries credentials, which shows
+  // up as "Load failed"; those calls authenticate via the Bearer JWT header, so
+  // omitting cookies lets them succeed on iPhone without weakening auth.
+  const credentials = options.credentials || 'include';
+  const res = await fetch(url, { ...options, credentials, headers });
 
   if (res.status === 401) {
     logout();
@@ -202,7 +208,7 @@ export async function getClientData() {
   // Cache-bust via a unique URL param instead of `cache: 'no-store'` — the
   // latter can make fetch() hang indefinitely on iOS Safari/WebKit (with
   // credentials), which left the app stuck on "Loading Application" on iPhone.
-  const res  = await apiFetch(`${JRNY}/client-data?_=${Date.now()}`, { method: 'GET' });
+  const res  = await apiFetch(`${JRNY}/client-data?_=${Date.now()}`, { method: 'GET', credentials: 'omit' });
   const data = await res.json();
   if (data.success) localStorage.setItem(clientKey(), JSON.stringify(data.data));
   return data;
