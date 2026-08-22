@@ -80,12 +80,12 @@ const Viewphoto = () => {
               </div>
             </div>
           </div>
-          <div className="text-center mt-5 pt-4">
+          {/* <div className="text-center mt-5 pt-4">
             <button className="btn btn-outline-dark rounded-0 px-5 py-3 text-uppercase tracking-widest mb-3">
               Load 12 More Images ↓
             </button>
             <p className="text-muted small">DISPLAYING 6 OF 42 PHOTOGRAPHS</p>
-          </div>
+          </div> */}
         </main>
       </div>
 
