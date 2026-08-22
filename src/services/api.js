@@ -199,7 +199,10 @@ export async function getNonce() {
 
 // ─── CLIENT DATA ──────────────────────────────────────────────────────────────
 export async function getClientData() {
-  const res  = await apiFetch(`${JRNY}/client-data`, { method: 'GET', cache: 'no-store' });
+  // Cache-bust via a unique URL param instead of `cache: 'no-store'` — the
+  // latter can make fetch() hang indefinitely on iOS Safari/WebKit (with
+  // credentials), which left the app stuck on "Loading Application" on iPhone.
+  const res  = await apiFetch(`${JRNY}/client-data?_=${Date.now()}`, { method: 'GET' });
   const data = await res.json();
   if (data.success) localStorage.setItem(clientKey(), JSON.stringify(data.data));
   return data;
@@ -307,9 +310,9 @@ export async function createRevolutCheckout(type) {
 export async function getRevolutStatus(type) {
   const params = new URLSearchParams();
   if (type) params.set('type', type);
+  params.set('_', String(Date.now())); // cache-bust via URL (see getClientData note)
   const res = await apiFetch(`${JRNY}/revolut-status?${params.toString()}`, {
     method: 'GET',
-    cache: 'no-store',
   });
   return res.json();
 }
@@ -347,6 +350,6 @@ export function getCachedClient() {
 // ─── PAYMENT UI (iframe HTML from WP shortcodes) ─────────────────────────────
 export async function getPaymentUI(method, section) {
   const params = new URLSearchParams({ method, section, _: String(Date.now()) });
-  const res = await apiFetch(`${JRNY}/payment-ui?${params.toString()}`, { method: 'GET', cache: 'no-store' });
+  const res = await apiFetch(`${JRNY}/payment-ui?${params.toString()}`, { method: 'GET' });
   return res.json();
 }

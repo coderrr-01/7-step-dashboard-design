@@ -18,7 +18,7 @@ export const verificationData = {
     moveInDate: "01 Oct 2026",
     currentAddress: "123 Main St, New York, NY 10001",
     employmentStatus: "Employed",
-    monthlyIncome: "$5,000",
+    monthlyIncome: "$0",
     message: "Looking forward to staying with JRNY.",
   },
 
