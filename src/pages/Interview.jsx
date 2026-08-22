@@ -139,7 +139,7 @@ export default function Interview() {
                                        <span><i className="bi bi-wifi text-gold me-1"></i> Gigabit Fiber</span>
                                     </div>
                                      <div className="mt-4">
-                                       <button className="btn btn-gold mb-2 w-50" onClick={viewroombtn}>View Room</button>
+                                       <button className="btn btn-gold mb-2 w-50" onClick={viewroombtn}>Back to View Room</button>
                                     </div>
                                  </div>
                               </div>

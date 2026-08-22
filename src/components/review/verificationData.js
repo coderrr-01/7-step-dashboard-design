@@ -4,7 +4,7 @@
 export const verificationData = {
   applicationId: "APP-10245",
   status: "in-progress", // pending | in-progress | action-required | completed | failed
-  progress: 62,
+  progress: 100,
   submittedAt: "2026-08-10T10:42:00",
   lastUpdated: "2026-08-10T10:45:00",
   estimatedTime: "24–48 hours",
