@@ -49,7 +49,7 @@ export default function ViewRoom() {
    const buildingHeritage = room.building_heritage || '';
    const agreementType = room.agreement_type || '';
 
-   const defaultAmenities = ['Climate Control', 'Giga-Fiber Wifi', 'Daily Housekeeping', '24/7 Concierge'];
+   // const defaultAmenities = ['Climate Control', 'Giga-Fiber Wifi', 'Daily Housekeeping', '24/7 Concierge'];
    const rawAmenities = Array.isArray(room.amenities)
       ? room.amenities
       : typeof room.amenities === 'string'
