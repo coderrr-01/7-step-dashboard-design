@@ -195,6 +195,7 @@ export default function Review() {
                   
                      <span className="verification-eyebrow">Secure Application Review</span>
                   </header>
+                  
                   <VerificationComplete data={data} />
                   </>
                ) : data.status === "failed" ? (
