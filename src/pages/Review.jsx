@@ -28,6 +28,36 @@ export default function Review() {
    const [loading, setLoading]   = useState(true);
    const pollRef = useRef(null);
 
+   // ── Stable, user-scoped Application ID ──────────────────────────────────────
+   // Generated exactly once per user and persisted, so it never regenerates on
+   // render/remount/refresh/logout-login, and VerificationProgress/Status and
+   // VerificationComplete all show the same value. Scoped by the existing user
+   // sub so it never leaks between users on a shared browser.
+   const [applicationId] = useState(() => {
+      const sub = getUserSub();
+      const key = sub ? `jrny_application_id_${sub}` : null;
+      if (!key) return '';
+      try {
+         const existing = localStorage.getItem(key);
+         if (existing) return existing;
+         const rand = (Math.random().toString(36) + Math.random().toString(36))
+            .replace(/[^a-z0-9]/gi, '').slice(0, 9).toUpperCase();
+         const gen = `APP-${rand}`;
+         localStorage.setItem(key, gen);
+         return gen;
+      } catch { return ''; }
+   });
+
+   // ── "Verified On" date ──────────────────────────────────────────────────────
+   // Set ONCE to the current date at the moment approval is first detected, then
+   // persisted (user-scoped) and reused. Empty until approved.
+   const [verifiedOn, setVerifiedOn] = useState(() => {
+      const sub = getUserSub();
+      const key = sub ? `jrny_verified_on_${sub}` : null;
+      if (!key) return '';
+      try { return localStorage.getItem(key) || ''; } catch { return ''; }
+   });
+
    // User-scoped cache key — User A's approval never leaks to User B
    const statusCacheKey = () => {
       const sub = getUserSub();
@@ -88,6 +118,17 @@ export default function Review() {
    // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
 
+   // Stamp the Verified On date once, only after approval is actually detected.
+   useEffect(() => {
+      if (!approved || verifiedOn) return;
+      const sub = getUserSub();
+      const key = sub ? `jrny_verified_on_${sub}` : null;
+      const now = new Date().toISOString();
+      if (key) { try { localStorage.setItem(key, now); } catch {} }
+      setVerifiedOn(now);
+   // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [approved]);
+
    const handleNext = () => {
       completeStep(2);
       navigate('/room-search');
@@ -97,6 +138,10 @@ export default function Review() {
    const data = {
       ...verificationData,
       status: approved ? 'completed' : verificationData.status,
+      // Dynamic, non-static values (no mock fallbacks):
+      applicationId: applicationId,                 // stable per-user ID
+      submittedAt:   client?.submitted_at || '',    // Zoho Created_Time (Submitted)
+      lastUpdated:   verifiedOn || '',              // Verified On (set at approval)
       applicant: {
          ...verificationData.applicant,
          fullName:       client?.name || verificationData.applicant.fullName,

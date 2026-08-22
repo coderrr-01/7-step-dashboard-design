@@ -66,7 +66,9 @@ export const verificationData = {
 };
 
 export const formatDate = (iso) => {
+  if (!iso) return "";
   const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
   return d.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
