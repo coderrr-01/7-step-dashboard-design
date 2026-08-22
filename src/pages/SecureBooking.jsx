@@ -6,7 +6,7 @@ import InterviewSchedule from "./Partial-element/InterviewSchedule.jsx";
 import Timeslot from "./Partial-element/Timeslot.jsx";
 import { useNavigate } from 'react-router-dom';
 import { useClientData } from "../hooks/useClientData";
-import { secureBooking } from "../services/api";
+import { secureBooking, releaseSlot } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
@@ -14,10 +14,6 @@ export default function SecureBooking() {
    const navigate = useNavigate();
    const { client } = useClientData();
    const { completeStep } = useSteps();
-
-   const viewroombtn = () => {
-      navigate('/view-room');
-   }
 
    // Load selected room from localStorage — same as Interview
    const selectedRoom = (() => {
@@ -79,6 +75,15 @@ export default function SecureBooking() {
       }
    };
 
+   // Reschedule: release the previously booked Tour slot and clear confirmed
+   // state so a new slot can be selected. Uses the same Tour namespace as booking.
+   const handleReschedule = async ({ date, time }) => {
+      try { await releaseSlot({ date, time }); } catch { /* non-blocking */ }
+      setConfirmedDate('');
+      setConfirmedTime('');
+      setMeetLink('');
+   };
+
    // Dynamic labels — same pattern as Interview
    const unitLabel = client ? (client.unit ? `Unit ${client.unit}` : roomName) : roomName;
    const rentLabel = client?.rent_amount ? `$${Number(client.rent_amount).toLocaleString()}/mo` : (selectedRoom?.monthly_rent ? `$${Number(selectedRoom.monthly_rent).toLocaleString()}/mo` : (selectedRoom?.price ? `$${Number(selectedRoom.price).toLocaleString()}/mo` : ''));
@@ -120,15 +125,14 @@ export default function SecureBooking() {
                               <span><i className="bi bi-snow2 text-gold me-1"></i> Climate Controlled</span>
                               <span><i className="bi bi-wifi text-gold me-1"></i> Gigabit Fiber</span>
                            </div>
-                           <div className="mt-4">
-                              <button className="btn btn-gold mb-2 w-50" onClick={viewroombtn}>View Room</button>
-                           </div>
+                           {/* View Room is intentionally not rendered on Secure Booking. */}
                         </div>
                      </div>
                      <InterviewSchedule
                         datatext="securePlaneblock"
                         interview_progress={interview_btn}
                         onConfirm={handleConfirm}
+                        onReschedule={handleReschedule}
                         confirmedDate={confirmedDate}
                         confirmedTime={confirmedTime}
                         meetLink={meetLink}

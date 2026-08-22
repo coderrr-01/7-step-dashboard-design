@@ -81,15 +81,19 @@ export default function Navbar() {
           }`}>
           <div className="stepper-container">
             {steps.map((step) => {
-              const isLocked = !canAccessStep(step[2]);
+              const isCurrent = step[1] === activePath;   // the only interactive step
+              // Only the current step behaves like a link. Completed (previous) and
+              // future steps are non-interactive: no pointer cursor and no tooltip
+              // that suggests they can be opened. Click is blocked in handleStepClick.
               return (
                 <Link
                   key={step[1]}
                   to={step[1]}
                   onClick={(e) => handleStepClick(step, e)}
                   className={getStepClass(step)}
-                  style={{ cursor: isLocked ? 'not-allowed' : 'pointer', userSelect: 'none' }}
-                  title={isLocked ? `Complete step ${step[2] - 1} first` : step[0]}
+                  style={{ cursor: isCurrent ? 'pointer' : 'not-allowed', userSelect: 'none' }}
+                  title={isCurrent ? step[0] : ''}
+                  aria-disabled={isCurrent ? undefined : 'true'}
                 >
                   <span>{step[0]}</span>
 

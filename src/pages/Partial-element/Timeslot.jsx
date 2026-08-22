@@ -1,5 +1,16 @@
 import { useState } from "react";
 
+// Single source of truth for the bookable slots, exported so the schedule view
+// can detect when every slot for a date is booked.
+export const TIME_SLOTS = [
+    "09:00 AM",
+    "10:30 AM",
+    "01:00 PM",
+    "02:30 PM",
+    "04:00 PM",
+    "05:30 PM"
+];
+
 function Timeslot({ selectedTime: externalTime, onSelectTime, bookedSlots = [] }) {
 
     const [internalTime, setInternalTime] = useState("10:30 AM");
@@ -11,14 +22,7 @@ function Timeslot({ selectedTime: externalTime, onSelectTime, bookedSlots = [] }
         if (onSelectTime) onSelectTime(time);
     };
 
-    const timeSlots = [
-        "09:00 AM",
-        "10:30 AM",
-        "01:00 PM",
-        "02:30 PM",
-        "04:00 PM",
-        "05:30 PM"
-    ];
+    const timeSlots = TIME_SLOTS;
 
 
 
@@ -38,8 +42,8 @@ function Timeslot({ selectedTime: externalTime, onSelectTime, bookedSlots = [] }
                                 bookedSlots.includes(time)
                                     ? "slot-btn booked"
                                     : selectedTime === time
-                                    ? "slot-btn selected"
-                                    : "slot-btn"
+                                        ? "slot-btn selected"
+                                        : "slot-btn"
                             }
 
                             onClick={() => handleSelect(time)}

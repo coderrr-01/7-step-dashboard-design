@@ -146,8 +146,8 @@ export default function DocumentSign() {
 
   // ── Derived values from Zoho CRM client ───────────────────────────────────
   const name = client?.name || "";
-  const unit = client?.unit || client?.room_name || "The Victorian Premier";
-  const address = client?.address || "Suite 422B";
+  const unit = client?.unit || client?.room_name || "";
+  const address = client?.address || "";
   const effectiveDate = client?.effective_date || "";
   const extStatus = client?.extension_status || "";
   const extensionPdf = client?.extension_signed_pdf || "";
@@ -169,8 +169,8 @@ export default function DocumentSign() {
     client?.rent_amount ||
     selectedRoom?.monthly_rent ||
     selectedRoom?.price ||
-    "N/A";
-  const deposit = client?.security_deposit || selectedRoom?.security_deposit || "N/A";
+    "";
+  const deposit = client?.security_deposit || selectedRoom?.security_deposit || "";
   const phone = client?.phone || "";
   const email = client?.email || "";
 

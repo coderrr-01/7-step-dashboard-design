@@ -6,7 +6,7 @@ import ResidenceSlider from "./Partial-element/ResidenceSlider.jsx";
 import Timeslot from "./Partial-element/Timeslot.jsx";
 import { useNavigate } from 'react-router-dom';
 import { useClientData } from "../hooks/useClientData";
-import { bookInterview } from "../services/api";
+import { bookInterview, releaseSlot } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
@@ -16,6 +16,8 @@ export default function Interview() {
    const { completeStep } = useSteps();
 
    const viewroombtn = () => {
+      // Clear ONLY the previously selected room before viewing rooms again.
+      try { localStorage.removeItem('jrny_selected_room'); } catch {}
       navigate('/view-room');
    }
 
@@ -82,8 +84,17 @@ export default function Interview() {
       }
    };
 
+   // Reschedule: release the previously booked slot so it becomes selectable
+   // again, and clear the confirmed state so a fresh booking can be made.
+   const handleReschedule = async ({ date, time }) => {
+      try { await releaseSlot({ date, time }); } catch { /* non-blocking */ }
+      setConfirmedDate('');
+      setConfirmedTime('');
+      setMeetLink('');
+   };
+
    const unitLabel = client ? (client.unit ? `Unit ${client.unit}` : roomName) : roomName;
-   const rentLabel = client && client.rent_amount ? `$${client.rent_amount}/mo` : (selectedRoom?.monthly_rent ? `$${selectedRoom.monthly_rent}/mo` : (selectedRoom?.price ? `$${selectedRoom.price}/mo` : '$4,850/mo'));
+   const rentLabel = client && client.rent_amount ? `$${client.rent_amount}/mo` : (selectedRoom?.monthly_rent ? `$${selectedRoom.monthly_rent}/mo` : (selectedRoom?.price ? `$${selectedRoom.price}/mo` : ''));
 
    return (
       <>
@@ -135,6 +146,7 @@ export default function Interview() {
                               <InterviewSchedule
                                  interview_progress={interview_btn}
                                  onConfirm={handleConfirm}
+                                 onReschedule={handleReschedule}
                                  confirmedDate={confirmedDate}
                                  confirmedTime={confirmedTime}
                                  meetLink={meetLink}

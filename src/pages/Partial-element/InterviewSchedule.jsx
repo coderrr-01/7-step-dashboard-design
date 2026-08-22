@@ -1,18 +1,26 @@
 import { useState, useEffect } from "react";
 import Calendar from "./Calendar";
-import Timeslot from "./Timeslot";
+import Timeslot, { TIME_SLOTS } from "./Timeslot";
 import { useNavigate } from 'react-router-dom';
 import tourImg from "../../assets/images/tour-img.png";
 import interviewImg from "../../assets/images/interview-img.png";
 
 const WP_BASE = 'https://wordpress-1608288-6566160.cloudwaysapps.com/wp-json/jrny/v1';
 
-function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedDate, confirmedTime, meetLink, submitting, roomName }) {
+function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName }) {
     const [activeTab, setActiveTab] = useState("schedule");
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
     const [bookedSlots, setBookedSlots] = useState([]);
     const [error, setError] = useState('');
+    // Booking lifecycle: once confirmed, the schedule tab is locked; Reschedule
+    // releases the old slot and reopens scheduling. slotsLoading/slotsError let
+    // us distinguish "all slots booked" from a loading or failed fetch.
+    const [booked, setBooked] = useState(false);
+    const [lastBooked, setLastBooked] = useState(null);
+    const [slotsLoading, setSlotsLoading] = useState(false);
+    const [slotsError, setSlotsError] = useState('');
+    const [refreshKey, setRefreshKey] = useState(0);
     const contentMap = {
         securePlaneblock: {
             img: tourImg,
@@ -33,12 +41,24 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!selectedDate) return;
+        if (!selectedDate) { setBookedSlots([]); return; }
+        setSlotsLoading(true);
+        setSlotsError('');
         fetch(`${WP_BASE}/booked-slots?date=${encodeURIComponent(selectedDate.value)}`)
             .then(r => r.json())
-            .then(data => { if (data.success) setBookedSlots(data.booked || []); })
-            .catch(() => {});
-    }, [selectedDate]);
+            .then(data => {
+                if (data.success) setBookedSlots(data.booked || []);
+                else setSlotsError('Could not load slots.');
+            })
+            .catch(() => setSlotsError('Could not load slots.'))
+            .finally(() => setSlotsLoading(false));
+    }, [selectedDate, refreshKey]);
+
+    // True only when the fetch succeeded and every slot for the date is booked —
+    // never during loading or after a failed request.
+    const allSlotsBooked =
+        !!selectedDate && !slotsLoading && !slotsError &&
+        TIME_SLOTS.every((t) => bookedSlots.includes(t));
 
     const handleConfirmClick = () => {
         if (!selectedDate || !selectedTime) {
@@ -47,10 +67,29 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
         }
         setError('');
         if (onConfirm) {
-            onConfirm(selectedDate, selectedTime, () => setActiveTab("confirm"));
+            onConfirm(selectedDate, selectedTime, () => {
+                // Lock the confirmed state and remember the exact slot so it can
+                // be released if the user reschedules.
+                setBooked(true);
+                setLastBooked({ date: selectedDate.value, time: selectedTime });
+                setActiveTab("confirm");
+            });
         } else {
             setActiveTab("confirm");
         }
+    };
+
+    // Reschedule: release the previously booked slot server-side, then return to
+    // scheduling with a fresh booked-slots fetch so the old slot is selectable.
+    const handleReschedule = async () => {
+        if (lastBooked && onReschedule) {
+            try { await onReschedule(lastBooked); } catch { /* non-blocking */ }
+        }
+        setBooked(false);
+        setLastBooked(null);
+        setSelectedTime(null);
+        setActiveTab("schedule");
+        setRefreshKey((k) => k + 1);
     };
 
     const leasebtn = () => {
@@ -63,7 +102,12 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
         <div>
             {/* Tabs */}
             <div className="scheduling-tabs">
-                <div className={`tab-item ${activeTab === "schedule" ? "active" : ""}`} onClick={() => setActiveTab("schedule")}>
+                <div
+                    className={`tab-item ${activeTab === "schedule" ? "active" : ""}`}
+                    onClick={() => { if (booked) return; setActiveTab("schedule"); }}
+                    style={{ cursor: booked ? 'not-allowed' : 'pointer' }}
+                    aria-disabled={booked ? 'true' : undefined}
+                >
                     <i className="bi bi-calendar3 fs-5"></i>
                     {
                         datatext === "securePlaneblock"
@@ -100,6 +144,9 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                         onSelectTime={(t) => { setSelectedTime(t); setError(''); }}
                                         bookedSlots={bookedSlots}
                                     />
+                                    {allSlotsBooked && (
+                                        <p className="text-danger small mb-2">All slots are booked for this date. Please select another date.</p>
+                                    )}
                                     {error && <p className="text-danger small mb-2">{error}</p>}
                                     <button
                                         className="btn btn-gold mb-2"
@@ -146,7 +193,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                                 Date
                                             </span>
                                             <span className="detail-value">
-                                                {confirmedDate || (selectedDate ? selectedDate.label : 'Oct 14, 2024')}
+                                                {confirmedDate || (selectedDate ? selectedDate.label : '')}
                                             </span>
                                         </div>
                                         <div className="detail-row">
@@ -154,7 +201,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                                 Time
                                             </span>
                                             <span className="detail-value">
-                                                {confirmedTime || selectedTime || '02:00 PM'}
+                                                {confirmedTime || selectedTime || ''}
                                             </span>
                                         </div>
                                         <div className="detail-row">
@@ -162,7 +209,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                                 Room
                                             </span>
                                             <span className="detail-value">
-                                                {roomName || 'The Victorian Premier'}
+                                                {roomName || ''}
                                             </span>
                                         </div>
                                     </div>
@@ -180,7 +227,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, confirmedD
                                     <button
                                         type="button"
                                         className="btn btn-black mb-3"
-                                        onClick={() => setActiveTab("schedule")}
+                                        onClick={handleReschedule}
                                     >
                                         Reschedule
                                     </button>

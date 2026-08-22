@@ -263,6 +263,18 @@ export async function secureBooking({ date, time, booking_type, client_id }) {
   return res.json();
 }
 
+// ─── RELEASE SLOT (used by Reschedule) ────────────────────────────────────────
+// Frees a previously booked date/time so it becomes selectable again. Does not
+// touch Google Meet / CRM — booking a new slot handles those idempotently.
+export async function releaseSlot({ date, time }) {
+  const nonce = await getNonce();
+  const res   = await apiFetch(`${JRNY}/release-slot`, {
+    method: 'POST', headers: { 'X-WP-Nonce': nonce },
+    body: JSON.stringify({ date, time }),
+  });
+  return res.json();
+}
+
 // ─── SIGN LEASE ───────────────────────────────────────────────────────────────
 export async function signLease({ client_id, signature }) {
   const nonce = await getNonce();

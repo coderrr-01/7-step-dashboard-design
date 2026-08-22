@@ -29,25 +29,25 @@ export default function ViewRoom() {
          : [];
    const images = rawImages.length
       ? rawImages
-      : [room.img || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCVfkL8eMoD4BRwoPZpU7RgLDUjbRLK3wH-XAdz6WV0kl6Du2f9yQcpOr7eTdjNWMDhmvQdihD1BrYLZgDmUp9Merj2fIgvWSZUw-NdZ1sgTwt2VceIiSimt_tDdNm1rYmGz2h9qJ9tbVt9bPdhcHml9lpYH4CDHeaEbDuKUxGcOpdkL-_Ln2Ic_GlPSiFdKp3y1dZcnAE25vyKoB_qYXoxj61V68bMgd6i5d4CcYyruqknzYFDsyh5Qg'];
-   const roomType = room.room_type || room.tier || 'King Studio Suite';
-   const roomNumber = room.roomNumber || (room.unit_number ? `Unit ${room.unit_number}` : 'Suite 402');
-   const roomName = room.name || 'Victorian Premier';
+      : [room.img || ''];
+   const roomType = room.room_type || room.tier || '';
+   const roomNumber = room.roomNumber || (room.unit_number ? `Unit ${room.unit_number}` : '');
+   const roomName = room.name || '';
    const roomDesc = room.size_sq_ft
       ? `${room.size_sq_ft} sq. ft. living space`
-      : (room.description || room.desc || 'Bespoke 750 sq. ft. living space with high ceilings and crown molding.');
-   const rentValue = Number(room.monthly_rent ?? room.price ?? 3450);
+      : (room.description || room.desc || '');
+   const rentValue = Number(room.monthly_rent ?? room.price ?? 0);
    const monthlyRent = rentValue.toLocaleString('en-US', { minimumFractionDigits: 2 });
    const depositAmt = (room.security_deposit != null ? Number(room.security_deposit) : rentValue ).toLocaleString('en-US', { minimumFractionDigits: 2 });
    // const holdingDeposit = (room.security_deposit != null ? Number(room.security_deposit) * 0.5 : rentValue * 0.5).toLocaleString('en-US', { minimumFractionDigits: 2 });
 
-   const bathroomInfo = room.bathroom_info || 'Carrara marble vanity with heated flooring and rainfall shower.';
-   const workstationInfo = room.workstation_info || 'Built-in mahogany desk with high-speed fiber optic connectivity.';
+   const bathroomInfo = room.bathroom_info || '';
+   const workstationInfo = room.workstation_info || '';
    const buildingName = room.building_name || roomName;
-   const buildingFloor = room.floor ? `Floor ${room.floor} with panoramic northern views of the park.` : 'Located on the 12th floor with panoramic northern views of the park.';
-   const commonAreas = room.common_areas || 'Access to the private library, gourmet kitchen, and grand salon.';
-   const buildingHeritage = room.building_heritage || 'A 1920s landmark meticulously restored for modern institutional living.';
-   const agreementType = room.agreement_type || 'Annual Lease [Fixed Term]';
+   const buildingFloor = room.floor ? `Floor ${room.floor} with panoramic northern views of the park.` : '';
+   const commonAreas = room.common_areas || '';
+   const buildingHeritage = room.building_heritage || '';
+   const agreementType = room.agreement_type || '';
 
    const defaultAmenities = ['Climate Control', 'Giga-Fiber Wifi', 'Daily Housekeeping', '24/7 Concierge'];
    const rawAmenities = Array.isArray(room.amenities)

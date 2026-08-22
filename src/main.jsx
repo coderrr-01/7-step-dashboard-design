@@ -9,8 +9,8 @@ import "./assets/styles/modern.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { StepProvider } from "./context/StepContext";
-import { saveToken, getLoggedOutToken, clearLoggedOutToken } from "./services/api";
+import { StepProvider, STEP_PATHS } from "./context/StepContext";
+import { saveToken, getLoggedOutToken, clearLoggedOutToken, getUserSub } from "./services/api";
 
 // Auto-login: read JWT from ?token param (WP iframe) or window.jrnyData.
 // This MUST run before StepProvider mounts so stepsKey() finds the token
@@ -28,7 +28,27 @@ if (_candidateToken && _candidateToken !== getLoggedOutToken()) {
 
 // Read ?step param passed by WP shortcode on refresh e.g. ?step=room-search
 const _step = _params.get('step');
-const _initialEntry = _step ? '/' + _step : '/';
+
+// Resume the user's correct step on login. An explicit ?step always wins.
+// Otherwise, derive the next required (first incomplete) step from the same
+// user-scoped completed-steps progress the navigator/StepProvider uses — which
+// persists across logout — so the user resumes their current step instead of
+// always landing on Home/Apply. Empty progress falls back to Home (Step 1).
+function resumeInitialEntry() {
+  if (_step) return '/' + _step;
+  try {
+    const sub = getUserSub();
+    const key = sub ? `jrny_completed_steps_${sub}` : 'jrny_completed_steps';
+    const completed = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!Array.isArray(completed) || completed.length === 0) return '/';
+    let cur = 1;
+    while (cur < 7 && completed.includes(cur)) cur++;
+    return STEP_PATHS[cur] || '/';
+  } catch {
+    return '/';
+  }
+}
+const _initialEntry = resumeInitialEntry();
 
 // When running inside an iframe, ensure the viewport meta is set correctly
 // so CSS media queries fire based on the device width, not the iframe container
