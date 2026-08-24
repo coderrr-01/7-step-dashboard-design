@@ -3198,7 +3198,8 @@ width: calc(100% + 1px);
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.5);
-  z-index: 9;
+  /* Above the sticky header (999), below the drawer (9999) — same tier as nav-overlay */
+  z-index: 2140;
 }
 
 .profile-wrapper {

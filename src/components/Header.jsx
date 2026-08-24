@@ -1,4 +1,5 @@
 import Navbar from "./Navbar";
+import { createPortal } from "react-dom";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
 import { FaRegUser } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
@@ -138,22 +139,28 @@ export default function Header({ activeLabel }) {
                </div>
             </header>
          </div>
-         <div className="mobile-megamenu">
-            {/* MOBILE DRAWER */}
-            <div className={`mobile-drawer ${open ? "active" : ""}`}>
-               <div className="drawer-header">
-                  <button className="close-btn" onClick={() => setOpen(false)}>✕</button>
-                 <img src={logo} alt="JRNY Logo" className="drawer-logo" />
+         {/* MOBILE DRAWER — portaled to <body> (same as nav-panel) so its
+             position:fixed always anchors to the viewport. Inside
+             .page-transition the retained animation filter creates a
+             containing block and the drawer scrolled away with the page. */}
+         {createPortal(
+            <>
+               <div className={`mobile-drawer ${open ? "active" : ""}`}>
+                  <div className="drawer-header">
+                     <button className="close-btn" onClick={() => setOpen(false)}>✕</button>
+                     <img src={logo} alt="JRNY Logo" className="drawer-logo" />
+                  </div>
+                  <a href="#">Dashboard</a>
+                  <a href="#">My profile</a>
+                  <a href="#">Lease agreement</a>
+                  <a href="#">Payment history</a>
+                  <a href="#">Contact us</a>
                </div>
-               <a href="#">Dashboard</a>
-               <a href="#">My profile</a>
-               <a href="#">Lease agreement</a>
-               <a href="#">Payment history</a>
-               <a href="#">Contact us</a>
-            </div>
-            {/* OVERLAY */}
-            {open && <div className="overlay" onClick={() => setOpen(false)} />}
-         </div>
+               {/* OVERLAY */}
+               {open && <div className="overlay" onClick={() => setOpen(false)} />}
+            </>,
+            document.body,
+         )}
          <Navbar />
       </div>
 
