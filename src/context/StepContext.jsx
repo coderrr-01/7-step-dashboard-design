@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getClientData, getUserSub, getToken } from '../services/api';
+import { resumeMeta } from '../resumeMeta';
 
 export const STEP_PATHS = {
   1: '/',
@@ -94,6 +95,10 @@ export function StepProvider({ children }) {
     getClientData()
       .then(data => {
         if (!data?.success) return;
+        // One-shot: did this page load resume from the user's last route?
+        const cameFromLastRoute = resumeMeta.fromLastRoute;
+        resumeMeta.fromLastRoute = false;
+
         const serverSteps = deriveStepsFromClient(data.data);
         if (!serverSteps) return;
 
@@ -103,6 +108,14 @@ export function StepProvider({ children }) {
           // Only update if different to avoid unnecessary re-renders
           return JSON.stringify(merged) !== JSON.stringify(prev) ? merged : prev;
         });
+
+        // The screen restored from jrny_last_route is where the user chose
+        // to be when they logged out — the server sync must never yank them
+        // elsewhere (e.g. back to room-search because a local step record is
+        // missing). The ONLY override, per product rule: both payments done
+        // → the congratulations screen always takes over.
+        const journeyDone = !!(data.data?.deposit_paid && data.data?.rent_paid);
+        if (cameFromLastRoute && !journeyDone) return;
 
         // Redirect only between known step pages — sub-pages like
         // /view-room or /residence-agreement are never hijacked.
