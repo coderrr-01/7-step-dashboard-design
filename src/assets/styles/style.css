@@ -90,6 +90,7 @@ img {
     height: auto;
 }
 
+
 a {
     color: inherit;
 }
@@ -2199,6 +2200,7 @@ width: 60px;
 
 .detail-row:last-child {
     border-bottom: none;
+    gap: 25px;
 }
 
 .detail-label {

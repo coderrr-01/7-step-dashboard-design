@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { IoClose } from "react-icons/io5";
 import "../../assets/styles/Navigator-style.css"
@@ -10,6 +10,26 @@ import { useSteps } from "../../context/StepContext";
 export default function Navigator({ activeStep = 1, totalSteps = 7, title }) {
   const [open, setOpen] = useState(false);
   const { completedSteps, canAccessStep } = useSteps();
+
+  // Lock background scroll while the panel is open — same approach as the
+  // mobile drawer in Header.jsx. The page's scroll container is the root
+  // <html> element (body only sets overflow-x), so BOTH must be locked.
+  // overflow:hidden preserves the current scroll position (no jump) and is
+  // restored on close. The panel itself keeps its own overflow:auto, so it
+  // can still scroll internally.
+  useEffect(() => {
+    if (!open) return;
+    const de = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = de.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    de.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    return () => {
+      de.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, [open]);
 
   const getStepState = (stepNumber) => {
     if (completedSteps.includes(stepNumber)) return "completed";
