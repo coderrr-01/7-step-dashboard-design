@@ -29,16 +29,30 @@ if (_candidateToken && _candidateToken !== getLoggedOutToken()) {
 // Read ?step param passed by WP shortcode on refresh e.g. ?step=room-search
 const _step = _params.get('step');
 
-// Resume the user's correct step on login. An explicit ?step always wins.
-// Otherwise, derive the next required (first incomplete) step from the same
-// user-scoped completed-steps progress the navigator/StepProvider uses — which
-// persists across logout — so the user resumes their current step instead of
-// always landing on Home/Apply. Empty progress falls back to Home (Step 1).
+// Last route the user was on (saved by RouteReporter on every navigation).
+// Tagged with the user sub so a different user logging in on the same browser
+// never resumes into someone else's screen.
+const _lastRoute = (() => {
+  try {
+    const raw = JSON.parse(localStorage.getItem('jrny_last_route') || 'null');
+    return raw && typeof raw.path === 'string' ? raw : null;
+  } catch { return null; }
+})();
+
+// Resume the user's correct step on login. Priority order:
+// 1. An explicit ?step slug from WP (mid-session refresh deep-links to a real
+//    step). 'apply' is the dashboard root WordPress sends on a fresh login, so
+//    it counts as "no explicit step".
+// 2. The exact screen the user was on when they logged out (jrny_last_route,
+//    matched against the logged-in user's sub) — "resume where I left off".
+// 3. Derived from the same user-scoped completed-steps progress the navigator
+//    uses, which persists across logout.
+// 4. Home/Apply (Step 1) for brand-new users with no progress.
 function resumeInitialEntry() {
-  // Honor an explicit, specific step slug (mid-session refresh deep-links to a
-  // real step). 'apply' is the dashboard root WordPress sends on a fresh login,
-  // so it is treated as "no explicit step" and we resume from saved progress.
   if (_step && _step !== 'apply') return '/' + _step;
+  if (_lastRoute && _lastRoute.sub === (getUserSub() || '') && _lastRoute.path.length > 1) {
+    return _lastRoute.path;
+  }
   try {
     const sub = getUserSub();
     const key = sub ? `jrny_completed_steps_${sub}` : 'jrny_completed_steps';
@@ -65,10 +79,14 @@ const _initialEntry = resumeInitialEntry();
   meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0';
 })();
 
-// Notify WP parent of route changes so it can update the browser URL
+// Notify WP parent of route changes so it can update the browser URL, and
+// remember the last visited screen so logout→login resumes exactly there.
 function RouteReporter() {
   const { pathname } = useLocation();
   useEffect(() => {
+    try {
+      localStorage.setItem('jrny_last_route', JSON.stringify({ sub: getUserSub() || '', path: pathname }));
+    } catch {}
     const slug = pathname === '/' ? 'apply' : pathname.replace(/^\//, '');
     window.parent.postMessage({ type: 'jrny_route', slug }, '*');
   }, [pathname]);

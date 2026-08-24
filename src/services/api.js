@@ -91,12 +91,16 @@ export function logout() {
 
   clearSessionCookies();
 
-  // Clear all jrny_ keys EXCEPT the user-scoped steps key so
-  // the same user gets their progress back instantly on next login.
+  // Clear all jrny_ keys EXCEPT the user-scoped steps key and the last-visited
+  // route so the same user gets their progress back instantly — and resumes on
+  // the exact screen they logged out from (main.jsx resumeInitialEntry).
   const sub = getUserSub();
-  const keepKey = sub ? `jrny_completed_steps_${sub}` : null;
+  const keepKeys = [
+    sub ? `jrny_completed_steps_${sub}` : null,
+    'jrny_last_route',
+  ].filter(Boolean);
   Object.keys(localStorage)
-    .filter(k => k.startsWith('jrny_') && k !== keepKey)
+    .filter(k => k.startsWith('jrny_') && !keepKeys.includes(k))
     .forEach(k => localStorage.removeItem(k));
 }
 
