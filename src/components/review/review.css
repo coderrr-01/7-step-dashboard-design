@@ -87,13 +87,17 @@
 }
 
 /* ---------- Entrance animation ---------- */
+/* Visibility must NOT depend on the animation running: iOS Safari (Reduce
+   Motion on, or its filter-animation compositing glitch) can refuse to run
+   vgUp, and a base opacity:0 left the whole card permanently invisible.
+   fill-mode:backwards hides only while the (delayed) animation is pending,
+   so if it never runs the element simply stays visible. */
 .vg-anim {
-  opacity: 0;
-  animation: vgUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: vgUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 @keyframes vgUp {
   from { opacity: 0; transform: translateY(22px); filter: blur(6px); }
-  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+  to   { opacity: 1; transform: translateY(0); filter: none; }
 }
 
 /* ---------- Cinematic hero ---------- */
@@ -399,8 +403,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px 4px;
-  opacity: 0;
-  animation: vgUp 0.5s ease both;
+  animation: vgUp 0.5s ease backwards;
 }
 .ver-step-icon {
   position: relative;
@@ -622,8 +625,7 @@
   gap: 12px;
   padding: 11px 2px;
   border-bottom: 1px solid #f1ebdf;
-  opacity: 0;
-  animation: vgUp 0.5s ease both;
+  animation: vgUp 0.5s ease backwards;
 }
 .ver-check-item:last-child {
   border-bottom: none;
@@ -827,8 +829,7 @@
   align-items: flex-start;
   gap: 14px;
   padding: 8px 0;
-  opacity: 0;
-  animation: vgUp 0.5s ease both;
+  animation: vgUp 0.5s ease backwards;
 }
 .ver-tl-marker {
   position: relative;
