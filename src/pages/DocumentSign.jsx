@@ -230,14 +230,14 @@ export default function DocumentSign() {
                   </p>
                 </div>
               </div>
-              <div className="ds-header-actions">
+              {/* <div className="ds-header-actions">
                 <a className="ds-header-btn" href={pdfUrl} target="_blank" rel="noreferrer">
                   <FaDownload /> Download PDF
                 </a>
-                {/* <button className="ds-header-btn" onClick={() => window.print()}>
+                <button className="ds-header-btn" onClick={() => window.print()}>
                   <FaPrint /> Print
-                </button> */}
-              </div>
+                </button>
+              </div> */}
             </div>
 
             <div className="ds-layout d-block">
