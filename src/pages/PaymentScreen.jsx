@@ -417,6 +417,71 @@ export default function PaymentScreen() {
       </div>
    );
 
+   // ── Fully paid → Celebration view ───────────────────────────────────────────
+   // Once BOTH payments are done ("Total Due Now: 0") the checkout UI is
+   // replaced by a congratulatory membership confirmation. Shown on every
+   // visit while payments stay complete — server flags drive this, so it
+   // survives logout/login and wiped browser caches.
+   if (!clientLoading && depositPaid && rentPaid) {
+      const methodUsed = paymentMethods[depositMethod]?.name || 'Online';
+      const firstName = clientName ? clientName.split(' ')[0] : '';
+      return (
+         <PageLayout page="PaymentScreen">
+            <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">
+               <div className="container container-narrow py-5 px-lg-5 secure-payment-details">
+                  <section className="pay-success" aria-live="polite">
+                     <span className="pay-spark pay-spark-1" aria-hidden="true"></span>
+                     <span className="pay-spark pay-spark-2" aria-hidden="true"></span>
+                     <span className="pay-spark pay-spark-3" aria-hidden="true"></span>
+                     <span className="pay-spark pay-spark-4" aria-hidden="true"></span>
+                     <span className="pay-spark pay-spark-5" aria-hidden="true"></span>
+
+                     <div className="pay-success-card">
+                        <div className="pay-check-wrap" aria-hidden="true">
+                           <span className="pay-halo pay-halo-1"></span>
+                           <span className="pay-halo pay-halo-2"></span>
+                           <div className="pay-check">
+                              <svg viewBox="0 0 52 52" width="44" height="44" fill="none"
+                                   stroke="#ffffff" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
+                                 <path d="M13 27l9 9 17-19" />
+                              </svg>
+                           </div>
+                        </div>
+
+                        <p className="pay-eyebrow">Payment Successful</p>
+                        <h1 className="pay-title">
+                           Congratulations{firstName ? `, ${firstName}` : ''}!
+                        </h1>
+                        <p className="pay-sub">
+                           You are now an official member of the <strong>Elysian Heritage</strong> community.
+                           Your reservation is confirmed and your spot is secured.
+                        </p>
+
+                        <div className="pay-details">
+                           <div className="pay-row"><span>Member</span><b>{clientName}</b></div>
+                           <div className="pay-row"><span>Residence</span><b>{unitLabel}</b></div>
+                           {roomMeta ? <div className="pay-row"><span>Details</span><b>{roomMeta}</b></div> : null}
+                           <div className="pay-row"><span>Security Deposit</span><b>{depositAmount} <em className="pay-paid-tag">Paid</em></b></div>
+                           <div className="pay-row"><span>First Month Rent</span><b>{rentAmount} <em className="pay-paid-tag">Paid</em></b></div>
+                           <div className="pay-row"><span>Paid Via</span><b>{methodUsed}</b></div>
+                           <div className="pay-row">
+                              <span>Membership Valid</span>
+                              <b>{startDate}{startDate && endDate ? '  →  ' : ''}{endDate || 'Active'}</b>
+                           </div>
+                        </div>
+
+                        <p className="pay-validity">
+                           ✨ Your residency is valid through <b>{endDate || 'your lease term'}</b>.
+                           Welcome aboard — we can't wait to have you home!
+                        </p>
+                     </div>
+                  </section>
+               </div>
+            </main>
+         </PageLayout>
+      );
+   }
+
    return (
       <PageLayout page="PaymentScreen">
          <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">

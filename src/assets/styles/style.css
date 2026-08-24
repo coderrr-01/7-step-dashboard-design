@@ -3791,3 +3791,205 @@ body .stepper-row{
         opacity: 1;
     }
 }
+
+/* ═══════════════════════════ PAYMENT SUCCESS ═══════════════════════════ */
+/* Celebration view shown on the Secure Payment screen once BOTH the security
+   deposit and first month rent are paid ("Total Due Now: 0"). Heritage gold
+   palette, animated check + halos, twinkling sparks. Visibility NEVER depends
+   on animations running (iOS Reduce Motion / WebKit quirks) — entrance uses
+   fill-mode:backwards and every element is visible by default. */
+
+.pay-success {
+    position: relative;
+    max-width: 680px;
+    margin: 0 auto;
+    animation: payRise .7s cubic-bezier(.22, 1, .36, 1) backwards;
+}
+@keyframes payRise {
+    from { opacity: 0; transform: translateY(26px) scale(.985); filter: blur(5px); }
+}
+
+.pay-success-card {
+    position: relative;
+    background: #fffdf8;
+    border: 1px solid rgba(184, 146, 74, .38);
+    border-top: 4px solid #b8924a;
+    border-radius: 26px;
+    padding: 52px 44px 44px;
+    text-align: center;
+    box-shadow:
+        0 30px 70px -28px rgba(17, 17, 17, .32),
+        0 8px 24px -12px rgba(184, 146, 74, .35);
+    overflow: hidden;
+}
+.pay-success-card::before {
+    content: "";
+    position: absolute;
+    inset: -40% -20% auto;
+    height: 220px;
+    background: radial-gradient(closest-side, rgba(201, 164, 92, .18), transparent);
+    pointer-events: none;
+}
+
+/* ── Check medallion ── */
+.pay-check-wrap {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    margin: 6px auto 22px;
+}
+.pay-check {
+    position: relative;
+    z-index: 1;
+    width: 84px;
+    height: 84px;
+    margin: 6px auto;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(140deg, #c9a45c, #b8924a 55%, #a87f3f);
+    box-shadow:
+        0 14px 34px -10px rgba(184, 146, 74, .75),
+        inset 0 2px 3px rgba(255, 255, 255, .45);
+    animation: payPop .55s cubic-bezier(.34, 1.56, .64, 1) backwards;
+}
+@keyframes payPop {
+    from { transform: scale(0); opacity: 0; }
+}
+.pay-check svg path { stroke-dasharray: none; }
+.pay-halo {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(184, 146, 74, .55);
+    animation: payHalo 2.4s ease-out infinite;
+}
+.pay-halo-2 { animation-delay: 1.2s; }
+@keyframes payHalo {
+    from { transform: scale(.85); opacity: .9; }
+    to   { transform: scale(1.65); opacity: 0; }
+}
+
+/* ── Headlines ── */
+.pay-eyebrow {
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: #b8924a;
+    margin: 0 0 10px;
+}
+.pay-title {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.15;
+    color: #171310;
+    margin: 0 0 12px;
+}
+.pay-sub {
+    font-family: "Poppins", sans-serif;
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: #5f574b;
+    max-width: 46ch;
+    margin: 0 auto 30px;
+}
+.pay-sub strong { color: #a87f3f; }
+
+/* ── Details ledger ── */
+.pay-details {
+    background: linear-gradient(180deg, #fbf7ee, #fffdf8);
+    border: 1px solid #eee3cd;
+    border-radius: 18px;
+    padding: 8px 24px;
+    text-align: left;
+    margin-bottom: 26px;
+}
+.pay-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 13px 0;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+}
+.pay-row + .pay-row { border-top: 1px dashed #e7dcc4; }
+.pay-row span {
+    color: #8d8272;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.pay-row b {
+    color: #171310;
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+.pay-paid-tag {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 4px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-style: normal;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #2e7d4f;
+    background: rgba(46, 125, 79, .12);
+    border: 1px solid rgba(46, 125, 79, .3);
+}
+
+/* ── Validity note ── */
+.pay-validity {
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #6b6152;
+    background: linear-gradient(90deg, transparent, rgba(201, 164, 92, .16), transparent);
+    padding: 12px 18px;
+    border-radius: 999px;
+    margin: 0;
+}
+
+/* ── Twinkling sparks (decorative) ── */
+.pay-spark {
+    position: absolute;
+    top: 34px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #d9ba72 0%, rgba(217, 186, 114, 0) 70%);
+    pointer-events: none;
+    animation: payTwinkle 2.8s ease-in-out infinite;
+}
+.pay-spark-1 { left: 12%; }
+.pay-spark-2 { left: 26%; top: 64px; width: 5px; height: 5px; animation-delay: -.9s; }
+.pay-spark-3 { right: 22%; top: 48px; animation-delay: -1.6s; }
+.pay-spark-4 { right: 10%; top: 90px; width: 5px; height: 5px; animation-delay: -.4s; }
+.pay-spark-5 { left: 47%; top: 14px; width: 6px; height: 6px; animation-delay: -2s; }
+@keyframes payTwinkle {
+    0%, 100% { opacity: .15; transform: scale(.6); }
+    50%      { opacity: 1;   transform: scale(1.35); }
+}
+
+@media (max-width: 575px) {
+    .pay-success-card { padding: 40px 20px 32px; border-radius: 20px; }
+    .pay-details { padding: 4px 16px; }
+    .pay-row { flex-direction: column; gap: 3px; align-items: flex-start; padding: 11px 0; }
+    .pay-row b { text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pay-success,
+    .pay-success-card,
+    .pay-check { animation: none !important; }
+    .pay-halo,
+    .pay-spark { animation: none !important; opacity: .5; }
+}
