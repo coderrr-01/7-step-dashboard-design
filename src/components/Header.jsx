@@ -123,6 +123,15 @@ export default function Header({ activeLabel }) {
                         <span className="user-name">{userName}</span>
                       </div>
                       <div className={`profile-dropdown ${dropdown ? "active" : ""}`}>
+                         <div className="pd-user">
+                            <span className="pd-avatar">
+                               {(userName || "U").charAt(0).toUpperCase()}
+                            </span>
+                            <div className="pd-user-info">
+                               <span className="pd-user-name">{userName}</span>
+                               <span className="pd-user-sub">Signed in</span>
+                            </div>
+                         </div>
                          <ul>
                             <li
                               className="logout"

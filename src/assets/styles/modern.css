@@ -263,11 +263,126 @@ h1, h2, h3, h4, h5, h6 {
    color: #000 !important;
 }
 
+/* ---------- Profile dropdown ---------- */
+/* z-index fixes: navbar-custom's backdrop-filter creates a stacking context,
+   and the stepper row paints later in the DOM — on iOS Safari it covered the
+   open dropdown. Lift the whole desktop-menu group above it. */
+.desktop-menu {
+   position: relative;
+   z-index: 20;
+}
+
+.profile-wrapper {
+   position: relative;
+   z-index: 30;
+}
+
 .profile-dropdown {
+   position: absolute;
+   top: calc(100% + 10px);
+   right: -6px;
+   width: 240px;
    background: #fff;
    border: 1px solid var(--t-border);
-   box-shadow: var(--shadow-lg);
+   border-radius: 16px;
+   box-shadow:
+      0 24px 60px -20px rgba(17, 17, 17, 0.28),
+      0 4px 14px -8px rgba(17, 17, 17, 0.15);
    color: #000;
+   opacity: 0;
+   transform: translateY(-8px) scale(0.97);
+   transform-origin: top right;
+   pointer-events: none;
+   transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+   overflow: hidden;
+   z-index: 999;
+}
+
+.profile-dropdown.active {
+   opacity: 1;
+   transform: none;
+   pointer-events: auto;
+}
+
+.pd-user {
+   display: flex;
+   align-items: center;
+   gap: 11px;
+   padding: 13px 15px;
+   background: linear-gradient(135deg, #faf5ec, #f3ead9);
+   border-bottom: 1px solid var(--t-border);
+}
+
+.pd-avatar {
+   width: 38px;
+   height: 38px;
+   flex-shrink: 0;
+   border-radius: 12px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background: linear-gradient(140deg, #c9a45c, #b8924a);
+   color: #fff;
+   font-family: "Poppins", sans-serif;
+   font-weight: 700;
+   font-size: 16px;
+   box-shadow: 0 8px 18px -8px rgba(184, 146, 74, 0.7);
+}
+
+.pd-user-info {
+   min-width: 0;
+   display: flex;
+   flex-direction: column;
+}
+
+.pd-user-name {
+   font-family: "Poppins", sans-serif;
+   font-weight: 600;
+   font-size: 13px;
+   color: #111;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+
+.pd-user-sub {
+   font-size: 10.5px;
+   letter-spacing: 0.06em;
+   text-transform: uppercase;
+   color: #8a8171;
+}
+
+.profile-dropdown ul {
+   list-style: none;
+   margin: 0;
+   padding: 6px;
+}
+
+.profile-dropdown li.logout {
+   display: flex;
+   align-items: center;
+   gap: 9px;
+   margin: 0;
+   padding: 11px 12px;
+   border-radius: 11px;
+   border-bottom: none;
+   color: #c0392b !important;
+   background: none;
+   font-size: 13.5px;
+   font-weight: 600;
+   cursor: pointer;
+   transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.profile-dropdown li.logout:hover {
+   background: rgba(192, 57, 43, 0.08);
+   color: #a93226 !important;
+   transform: translateX(2px);
+}
+
+.profile-dropdown li.logout svg {
+   width: 18px;
+   height: 18px;
 }
 
 .mobile-drawer {

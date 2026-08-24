@@ -385,7 +385,7 @@ export default function PaymentScreen() {
    );
 
    const AmountInput = () => (
-      <div className="mb-5">
+      <div className="mb-2">
          <label className="form-label small fw-bold text-muted mb-2">
             {activeStep === "Security" ? "Amount to Authorize" : "Rent Amount"}
          </label>
