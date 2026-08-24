@@ -17,7 +17,24 @@ export default function Header({ activeLabel }) {
    const [open, setOpen] = useState(false);
    const [dropdown, setdropdown] = useState(false);
    const ref = useRef(null);
+   const ddRef = useRef(null);
+   // Viewport coords for the portaled dropdown — computed from the trigger
+   // rect when it opens. The header is sticky, so the anchor stays put.
+   const [ddPos, setddPos] = useState({ top: 0, right: 8 });
    const userName = client?.name || client?.email || 'Loading...';
+
+   const toggleDropdown = () => {
+      if (!dropdown) {
+         const r = ref.current?.getBoundingClientRect();
+         if (r) {
+            setddPos({
+               top: r.bottom + 10,
+               right: Math.max(8, window.innerWidth - r.right),
+            });
+         }
+      }
+      setdropdown(!dropdown);
+   };
 
    function handleLogout() {
       const token = getToken();
@@ -50,10 +67,14 @@ export default function Header({ activeLabel }) {
       wpServerLogout(token).catch(() => {}).finally(goToLogin);
    }
 
-   // close when click outside
+   // close when click outside (trigger wrapper OR the portaled dropdown itself)
    useEffect(() => {
       const handleClickOutside = (event) => {
-         if (ref.current && !ref.current.contains(event.target)) {
+         if (
+            ref.current &&
+            !ref.current.contains(event.target) &&
+            !ddRef.current?.contains(event.target)
+         ) {
             setdropdown(false);
          }
       };
@@ -106,8 +127,8 @@ export default function Header({ activeLabel }) {
                   <div className="profile-wrapper" ref={ref}>
                      <div
                         className="user-profile new-iconset"
-                        onClick={() => setdropdown(!dropdown)}
-                     >
+                        onClick={toggleDropdown}
+                      >
                     
 <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_77_8841)">
@@ -122,24 +143,36 @@ export default function Header({ activeLabel }) {
 
                         <span className="user-name">{userName}</span>
                       </div>
-                      <div className={`profile-dropdown ${dropdown ? "active" : ""}`}>
-                         <div className="pd-user">
-                            <span className="pd-avatar">
-                               {(userName || "U").charAt(0).toUpperCase()}
-                            </span>
-                            <div className="pd-user-info">
-                               <span className="pd-user-name">{userName}</span>
-                               <span className="pd-user-sub">Signed in</span>
-                            </div>
-                         </div>
-                         <ul>
-                            <li
-                              className="logout"
-                              onMouseDown={(e) => { e.stopPropagation(); handleLogout(); }}
-                            ><span><IoLogOut /></span> Logout</li>
-                         </ul>
-                      </div>
                   </div>
+                  {/* LOGOUT DROPDOWN — portaled to <body> with position:fixed
+                      (coords from the trigger rect). Inside the header it was
+                      trapped in stacking contexts and hid behind the header /
+                      stepper bar on iOS. Portaled + z-index 2200 = always on
+                      top of the header too. */}
+                  {createPortal(
+                     <div
+                        className={`profile-dropdown ${dropdown ? "active" : ""}`}
+                        ref={ddRef}
+                        style={{ top: ddPos.top, right: ddPos.right }}
+                     >
+                        <div className="pd-user">
+                           <span className="pd-avatar">
+                              {(userName || "U").charAt(0).toUpperCase()}
+                           </span>
+                           <div className="pd-user-info">
+                              <span className="pd-user-name">{userName}</span>
+                              <span className="pd-user-sub">Signed in</span>
+                           </div>
+                        </div>
+                        <ul>
+                           <li
+                             className="logout"
+                             onMouseDown={(e) => { e.stopPropagation(); handleLogout(); }}
+                           ><span><IoLogOut /></span> Logout</li>
+                        </ul>
+                     </div>,
+                     document.body,
+                  )}
                   <div className="hamburger" onClick={() => setOpen(true)}>
                      <span></span>
                      <span></span>

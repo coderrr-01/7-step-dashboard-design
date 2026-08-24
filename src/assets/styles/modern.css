@@ -264,24 +264,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ---------- Profile dropdown ---------- */
-/* z-index fixes: navbar-custom's backdrop-filter creates a stacking context,
-   and the stepper row paints later in the DOM — on iOS Safari it covered the
-   open dropdown. Lift the whole desktop-menu group above it. */
-.desktop-menu {
-   position: relative;
-   z-index: 20;
-}
-
+/* The dropdown is portaled to <body> with position:fixed (see Header.jsx),
+   so no z-index juggling inside the header is needed — the old in-header
+   version sat behind the stepper bar on iOS Safari. */
 .profile-wrapper {
    position: relative;
-   z-index: 30;
 }
 
 .profile-dropdown {
-   position: absolute;
-   top: calc(100% + 10px);
-   right: -6px;
-   width: 240px;
+   position: fixed;
+   width: min(240px, calc(100vw - 20px));
    background: #fff;
    border: 1px solid var(--t-border);
    border-radius: 16px;
@@ -295,7 +287,8 @@ h1, h2, h3, h4, h5, h6 {
    pointer-events: none;
    transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
    overflow: hidden;
-   z-index: 999;
+   /* Above the sticky header (999) and everything in-page */
+   z-index: 2200;
 }
 
 .profile-dropdown.active {
