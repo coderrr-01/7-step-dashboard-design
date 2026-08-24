@@ -15,6 +15,11 @@ const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getD
   const [selectedDate, setSelectedDate] = useState(
      today.getDate()
   );
+  // Track the month/year the selected day belongs to, so the "active" highlight
+  // only shows in that month — not on the same day-number in other months when
+  // the user pages forward/back.
+  const [selectedMonth, setSelectedMonth] = useState(today.getMonth());
+  const [selectedYear, setSelectedYear] = useState(today.getFullYear());
 
   const [showPicker, setShowPicker] = useState(false);
 
@@ -359,7 +364,7 @@ ${date !== "" && (startDay + index) % 7 === 0 ? "weekend" : ""}
 
 ${date !== "" && (startDay + index) % 7 === 6 ? "weekend" : ""}
 
-${selectedDate === date ? "active" : ""}
+${date !== "" && selectedDate === date && month === selectedMonth && year === selectedYear ? "active" : ""}
 
 ${date !== "" && date === today.getDate() && month === today.getMonth() && year === today.getFullYear() ? "today" : ""}
 
@@ -371,6 +376,8 @@ ${date !== "" && date === today.getDate() && month === today.getMonth() && year 
               onClick={() => {
                 if (!date || isPast) return;
                 setSelectedDate(date);
+                setSelectedMonth(month);
+                setSelectedYear(year);
                 if (onSelectDate) {
                   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
                   const yr = currentDate.getFullYear();
