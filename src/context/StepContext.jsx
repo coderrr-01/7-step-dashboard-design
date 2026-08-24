@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getClientData, getUserSub, getToken } from '../services/api';
 
 export const STEP_PATHS = {
@@ -70,6 +71,8 @@ function getInitialCompleted() {
 
 export function StepProvider({ children }) {
   const [completedSteps, setCompletedSteps] = useState(getInitialCompleted);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   // Persist to user-scoped key whenever steps change
   useEffect(() => {
@@ -78,10 +81,21 @@ export function StepProvider({ children }) {
 
   // Background fetch from WP on mount — syncs steps with server state
   useEffect(() => {
+    // Captured at mount: this redirect is about where the user LANDED,
+    // not about later in-app navigation.
+    const landedPath = pathname;
     if (!getToken()) return;
     getClientData()
       .then(data => {
         if (!data?.success) return;
+        // Fully-paid users (both payments done → "Total Due Now: 0") must
+        // always resume on the payment screen — even after logout/login or a
+        // wiped browser cache, where no local resume data survives. Server
+        // payment flags are the source of truth.
+        if (landedPath !== '/payment-screen' && data.data?.deposit_paid && data.data?.rent_paid) {
+          navigate('/payment-screen', { replace: true });
+          return;
+        }
         const serverSteps = deriveStepsFromClient(data.data);
         if (!serverSteps) return;
         // Merge: keep any locally completed steps + add server steps
