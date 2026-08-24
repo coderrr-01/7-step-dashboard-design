@@ -139,7 +139,18 @@ async function apiFetch(url, options = {}) {
   // up as "Load failed"; those calls authenticate via the Bearer JWT header, so
   // omitting cookies lets them succeed on iPhone without weakening auth.
   const credentials = options.credentials || 'include';
-  const res = await fetch(url, { ...options, credentials, headers });
+  // iOS Safari (WebKit ITP) blocks cross-site fetches carrying credentials —
+  // they die in-browser with "Load failed" without ever reaching the server,
+  // so retrying without credentials cannot double-submit anything. Android /
+  // desktop succeed on the first attempt exactly as before; on iPhone the
+  // retry below lets the Bearer JWT carry authentication instead of cookies.
+  let res;
+  try {
+    res = await fetch(url, { ...options, credentials, headers });
+  } catch (networkErr) {
+    if (credentials !== 'include') throw new Error('Network request failed');
+    res = await fetch(url, { ...options, credentials: 'omit', headers });
+  }
 
   if (res.status === 401) {
     logout();
@@ -195,7 +206,7 @@ export async function refreshToken() {
 export async function getNonce() {
   const cached = localStorage.getItem(NONCE_KEY);
   if (cached) return cached;
-  const res  = await apiFetch(`${JRNY}/nonce`, { method: 'GET' });
+  const res  = await apiFetch(`${JRNY}/nonce?_=${Date.now()}`, { method: 'GET' });
   const data = await res.json();
   if (data.nonce) {
     localStorage.setItem(NONCE_KEY, data.nonce);
