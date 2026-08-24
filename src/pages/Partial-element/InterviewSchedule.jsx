@@ -160,7 +160,10 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                     activeTab === "schedule" && (
                         <div className="tab_schedule_room">
                             <div className="row">
-                                <div className="col-md-6 pe-md-4">
+                                <div
+                                    className="col-md-6 pe-md-4"
+                                    style={{ pointerEvents: submitting ? 'none' : 'auto' }}
+                                >
                                     <Calendar onSelectDate={(d) => { setSelectedDate(d); setError(''); }} />
                                 </div>
                                 {/* Slots */}
@@ -171,20 +174,22 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                     {slotsLoading ? (
                                         <p className="text-muted small mb-3">Loading available slots…</p>
                                     ) : (
-                                        <Timeslot
-                                            selectedTime={selectedTime}
-                                            onSelectTime={(t) => { setSelectedTime(t); setError(''); }}
-                                            bookedSlots={bookedSlots}
-                                        />
+                                        <div style={{ pointerEvents: submitting ? 'none' : 'auto' }}>
+                                            <Timeslot
+                                                selectedTime={selectedTime}
+                                                onSelectTime={(t) => { setSelectedTime(t); setError(''); }}
+                                                bookedSlots={bookedSlots}
+                                            />
+                                        </div>
                                     )}
                                     {allSlotsBooked && (
                                         <p className="text-danger small mb-2">All slots are booked for this date. Please select another date.</p>
                                     )}
                                     {error && <p className="text-danger small mb-2">{error}</p>}
                                     <button
-                                        className="btn btn-gold mb-2 mt-3"
+                                        className="btn btn-gold mb-2"
                                         onClick={handleConfirmClick}
-                                        disabled={submitting}
+                                        disabled={submitting || !selectedDate || !selectedTime}
                                     >
                                         {submitting ? 'Booking...' : 'Confirm Time Slot'}
                                     </button>
