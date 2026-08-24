@@ -164,7 +164,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                     className="col-md-6 pe-md-4"
                                     style={{ pointerEvents: submitting ? 'none' : 'auto' }}
                                 >
-                                    <Calendar onSelectDate={(d) => { setSelectedDate(d); setError(''); }} />
+                                    <Calendar onSelectDate={(d) => { setSelectedDate(d); setSelectedTime(null); setError(''); }} />
                                 </div>
                                 {/* Slots */}
                                 <div className="col-md-6 ps-md-2 mt-4 mt-md-0">
@@ -187,7 +187,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                     )}
                                     {error && <p className="text-danger small mb-2">{error}</p>}
                                     <button
-                                        className="btn btn-gold mb-2"
+                                        className="btn btn-gold mb-2 mt-3"
                                         onClick={handleConfirmClick}
                                         disabled={submitting || !selectedDate || !selectedTime}
                                     >
