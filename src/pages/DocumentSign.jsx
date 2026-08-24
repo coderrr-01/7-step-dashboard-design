@@ -212,7 +212,7 @@ export default function DocumentSign() {
     const pdfUrl = signedPdf || client.signed_lease;
     return (
       <PageLayout page="DocumentSign">
-        <main className="container-fluid px-lg-5 ">
+        <main className="ds-page-bg container-fluid px-lg-5 ">
           <div className="ds-ambient">
             <span className="ds-blob ds-blob-1"></span>
             <span className="ds-blob ds-blob-2"></span>
@@ -311,7 +311,7 @@ export default function DocumentSign() {
   // ── Main sign view ────────────────────────────────────────────────────────
   return (
     <PageLayout page="DocumentSign">
-      <main className="ds-page-bg">
+      <main className="ds-page-bg container-fluid px-lg-5 ">
         <div className="ds-ambient">
           <span className="ds-blob ds-blob-1"></span>
           <span className="ds-blob ds-blob-2"></span>
