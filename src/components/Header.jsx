@@ -167,7 +167,18 @@ export default function Header({ activeLabel }) {
                         <ul>
                            <li
                              className="logout"
-                             onMouseDown={(e) => { e.stopPropagation(); handleLogout(); }}
+                             role="button"
+                             tabIndex={0}
+                             /* onClick, NOT onMouseDown — iOS Safari never
+                                fires mousedown for taps on plain <li>, so
+                                logout worked on Android but died on iPhone */
+                             onClick={(e) => { e.stopPropagation(); handleLogout(); }}
+                             onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                   e.preventDefault();
+                                   handleLogout();
+                                }
+                             }}
                            ><span><IoLogOut /></span> Logout</li>
                         </ul>
                      </div>,

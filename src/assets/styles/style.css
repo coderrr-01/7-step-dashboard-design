@@ -1076,10 +1076,19 @@ body.page-residence-agreement .form-check-label {
 }
 
 .payment-tile.active {
-    background-color: #f2e1ba;
-    border-color: var(--primary-container);
-    box-shadow: 0 0 0 1px var(--primary-container);
-}
+      background-color: #f2e1ba;
+      border-color: var(--primary-container);
+      box-shadow: 0 0 0 1px var(--primary-container);
+  }
+
+  /* Payment method count comes from the backend (1..N). Bootstrap ".col"
+     would stretch each tile across 100/N % — 2 tiles became huge.
+     Pin every tile to the 4-per-row size instead; extras wrap to new lines
+     (mobile's smaller fixed-size override in media.css still wins). */
+  .checkout-card .row.g-3.mb-4 > .col {
+      flex: 0 0 auto;
+      width: 25%;
+  }
 
 .payment-tile .material-symbols-outlined {
     font-size: 2rem;

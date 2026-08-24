@@ -463,7 +463,7 @@ export default function PaymentScreen() {
                               <span className="fw-medium">{rentAmount}</span>
                            </div>
                            <hr className="my-4 opacity-10" />
-                           <div className="d-flex justify-content-between align-items-baseline pt-2">
+                           <div className="d-flex justify-content-between align-items-baseline">
                               <span className="fw-bold">Total Due Now</span>
                               <span className="h4 text-primary-container mb-0 fw-bold">
                                  {depositPaid && rentPaid ? 0 : depositPaid ? rentAmount : depositAmount}
