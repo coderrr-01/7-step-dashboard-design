@@ -466,7 +466,7 @@ export default function PaymentScreen() {
                            <div className="d-flex justify-content-between align-items-baseline pt-2">
                               <span className="fw-bold">Total Due Now</span>
                               <span className="h4 text-primary-container mb-0 fw-bold">
-                                 {depositPaid ? rentAmount : depositAmount}
+                                 {depositPaid && rentPaid ? 0 : depositPaid ? rentAmount : depositAmount}
                               </span>
                            </div>
                         </div>
