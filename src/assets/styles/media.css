@@ -183,8 +183,18 @@
         top: 0px;
         z-index: 999;
     }
+    /* Sticky + no horizontal scroll, on every browser:
+       - Modern browsers use overflow: clip — clips stray overflow WITHOUT
+         creating a scroll container, so the sticky header keeps sticking.
+       - Old browsers (no clip support) drop that line and fall back to
+         visible. That is safe now because nothing overflows horizontally
+         anymore (stepper-row width fixed, drawer slides via transform), and
+         body's overflow-x:hidden already clips at the viewport.
+       Never use hidden/auto here: it would make .page-transition a scroll
+       container and kill the sticky header. */
     .page-transition{
-        overflow-x:unset !important;
+        overflow: visible !important;
+        overflow: clip !important;
     }
     
     .verification-card{
@@ -257,7 +267,7 @@
     .stepper-row {
         padding: 10px;
         gap: 10px;
-        width: calc(120% - 100px) !important;
+        width: calc(100% - 20px) !important;
         margin: auto;
         background: #ffd229;
         top: -33px;
