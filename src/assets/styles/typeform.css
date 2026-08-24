@@ -7,7 +7,9 @@
    position:unset !important;
    min-height: 100vh;
 }
-.page-transition > *{
+/* .sticky-header excluded so the mobile sticky header (media.css) is not
+   overridden back to position:unset by this later-loaded reset. */
+.page-transition > :not(.sticky-header){
    position: unset !important;
 }
 
