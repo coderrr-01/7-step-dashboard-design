@@ -2,9 +2,6 @@
    Variables
 ===================== */
 
-
-
-
 :root {
     /* Brand â€” core palette */
     --jrny-gold: #b8924a;
@@ -23,8 +20,6 @@
     --jrny-border: #e8e1d5;
     --jrny-text-dark: #2c2c2c;
     --jrny-text-muted: #6b6b6b;
-
-    /* Heritage / payment palette */
     --primary: #795916;
     --primary-container: #b8924a;
     --primary-gold: #b8924a;
