@@ -61,10 +61,14 @@ export default function Header({ activeLabel }) {
          window.location.replace(loginUrl);
       };
 
-      // Invalidate the WordPress server-side session first (best-effort, has its
-      // own timeout), then redirect — so the user cannot re-enter via Back or by
-      // re-visiting a protected route.
-      wpServerLogout(token).catch(() => {}).finally(goToLogin);
+      // Redirect SYNCHRONOUSLY inside the click handler. iOS Safari keeps the
+      // tap's user-activation alive only briefly — awaiting the server call
+      // first expired it, and the cross-origin top-navigation was then refused,
+      // so iPhone users never left the dashboard (Android was lenient).
+      // Session invalidation below continues best-effort with keepalive so it
+      // survives the navigation.
+      goToLogin();
+      wpServerLogout(token).catch(() => {});
    }
 
    // close when click outside (trigger wrapper OR the portaled dropdown itself)

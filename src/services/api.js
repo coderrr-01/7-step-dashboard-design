@@ -101,10 +101,10 @@ export function logout() {
 }
 
 // Invalidates the WordPress server-side authentication session (the HttpOnly
-// wordpress_logged_in_* cookie). This MUST complete before redirecting to the
-// login page — otherwise WordPress still sees the user as authenticated and
-// bounces /login straight back to /my-dashboard. Best-effort: the caller
-// redirects regardless of outcome.
+// wordpress_logged_in_* cookie). Best-effort: the caller redirects IMMEDIATELY
+// (to preserve iOS Safari user-activation for the cross-origin top-navigation)
+// while this call keeps running in the background — keepalive:true lets it
+// survive that navigation so WordPress still gets told to kill the session.
 export async function wpServerLogout(token) {
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
   const timer = controller ? setTimeout(() => controller.abort(), 10000) : null;
@@ -112,6 +112,7 @@ export async function wpServerLogout(token) {
     await fetch(`${JRNY}/logout`, {
       method: 'POST',
       credentials: 'include',
+      keepalive: true,
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
