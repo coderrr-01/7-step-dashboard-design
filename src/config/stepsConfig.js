@@ -39,7 +39,7 @@ const stepsConfig = [
     number: 7,
     label: "SECURE PAYMENT",
     path: "/payment-screen",
-    description: "Completion of the Elysian Heritage onboarding journey.",
+    description: "Completion of the  onboarding journey.",
   },
 ];
 

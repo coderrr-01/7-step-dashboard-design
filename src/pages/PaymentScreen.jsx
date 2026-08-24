@@ -457,7 +457,7 @@ export default function PaymentScreen() {
                            Congratulations{firstName ? `, ${firstName}` : ''}!
                         </h1>
                         <p className="pay-sub">
-                           You are now an official member of the <strong>Elysian Heritage</strong> community.
+                           You are now an official member of the  community.
                            Your reservation is confirmed and your spot is secured.
                         </p>
 
