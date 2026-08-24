@@ -18,7 +18,7 @@ export const verificationData = {
     moveInDate: "",
     currentAddress: "",
     employmentStatus: "",
-    monthlyIncome: "$0",
+    monthlyIncome: "",
     message: "Looking forward to staying with JRNY.",
   },
 

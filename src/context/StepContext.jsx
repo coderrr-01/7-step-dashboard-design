@@ -50,12 +50,12 @@ function deriveStepsFromClient(client) {
     }
   }
   if (signedLease && !steps.includes(6)) steps.push(6);
-  // Step 7 completes ONLY when both payments are actually done — the same
-  // condition that makes PaymentScreen show "Total Due Now: 0". A status
-  // string like 'Pending for Verification' must never finish the whole
-  // timeline while rent is still unpaid.
-  if (client.deposit_paid && client.rent_paid && !steps.includes(7)) {
-    steps.push(7);
+  // Both payments settled ("Total Due Now: 0") means the ENTIRE journey is
+  // finished — mark every step complete so the timeline shows all Completed
+  // next to the celebration screen, even if a middle step (e.g. ROOM SEARCH
+  // recorded only in another browser's localStorage) is missing here.
+  if (client.deposit_paid && client.rent_paid) {
+    return [1, 2, 3, 4, 5, 6, 7];
   }
   return [...new Set(steps)].sort((a, b) => a - b);
 }
