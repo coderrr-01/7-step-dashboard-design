@@ -47,8 +47,10 @@ export default function Navbar() {
 
   const getStepClass = (step) => {
     const isActive    = activePath === step[1];
-    const isCompleted = completedSteps.includes(step[2]);
-    const isLocked    = !canAccessStep(step[2]);
+    // The step the user is on must render as active, never as completed —
+    // skip the completed class for it even when its completion is recorded.
+    const isCompleted = !isActive && completedSteps.includes(step[2]);
+    const isLocked    = !isActive && !canAccessStep(step[2]);
     const isFirst     = step[2] === 1;
     const isLast      = step[2] === steps.length;
 

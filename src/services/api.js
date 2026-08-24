@@ -125,7 +125,7 @@ export async function wpServerLogout(token) {
 }
 
 // ─── BASE FETCH ───────────────────────────────────────────────────────────────
-async function apiFetch(url, options = {}) {
+export async function apiFetch(url, options = {}) {
   const token = getToken();
   const headers = {
     'Content-Type': 'application/json',

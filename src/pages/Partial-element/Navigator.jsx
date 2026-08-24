@@ -32,8 +32,11 @@ export default function Navigator({ activeStep = 1, totalSteps = 7, title }) {
   }, [open]);
 
   const getStepState = (stepNumber) => {
-    if (completedSteps.includes(stepNumber)) return "completed";
+    // The screen the user is ON always shows as Active — even if its
+    // completion was already recorded. Completed must therefore be checked
+    // AFTER active, otherwise the current step renders as "Completed".
     if (stepNumber === activeStep) return "active";
+    if (completedSteps.includes(stepNumber)) return "completed";
     if (!canAccessStep(stepNumber)) return "muted";
     return "inactive";
   };

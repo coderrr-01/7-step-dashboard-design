@@ -28,7 +28,12 @@ function deriveStepsFromClient(client) {
   const signedLease   = client.signed_lease   || '';
 
   const hasSubmitted = !!leaseStatus;
-  if (hasSubmitted) steps.push(1, 2, 3);
+  // Only 1–2 are automatic (form submitted + Zoho verification). Step 3
+  // (ROOM SEARCH) needs a real user action — RoomSearch.jsx calls completeStep(3)
+  // when a room is chosen — so it must never be derived as done from server data.
+  // Auto-pushing it made fresh approved users see Room Search as "Completed"
+  // in the timeline before ever visiting it.
+  if (hasSubmitted) steps.push(1, 2);
 
   const map = {
     'Interview Scheduled': 4,

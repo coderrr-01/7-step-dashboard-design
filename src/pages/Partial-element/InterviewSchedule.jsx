@@ -4,6 +4,7 @@ import Timeslot, { TIME_SLOTS } from "./Timeslot";
 import { useNavigate } from 'react-router-dom';
 import tourImg from "../../assets/images/tour-img.png";
 import interviewImg from "../../assets/images/interview-img.png";
+import { apiFetch } from '../../services/api';
 
 const WP_BASE = 'https://wordpress-1608288-6566160.cloudwaysapps.com/wp-json/jrny/v1';
 
@@ -66,7 +67,12 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
         setSlotsLoading(true);
         setSlotsError('');
         setBookedSlots([]); // clear stale slots immediately so they never show for the new date
-        fetch(`${WP_BASE}/booked-slots?date=${encodeURIComponent(selectedDate.value)}`)
+        // apiFetch (not raw fetch) so the iOS Safari ITP fallback applies — a
+        // raw cross-site fetch dies with "Load failed" on iPhone, which left
+        // reschedule stuck on "Could not load slots". Cache-bust too, so a
+        // freshly released slot is reflected immediately instead of coming
+        // from Safari's HTTP cache.
+        apiFetch(`${WP_BASE}/booked-slots?date=${encodeURIComponent(selectedDate.value)}&_=${Date.now()}`)
             .then(r => r.json())
             .then(data => {
                 if (!active) return;
