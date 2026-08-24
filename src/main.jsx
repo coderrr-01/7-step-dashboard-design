@@ -40,19 +40,22 @@ const _lastRoute = (() => {
 })();
 
 // Resume the user's correct step on login. Priority order:
-// 1. An explicit ?step slug from WP (mid-session refresh deep-links to a real
-//    step). 'apply' is the dashboard root WordPress sends on a fresh login, so
-//    it counts as "no explicit step".
-// 2. The exact screen the user was on when they logged out (jrny_last_route,
-//    matched against the logged-in user's sub) — "resume where I left off".
+// 1. The exact screen the user was on when they logged out (jrny_last_route,
+//    matched against the logged-in user's sub). This must WIN over WP's
+//    ?step param: WordPress remembers an older slug and would otherwise land
+//    the user on the wrong screen after re-login (e.g. Review instead of the
+//    page they logged out from).
+// 2. An explicit ?step slug from WP (mid-session refresh deep-links to a real
+//    step; 'apply' is the dashboard root WordPress sends on a fresh login).
+//    Only consulted when no personal last-route exists (fresh browser/cache).
 // 3. Derived from the same user-scoped completed-steps progress the navigator
 //    uses, which persists across logout.
 // 4. Home/Apply (Step 1) for brand-new users with no progress.
 function resumeInitialEntry() {
-  if (_step && _step !== 'apply') return '/' + _step;
   if (_lastRoute && _lastRoute.sub === (getUserSub() || '') && _lastRoute.path.length > 1) {
     return _lastRoute.path;
   }
+  if (_step && _step !== 'apply') return '/' + _step;
   try {
     const sub = getUserSub();
     const key = sub ? `jrny_completed_steps_${sub}` : 'jrny_completed_steps';
