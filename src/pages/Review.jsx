@@ -23,9 +23,9 @@ export default function Review() {
    const navigate = useNavigate();
    const { completeStep } = useSteps();
    const { client } = useClientData();
-   const [status, setStatus]     = useState('Submitted');
+   const [status, setStatus] = useState('Submitted');
    const [approved, setApproved] = useState(false);
-   const [loading, setLoading]   = useState(true);
+   const [loading, setLoading] = useState(true);
    const pollRef = useRef(null);
 
    // ── Stable, user-scoped Application ID ──────────────────────────────────────
@@ -82,7 +82,7 @@ export default function Review() {
       if (!key) return;
       try {
          localStorage.setItem(key, JSON.stringify({ status: "Approved" }));
-      } catch {}
+      } catch { }
    };
 
    const fetchStatus = async () => {
@@ -97,7 +97,7 @@ export default function Review() {
                completeStep(2);
             }
          }
-      } catch {}
+      } catch { }
       finally { setLoading(false); }
    };
 
@@ -115,7 +115,7 @@ export default function Review() {
       fetchStatus();
       pollRef.current = setInterval(fetchStatus, 15000);
       return () => clearInterval(pollRef.current);
-   // eslint-disable-next-line react-hooks/exhaustive-deps
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
 
    // Stamp the Verified On date once, only after approval is actually detected.
@@ -124,9 +124,9 @@ export default function Review() {
       const sub = getUserSub();
       const key = sub ? `jrny_verified_on_${sub}` : null;
       const now = new Date().toISOString();
-      if (key) { try { localStorage.setItem(key, now); } catch {} }
+      if (key) { try { localStorage.setItem(key, now); } catch { } }
       setVerifiedOn(now);
-   // eslint-disable-next-line react-hooks/exhaustive-deps
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [approved]);
 
    const handleNext = () => {
@@ -140,19 +140,19 @@ export default function Review() {
       status: approved ? 'completed' : verificationData.status,
       // Dynamic, non-static values (no mock fallbacks):
       applicationId: applicationId,                 // stable per-user ID
-      submittedAt:   client?.submitted_at || '',    // Zoho Created_Time (Submitted)
-      lastUpdated:   verifiedOn || '',              // Verified On (set at approval)
+      submittedAt: client?.submitted_at || '',    // Zoho Created_Time (Submitted)
+      lastUpdated: verifiedOn || '',              // Verified On (set at approval)
       applicant: {
          ...verificationData.applicant,
-         fullName:       client?.name || verificationData.applicant.fullName,
-         email:          client?.email || verificationData.applicant.email,
-         phone:          client?.phone || verificationData.applicant.phone,
-         dateOfBirth:    client?.date_of_birth || verificationData.applicant.dateOfBirth,
-         moveInDate:     client?.move_in_date || verificationData.applicant.moveInDate,
+         fullName: client?.name || verificationData.applicant.fullName,
+         email: client?.email || verificationData.applicant.email,
+         phone: client?.phone || verificationData.applicant.phone,
+         dateOfBirth: client?.date_of_birth || verificationData.applicant.dateOfBirth,
+         moveInDate: client?.move_in_date || verificationData.applicant.moveInDate,
          currentAddress: client?.current_address || verificationData.applicant.currentAddress,
          employmentStatus: client?.employment_status || verificationData.applicant.employmentStatus,
-         monthlyIncome:  client?.monthly_income ? `$${client.monthly_income}` : verificationData.applicant.monthlyIncome,
-         message:        client?.message || verificationData.applicant.message,
+         monthlyIncome: client?.monthly_income ? `$${client.monthly_income}` : verificationData.applicant.monthlyIncome,
+         message: client?.message || verificationData.applicant.message,
       },
    };
 
@@ -177,17 +177,18 @@ export default function Review() {
             </div>
 
             <div className="verification-center">
-               <VerificationHeader />
 
                {approved ? (
                   <VerificationComplete data={data} />
                ) : data.status === "failed" ? (
+
                   <VerificationFailed data={data} />
                ) : (
-               <>
-                  <ApplicationOverview data={data} />
+                  <>
+                     <VerificationHeader />
+                     <ApplicationOverview data={data} />
 
-                  <div className={`verification-grid ${data.status === "action-required" ? "has-action" : ""}`}>
+                     <div className={`verification-grid ${data.status === "action-required" ? "has-action" : ""}`}>
                         <VerificationStatus data={data} />
                         <VerificationProgress data={data} />
                         {data.status === "action-required" && (
