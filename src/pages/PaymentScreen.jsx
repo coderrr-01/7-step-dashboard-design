@@ -498,6 +498,24 @@ export default function PaymentScreen() {
       );
    }
 
+   // Payment status is not yet known (fresh login — local flags were cleared on
+   // logout). Hold on a spinner instead of flashing the checkout UI, so users
+   // with both payments done land straight on the celebration screen.
+   if (clientLoading) {
+      return (
+         <PageLayout page="PaymentScreen">
+            <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">
+               <div className="container container-narrow py-5 px-lg-5 secure-payment-details">
+                  <div className="pay-loading" role="status" aria-live="polite">
+                     <span className="pay-loading-ring" aria-hidden="true"></span>
+                     <p>Loading your reservation…</p>
+                  </div>
+               </div>
+            </main>
+         </PageLayout>
+      );
+   }
+
    return (
       <PageLayout page="PaymentScreen">
          <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">

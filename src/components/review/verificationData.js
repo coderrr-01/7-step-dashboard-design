@@ -11,13 +11,13 @@ export const verificationData = {
 
   // The application form the user submitted — every field below gets verified.
   applicant: {
-    fullName: "John Smith",
-    email: "simonramsey@gmail.com",
-    phone: "+1 (212) 555-0100",
-    dateOfBirth: "12 Mar 1992",
-    moveInDate: "01 Oct 2026",
-    currentAddress: "123 Main St, New York, NY 10001",
-    employmentStatus: "Employed",
+    fullName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    moveInDate: "",
+    currentAddress: "",
+    employmentStatus: "",
     monthlyIncome: "$0",
     message: "Looking forward to staying with JRNY.",
   },

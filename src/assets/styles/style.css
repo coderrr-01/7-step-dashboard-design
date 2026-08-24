@@ -3997,6 +3997,30 @@ body .stepper-row{
     .pay-view-btn { width: 100%; justify-content: center; margin-top: 22px; }
 }
 
+/* ── Payment-status loading gate ── */
+.pay-loading {
+    min-height: 46vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    font-family: "Poppins", sans-serif;
+    color: #8d8272;
+    font-size: 14px;
+    letter-spacing: .04em;
+}
+.pay-loading p { margin: 0; }
+.pay-loading-ring {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 3px solid rgba(184, 146, 74, .25);
+    border-top-color: #b8924a;
+    animation: paySpin .8s linear infinite;
+}
+@keyframes paySpin { to { transform: rotate(360deg); } }
+
 /* ── Twinkling sparks (decorative) ── */
 .pay-spark {
     position: absolute;
