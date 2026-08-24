@@ -144,6 +144,13 @@ export default function PaymentScreen() {
    const depositPaid = depositPaidNow || !!client?.deposit_paid;
    const rentPaid = rentPaidNow || !!client?.rent_paid;
 
+   // "Total Due Now: 0" (both payments done) must mark SECURE PAYMENT as
+   // completed in the timeline — covers users returning to an already-paid
+   // account where no payment handler runs again.
+   useEffect(() => {
+      if (!clientLoading && depositPaid && rentPaid) completeStep(7);
+   }, [clientLoading, depositPaid, rentPaid]);
+
    const visibleMethods = depositPaid && depositMethod !== null
       ? paymentMethods.filter((_, i) => i === depositMethod || i === 4)
       : paymentMethods;

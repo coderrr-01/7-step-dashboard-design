@@ -195,6 +195,11 @@
   /* ---------- Map ---------- */
   .property-map-wrap {
     position: relative;
+    /* Base height for desktop — the inner .property-map is position:absolute
+       so it contributes no height; without an explicit height the whole map
+       collapsed to 0px on >991px viewports (mobile heights come from the
+       responsive blocks below). */
+    height: 520px;
     /* Own stacking context: Leaflet's zoom (+/-) buttons and our Reset pill
        use z-index up to 1000+, which otherwise escapes above the 999
        sticky header on mobile while scrolling. Isolated here, they can

@@ -3,7 +3,7 @@
 .page-transition > main.review-page-bg,
 .review-page-bg {
   position: relative !important;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   background: #f7f4ee;
   overflow: hidden;
 }

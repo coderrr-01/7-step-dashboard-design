@@ -355,7 +355,7 @@ export default function ViewRoom() {
                                <div className="h6 mb-0">{agreementType}</div>
                          </div>
                          <hr className="my-4 opacity-10" />
-                         <div className="d-flex justify-content-between align-items-center mb-3">
+                         <div className="d-flex justify-content-between align-items-center mb-3 gap-2">
                             <span className="fw-bold">Monthly Residency Rate</span>
                             <span className="h5 mb-0 fw-bold text-primary">${monthlyRent}</span>
                          </div>
