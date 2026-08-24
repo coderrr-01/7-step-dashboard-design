@@ -75,14 +75,15 @@ export default function ViewRoom() {
                            <div className="parchment-card p-4">
                               <div className="position-relative mb-4">
                                   <img alt="Main" className="w-100 gallery-main shadow-sm" src={images[mainImg]} />
-                                   <Link to="/Viewphoto"><button className="view-all-btn btn d-flex align-items-center gap-2">
+                                   <Link to="/Viewphoto">
+                                   {/* <button className="view-all-btn btn d-flex align-items-center gap-2">
                                     <span className="material-symbols-outlined fs-6">
 <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M12.5443 12.5443V9.66667H9.66667V12.5443H12.5443ZM8.21094 8.21094H14V14H8.21094V8.21094ZM12.5443 5.33333V2.45573H9.66667V5.33333H12.5443ZM8.21094 1H14V6.78906H8.21094V1ZM5.33333 12.5443V9.66667H2.45573V12.5443H5.33333ZM1 8.21094H6.78906V14H1V8.21094ZM5.33333 5.33333V2.45573H2.45573V5.33333H5.33333ZM1 1H6.78906V6.78906H1V1Z" fill="#B8924A"/>
 </svg>
 </span>
                                     VIEW ALL PHOTOS
-                                 </button>
+                                 </button> */}
                                  </Link>
                               </div>
                               <div className="row g-3">
