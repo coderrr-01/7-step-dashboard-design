@@ -7,15 +7,11 @@
     /* max-width:550px; */
     font-family:Arial, sans-serif;
 }
-
-
 .deposit-card h3{
     margin:0 0 10px;
     font-size:14px;
     color:#111;
 }
-
-
 .deposit-card .bank-details{
     border:1px dashed #cbd5e1;
     border-radius:8px;
