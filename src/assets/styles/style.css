@@ -1639,7 +1639,6 @@ background-color: #b8924a;
 .chevron-tab.inactive {
     color: var(--on-surface-variant);
     padding-left: 3rem;
-    margin-left: -20px;
     z-index: 1;
 }
 
