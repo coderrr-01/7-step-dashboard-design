@@ -1402,7 +1402,6 @@ body.page-residence-agreement .form-check-label {
 .chevron-tab.inactive {
     color: var(--on-surface-variant);
     padding-left: 3rem;
-    margin-left: -20px;
     z-index: 1;
 }
 
