@@ -103,6 +103,10 @@ export default function PaymentScreen() {
       return localStorage.getItem(rentStorageKey) === '1';
    });
 
+   // Celebration screen is shown first when everything is paid; "View Details"
+   // dismisses it for the session so the user can inspect the checkout UI.
+   const [successDismissed, setSuccessDismissed] = useState(false);
+
    useEffect(() => {
       if (client?.deposit_paid && !depositPaidNow) {
          setDepositPaidNow(true);
@@ -422,7 +426,7 @@ export default function PaymentScreen() {
    // replaced by a congratulatory membership confirmation. Shown on every
    // visit while payments stay complete — server flags drive this, so it
    // survives logout/login and wiped browser caches.
-   if (!clientLoading && depositPaid && rentPaid) {
+   if (!clientLoading && depositPaid && rentPaid && !successDismissed) {
       const methodUsed = paymentMethods[depositMethod]?.name || 'Online';
       const firstName = clientName ? clientName.split(' ')[0] : '';
       return (
@@ -474,6 +478,18 @@ export default function PaymentScreen() {
                            ✨ Your residency is valid through <b>{endDate || 'your lease term'}</b>.
                            Welcome aboard — we can't wait to have you home!
                         </p>
+
+                        <button
+                           type="button"
+                           className="pay-view-btn"
+                           onClick={() => setSuccessDismissed(true)}
+                        >
+                           View Details
+                           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8"
+                                    strokeLinecap="round" strokeLinejoin="round" />
+                           </svg>
+                        </button>
                      </div>
                   </section>
                </div>

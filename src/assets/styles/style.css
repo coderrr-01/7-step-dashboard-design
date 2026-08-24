@@ -3958,6 +3958,45 @@ body .stepper-row{
     margin: 0;
 }
 
+/* ── View Details CTA ── */
+.pay-view-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 26px;
+    padding: 13px 30px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: #fff;
+    background: linear-gradient(140deg, #c9a45c, #b8924a 55%, #a87f3f);
+    box-shadow:
+        0 12px 26px -10px rgba(184, 146, 74, .8),
+        inset 0 1.5px 2px rgba(255, 255, 255, .4);
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.pay-view-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    box-shadow:
+        0 18px 34px -10px rgba(184, 146, 74, .9),
+        inset 0 1.5px 2px rgba(255, 255, 255, .45);
+}
+.pay-view-btn:active { transform: translateY(0); }
+.pay-view-btn:focus-visible {
+    outline: 3px solid rgba(184, 146, 74, .5);
+    outline-offset: 2px;
+}
+.pay-view-btn svg { transition: transform .18s ease; }
+.pay-view-btn:hover svg { transform: translateX(3px); }
+@media (max-width: 575px) {
+    .pay-view-btn { width: 100%; justify-content: center; margin-top: 22px; }
+}
+
 /* ── Twinkling sparks (decorative) ── */
 .pay-spark {
     position: absolute;

@@ -31,7 +31,12 @@ export default function Navigator({ activeStep = 1, totalSteps = 7, title }) {
     };
   }, [open]);
 
+  // Journey finished end-to-end (e.g. both payments done)? Then the whole
+  // timeline reads Completed — no Active/Upcoming/Locked leftovers.
+  const journeyComplete = stepsConfig.every((s) => completedSteps.includes(s.number));
+
   const getStepState = (stepNumber) => {
+    if (journeyComplete) return "completed";
     // The screen the user is ON always shows as Active — even if its
     // completion was already recorded. Completed must therefore be checked
     // AFTER active, otherwise the current step renders as "Completed".
