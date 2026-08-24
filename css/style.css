@@ -93,6 +93,12 @@ img {
 a {
     color: inherit;
 }
+.user-name{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+}
 
 /* Page-specific body themes */
 body.page-index {

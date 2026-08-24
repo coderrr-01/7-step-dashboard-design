@@ -7,9 +7,26 @@ import interviewImg from "../../assets/images/interview-img.png";
 
 const WP_BASE = 'https://wordpress-1608288-6566160.cloudwaysapps.com/wp-json/jrny/v1';
 
+// Today's date in the exact { label, value } shape the Calendar's onSelectDate
+// emits, so the schedule opens with today already selected (and its slots
+// fetched) without the user having to click. label e.g. "Aug 24, 2026",
+// value "dd/mm/yyyy" — the format the booked-slots API expects.
+const buildToday = () => {
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const d = now.getDate();
+    const mo = now.getMonth();
+    const yr = now.getFullYear();
+    const padded = String(d).padStart(2, '0');
+    const moPadded = String(mo + 1).padStart(2, '0');
+    return { label: `${months[mo]} ${d}, ${yr}`, value: `${padded}/${moPadded}/${yr}` };
+};
+
 function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName }) {
     const [activeTab, setActiveTab] = useState("schedule");
-    const [selectedDate, setSelectedDate] = useState(null);
+    // Today is selected by default (Calendar already highlights today; this makes
+    // it the real selected date so today's slots load on open).
+    const [selectedDate, setSelectedDate] = useState(buildToday);
     const [selectedTime, setSelectedTime] = useState(null);
     const [bookedSlots, setBookedSlots] = useState([]);
     const [error, setError] = useState('');
@@ -42,16 +59,23 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
 
     useEffect(() => {
         if (!selectedDate) { setBookedSlots([]); return; }
+        // `active` guards against a race: if the user switches dates quickly, the
+        // cleanup flips it false so a slower earlier response can't overwrite the
+        // slots for the newer date.
+        let active = true;
         setSlotsLoading(true);
         setSlotsError('');
+        setBookedSlots([]); // clear stale slots immediately so they never show for the new date
         fetch(`${WP_BASE}/booked-slots?date=${encodeURIComponent(selectedDate.value)}`)
             .then(r => r.json())
             .then(data => {
+                if (!active) return;
                 if (data.success) setBookedSlots(data.booked || []);
                 else setSlotsError('Could not load slots.');
             })
-            .catch(() => setSlotsError('Could not load slots.'))
-            .finally(() => setSlotsLoading(false));
+            .catch(() => { if (active) setSlotsError('Could not load slots.'); })
+            .finally(() => { if (active) setSlotsLoading(false); });
+        return () => { active = false; };
     }, [selectedDate, refreshKey]);
 
     // True only when the fetch succeeded and every slot for the date is booked —
@@ -139,11 +163,15 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                     <h6 className="slots-heading">
                                         AVAILABLE SLOTS FOR {selectedDate ? selectedDate.label : 'TODAY'}
                                     </h6>
-                                    <Timeslot
-                                        selectedTime={selectedTime}
-                                        onSelectTime={(t) => { setSelectedTime(t); setError(''); }}
-                                        bookedSlots={bookedSlots}
-                                    />
+                                    {slotsLoading ? (
+                                        <p className="text-muted small mb-3">Loading available slots…</p>
+                                    ) : (
+                                        <Timeslot
+                                            selectedTime={selectedTime}
+                                            onSelectTime={(t) => { setSelectedTime(t); setError(''); }}
+                                            bookedSlots={bookedSlots}
+                                        />
+                                    )}
                                     {allSlotsBooked && (
                                         <p className="text-danger small mb-2">All slots are booked for this date. Please select another date.</p>
                                     )}
