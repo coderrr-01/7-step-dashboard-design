@@ -79,31 +79,43 @@ export function StepProvider({ children }) {
     localStorage.setItem(stepsKey(), JSON.stringify(completedSteps));
   }, [completedSteps]);
 
-  // Background fetch from WP on mount — syncs steps with server state
+  // Background fetch from WP on mount — syncs steps with server state, then
+  // places the user on the step the SERVER says they are on. This is what
+  // makes a wiped-cache re-login resume correctly: local resume keys
+  // (last-route / completed-steps) are gone, so the server's derived progress
+  // is the only remaining source of truth. Fully-paid users land on
+  // /payment-screen through the same rule (serverSteps = [1..7] → cur = 7).
   useEffect(() => {
     // Captured at mount: this redirect is about where the user LANDED,
     // not about later in-app navigation.
     const landedPath = pathname;
+    const knownAtMount = completedSteps;
     if (!getToken()) return;
     getClientData()
       .then(data => {
         if (!data?.success) return;
-        // Fully-paid users (both payments done → "Total Due Now: 0") must
-        // always resume on the payment screen — even after logout/login or a
-        // wiped browser cache, where no local resume data survives. Server
-        // payment flags are the source of truth.
-        if (landedPath !== '/payment-screen' && data.data?.deposit_paid && data.data?.rent_paid) {
-          navigate('/payment-screen', { replace: true });
-          return;
-        }
         const serverSteps = deriveStepsFromClient(data.data);
         if (!serverSteps) return;
+
         // Merge: keep any locally completed steps + add server steps
         setCompletedSteps(prev => {
           const merged = [...new Set([...prev, ...serverSteps])].sort((a, b) => a - b);
           // Only update if different to avoid unnecessary re-renders
           return JSON.stringify(merged) !== JSON.stringify(prev) ? merged : prev;
         });
+
+        // Redirect only between known step pages — sub-pages like
+        // /view-room or /residence-agreement are never hijacked.
+        const isKnownStepPath = Object.values(STEP_PATHS).includes(landedPath);
+        if (!isKnownStepPath) return;
+
+        const known = [...new Set([...knownAtMount, ...serverSteps])].sort((a, b) => a - b);
+        let cur = 1;
+        while (cur < 7 && known.includes(cur)) cur++;
+        const target = STEP_PATHS[cur];
+        if (target && landedPath !== target) {
+          navigate(target, { replace: true });
+        }
       })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
