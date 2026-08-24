@@ -240,7 +240,13 @@ export async function applyForm(data) {
 
 // ─── APPLICATION STATUS ───────────────────────────────────────────────────────
 export async function getApplicationStatus() {
-  const res = await apiFetch(`${JRNY}/application-status`, { method: 'GET' });
+  // Same treatment as getClientData(): iOS Safari (ITP) blocks the
+  // credentials-carrying cross-site fetch ("Load failed"). fetchStatus()
+  // swallows that error silently, so approval from Zoho was never detected on
+  // iPhone and the Verification Complete screen never appeared (Android was
+  // unaffected). The Bearer JWT authenticates the call, so cookies can be
+  // omitted safely; cache-bust the GET so every poll reaches the server.
+  const res = await apiFetch(`${JRNY}/application-status?_=${Date.now()}`, { method: 'GET', credentials: 'omit' });
   return res.json();
 }
 
