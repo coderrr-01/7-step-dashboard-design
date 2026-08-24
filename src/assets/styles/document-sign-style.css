@@ -3,7 +3,7 @@
 .page-transition > main.ds-page-bg,
 main.ds-page-bg {
   position: relative !important;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   /* clip (modern) keeps the ambient blobs clipped without creating a scroll
      container, so .ds-auth-card's position:sticky keeps working */
   overflow: hidden;
