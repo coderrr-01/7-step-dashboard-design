@@ -112,6 +112,11 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
         setBooked(false);
         setLastBooked(null);
         setSelectedTime(null);
+        // Reset the selected date back to today so the "AVAILABLE SLOTS FOR ..."
+        // heading and the fetched slots reflect today (matching the freshly
+        // remounted Calendar, which highlights today) instead of the previously
+        // booked date.
+        setSelectedDate(buildToday());
         setActiveTab("schedule");
         setRefreshKey((k) => k + 1);
     };
