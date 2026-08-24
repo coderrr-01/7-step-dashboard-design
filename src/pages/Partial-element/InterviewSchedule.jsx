@@ -182,7 +182,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                     )}
                                     {error && <p className="text-danger small mb-2">{error}</p>}
                                     <button
-                                        className="btn btn-gold mb-2"
+                                        className="btn btn-gold mb-2 mt-3"
                                         onClick={handleConfirmClick}
                                         disabled={submitting}
                                     >
