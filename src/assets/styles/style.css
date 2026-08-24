@@ -3180,7 +3180,11 @@ width: calc(100% + 1px);
 .page-transition {
     position: relative !important;
     min-height: 100vh;
+    /* "hidden" is the old-browser fallback; "clip" (all modern browsers)
+       clips the same content WITHOUT creating a scroll container, so
+       position:sticky children (e.g. .ds-auth-card on Document Sign) work. */
     overflow: hidden !important;
+    overflow: clip !important;
 }
 
 .mobile-drawer.active {

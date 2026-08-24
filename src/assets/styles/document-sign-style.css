@@ -4,7 +4,10 @@
 main.ds-page-bg {
   position: relative !important;
   min-height: 100vh;
+  /* clip (modern) keeps the ambient blobs clipped without creating a scroll
+     container, so .ds-auth-card's position:sticky keeps working */
   overflow: hidden;
+  overflow: clip;
 }
 
 .ds-ambient {
@@ -302,6 +305,9 @@ main.ds-page-bg {
   padding: 28px;
   position: sticky;
   top: 24px;
+  /* grid child would stretch to the full column height and leave sticky
+     nowhere to travel — pin it to the top of its track */
+  align-self: start;
 }
 .ds-auth-head {
   display: flex;
@@ -420,11 +426,55 @@ main.ds-page-bg {
   border-color: #2e7d4f;
   color: #2e7d4f;
 }
+/* Unverified state: gold pulse + tinted look so users SEE that this button
+   is the action they must take before "Adopt & Sign" unlocks */
+@keyframes dsCheckPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(184, 146, 74, 0.55); }
+  70%  { box-shadow: 0 0 0 12px rgba(184, 146, 74, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(184, 146, 74, 0); }
+}
+.ds-sign-check:not(.verified) {
+  border-color: #b8924a;
+  background: #fffdf6;
+  color: #b8924a;
+  animation: dsCheckPulse 1.6s ease-out infinite;
+}
 .ds-sign-check.verified {
   border-color: rgba(46, 125, 79, 0.3);
   background: rgba(46, 125, 79, 0.1);
   color: #2e7d4f;
   box-shadow: 0 0 16px -4px rgba(46, 125, 79, 0.5);
+}
+/* Hint line that tells the user exactly what the ✓ button does */
+.ds-check-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  font-family: "Poppins", sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #9a7423;
+  background: rgba(184, 146, 74, 0.09);
+  border: 1px dashed rgba(184, 146, 74, 0.5);
+  border-radius: 10px;
+  padding: 9px 12px;
+  animation: dsHintIn 0.35s ease both;
+}
+.ds-check-hint svg {
+  flex-shrink: 0;
+  font-size: 13px;
+}
+.ds-check-hint.done {
+  color: #2e7d4f;
+  background: rgba(46, 125, 79, 0.08);
+  border-style: solid;
+  border-color: rgba(46, 125, 79, 0.4);
+}
+@keyframes dsHintIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
 }
 .ds-legal-note {
   font-family: "Poppins", sans-serif;

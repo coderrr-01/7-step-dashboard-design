@@ -12,6 +12,7 @@ import {
   FaLandmark,
   FaPen,
   FaLock,
+  FaHandPointer,
 } from "react-icons/fa6";
 import "../assets/styles/document-sign-style.css";
 import { useNavigate } from 'react-router-dom';
@@ -612,10 +613,23 @@ function SignaturePanel({
               onClick={verifyData}
               className={`ds-sign-check ${verfiyeActive ? "verified" : ""}`}
               style={{ cursor: "pointer" }}
+              title="Click here to verify and activate Adopt & Sign"
             >
               <FaCheck />
             </span>
           </div>
+          {/* Explicit hint so users understand the ✓ click unlocks the button */}
+          <p className={`ds-check-hint ${verfiyeActive ? "done" : ""}`}>
+            {verfiyeActive ? (
+              <>
+                <FaCheck /> Verified — “Adopt &amp; Sign” is now active
+              </>
+            ) : (
+              <>
+                <FaHandPointer /> Tap the ✓ button above to activate “Adopt &amp; Sign”
+              </>
+            )}
+          </p>
           <p className="ds-legal-note">
             By typing your name, you agree that this digital signature is the legal
             equivalent of your manual signature.
@@ -643,7 +657,12 @@ function SignaturePanel({
       )}
 
       {activeTab === "type" ? (
-        <button className="ds-sign-btn" disabled={!verified} onClick={handleAdoptSign}>
+        <button
+          className="ds-sign-btn"
+          disabled={!verified}
+          onClick={handleAdoptSign}
+          title={verified ? undefined : "First tap the ✓ check button to enable this"}
+        >
           <FaFileSignature /> Adopt &amp; Sign
         </button>
       ) : (
