@@ -406,11 +406,21 @@ export async function saveLastRoute(path) {
 }
 
 export async function getLastRoute() {
+  const token = getToken();
+  if (!token) return null;
   try {
-    const res = await apiFetch(`${JRNY}/last-route?_=${Date.now()}`, { method: 'GET' });
+    const res = await fetch(`${JRNY}/last-route?_=${Date.now()}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) return null;
     const data = await res.json();
     if (data.success && data.path) return data.path;
-  } catch { /* fall through to localStorage */ }
+  } catch { /* fall through to null */ }
   return null;
 }
 
