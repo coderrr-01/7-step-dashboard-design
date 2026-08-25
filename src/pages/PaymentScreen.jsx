@@ -510,7 +510,7 @@ export default function PaymentScreen() {
                         <div className="p-4 border-bottom checkout-summary-header">
                            <h3 className="h5 mb-4">Reservation Summary</h3>
                            <div className="d-flex gap-3">
-                              <img alt={unitLabel || "Reserved Room"} className="property-img" src={roomImage} />
+                              <img alt={unitLabel || "Reserved Room"} className="property-img" src={roomImages[unitLabel] || "https://lh3.googleusercontent.com/aida-public/AB6AXuCA4V3fzGFxJRfHod-q3i610fpthD2Ue4VGIGDUje-iPYuVVdhTF9ISMA8pliiKaFrTiBcSdZR99tUouMkDjPEJq7AlRG5GL8uWblUgPopibMVKtg5K3ltNBt_-EWva5iLE2uCGEygHax40C2fDKHRddQUv_dQhbwQD_DLqLe1O952nifBIl5QaWyonzDRKBYcWu_wpXwgQ9Dug7wx2LCyLw5ewlbpMA0tqqKv4mVo6fuavy7TxWhwVlBDwZIsyg_L5joLScmveingP"} />
                               <div>
                                  <h4 className="h6 mb-1 fw-bold">{unitLabel}</h4>
                                  <p className="small text-muted mb-2">{roomMeta}</p>
