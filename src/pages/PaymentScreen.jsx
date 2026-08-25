@@ -159,10 +159,10 @@ export default function PaymentScreen() {
 
    const rawDeposit = client?.security_deposit
       ? parseFloat(client.security_deposit)
-      : (selectedRoom?.security_deposit ? parseFloat(selectedRoom.security_deposit) : 0);
+      : (activeRoom?.security_deposit ? parseFloat(activeRoom.security_deposit) : 0);
    const rawRent = client?.rent_amount
       ? parseFloat(client.rent_amount)
-      : (selectedRoom?.monthly_rent ? parseFloat(selectedRoom.monthly_rent) : (selectedRoom?.price ? parseFloat(selectedRoom.price) : 0));
+      : (activeRoom?.monthly_rent ? parseFloat(activeRoom.monthly_rent) : (activeRoom?.price ? parseFloat(activeRoom.price) : 0));
 
    const depositAmount = `$ ${rawDeposit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
    const rentAmount = `$ ${rawRent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
@@ -172,18 +172,18 @@ export default function PaymentScreen() {
    const clientEmail = client?.email || '';
    const startDate = client?.start_date || '';
    const endDate = client?.end_date || '';
-   const unitLabel = selectedRoom?.name || client?.unit || client?.room_name || '';
+   const unitLabel = activeRoom?.name || client?.unit || client?.room_name || '';
 
    const roomMeta = (() => {
-      if (!selectedRoom) return '';
+      if (!activeRoom) return '';
       const parts = [
-         selectedRoom.floor ? `Floor ${selectedRoom.floor}` : null,
-         selectedRoom.unit_number ? `Unit ${selectedRoom.unit_number}` : null,
-         selectedRoom.size_sq_ft ? `${selectedRoom.size_sq_ft} sq.ft` : null,
-         selectedRoom.status ? selectedRoom.status : null,
+         activeRoom.floor ? `Floor ${activeRoom.floor}` : null,
+         activeRoom.unit_number ? `Unit ${activeRoom.unit_number}` : null,
+         activeRoom.size_sq_ft ? `${activeRoom.size_sq_ft} sq.ft` : null,
+         activeRoom.status ? activeRoom.status : null,
       ].filter(Boolean);
       if (parts.length) return parts.join(' • ');
-      return [selectedRoom.roomNumber, selectedRoom.city].filter(Boolean).join(' • ');
+      return [activeRoom.roomNumber, activeRoom.city].filter(Boolean).join(' • ');
    })();
 
    const handleRentTabClick = () => {
