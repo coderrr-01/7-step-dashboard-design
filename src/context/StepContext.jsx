@@ -76,13 +76,32 @@ export function StepProvider({ children }) {
       .catch(() => {});
   }, []);
 
-  // Jab bhi user / pe aaye, already-loaded steps se seedha sahi step pe bhejo
+  // Jab bhi user / pe aaye, pehle stale data se turant redirect karo (no flash),
+  // phir fresh data leke redirect update karo (in case step complete ho gaya).
   useEffect(() => {
-    if (!getToken() || pathname !== '/' || completedSteps.length === 0) return;
-    const nextStep = findFirstIncompleteStep(completedSteps);
-    if (nextStep && nextStep !== '/') {
-      navigate(nextStep, { replace: true });
+    if (!getToken() || pathname !== '/') return;
+
+    // Instant redirect with already-loaded steps (no apply screen flash)
+    if (completedSteps.length > 0) {
+      const nextStep = findFirstIncompleteStep(completedSteps);
+      if (nextStep && nextStep !== '/') {
+        navigate(nextStep, { replace: true });
+      }
     }
+
+    // Also fetch fresh data so latest Zoho status reflects immediately
+    getClientData()
+      .then(data => {
+        if (!data?.success) return;
+        const serverSteps = deriveStepsFromClient(data.data);
+        if (!serverSteps) return;
+        setCompletedSteps(serverSteps);
+        const nextStep = findFirstIncompleteStep(serverSteps);
+        if (nextStep && nextStep !== pathname) {
+          navigate(nextStep, { replace: true });
+        }
+      })
+      .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
