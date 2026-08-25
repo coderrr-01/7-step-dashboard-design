@@ -732,7 +732,7 @@ export default function PaymentScreen() {
                               </svg>
                            </a>
 
-                           {/* WhatsApp */}
+                
                            <a
                               href="https://wa.me/19292419530"
                               target="_blank"
