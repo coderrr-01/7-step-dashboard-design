@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { MemoryRouter, useLocation } from "react-router-dom";
+import { MemoryRouter, useLocation, useNavigate } from "react-router-dom";
 import App from "./App";
 import "./assets/styles/style.css";
 import "./assets/styles/media.css";
@@ -10,7 +10,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { StepProvider, STEP_PATHS } from "./context/StepContext";
-import { saveToken, getLoggedOutToken, clearLoggedOutToken, getUserSub } from "./services/api";
+import { saveToken, getLoggedOutToken, clearLoggedOutToken, getUserSub, getLastRoute } from "./services/api";
 import { resumeMeta } from "./resumeMeta";
 
 // Auto-login: read JWT from ?token param (WP iframe) or window.jrnyData.
@@ -88,10 +88,33 @@ function RouteReporter() {
   return null;
 }
 
+// Cross-device resume: if the user has NO saved route in localStorage
+// (logging in from a new device), fetch the last route from the server
+// and redirect there.
+function ServerRouteRedirect() {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    // Skip if localStorage already has a route (same-device fast path)
+    try {
+      const saved = JSON.parse(localStorage.getItem('jrny_last_route') || 'null');
+      if (saved && saved.path && saved.path.length > 1) return;
+    } catch {}
+    // No localStorage route — ask server for cross-device resume point
+    getLastRoute().then(serverPath => {
+      if (serverPath && serverPath !== pathname) {
+        navigate(serverPath, { replace: true });
+      }
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+}
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <MemoryRouter initialEntries={[_initialEntry]} initialIndex={0}>
-      <StepProvider><RouteReporter /><App /></StepProvider>
+      <StepProvider><ServerRouteRedirect /><RouteReporter /><App /></StepProvider>
     </MemoryRouter>
   </React.StrictMode>,
 );
