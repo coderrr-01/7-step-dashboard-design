@@ -54,23 +54,11 @@ const _lastRoute = (() => {
 // 4. Home/Apply (Step 1) for brand-new users with no progress.
 function resumeInitialEntry() {
   if (_lastRoute && _lastRoute.sub === (getUserSub() || '') && _lastRoute.path.length > 1) {
-    // Tell StepContext the landing is intentional — its server-sync redirect
-    // must not move the user off the screen they logged out from.
     resumeMeta.fromLastRoute = true;
     return _lastRoute.path;
   }
   if (_step && _step !== 'apply') return '/' + _step;
-  try {
-    const sub = getUserSub();
-    const key = sub ? `jrny_completed_steps_${sub}` : 'jrny_completed_steps';
-    const completed = JSON.parse(localStorage.getItem(key) || '[]');
-    if (!Array.isArray(completed) || completed.length === 0) return '/';
-    let cur = 1;
-    while (cur < 7 && completed.includes(cur)) cur++;
-    return STEP_PATHS[cur] || '/';
-  } catch {
-    return '/';
-  }
+  return '/';
 }
 const _initialEntry = resumeInitialEntry();
 
