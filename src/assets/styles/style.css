@@ -997,7 +997,7 @@ body.page-residence-agreement .form-check-label {
     border: 1px solid #D3C8B8;
     border-radius: 4px;
     padding: 1.5rem;
-    /* height: 100%; */
+    height: 100%;
 }
 
 .parchment-card .calendar-widget {
@@ -1136,6 +1136,11 @@ background-color: #b8924a;
 
 .payment-card-logos {
     filter: grayscale(1);
+}
+.payment-card-logos{
+        display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 .payment-card-logos img {
