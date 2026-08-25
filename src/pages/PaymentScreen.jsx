@@ -119,7 +119,7 @@ export default function PaymentScreen() {
       if (activeRoom.img) return [activeRoom.img];
       return [];
    })();
-   const roomImage = roomImages[0] || '';
+   const roomImage = client?.room_img || roomImages[0] || '';
 
    const [optimisticDepositPaid, setOptimisticDepositPaid] = useState(false);
    const [optimisticDepositMethod, setOptimisticDepositMethod] = useState(null);

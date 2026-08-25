@@ -25,8 +25,9 @@ export default function Interview() {
    const selectedRoom = (() => {
       try { return JSON.parse(localStorage.getItem('jrny_selected_room') || 'null'); } catch { return null; }
    })();
-   const roomName = selectedRoom?.name || '';
-   const roomId   = selectedRoom?.id   || '';
+    const roomName = selectedRoom?.name || '';
+    const roomId   = selectedRoom?.id   || '';
+    const roomImg  = (Array.isArray(selectedRoom?.images) && selectedRoom.images.length) ? selectedRoom.images[0] : (selectedRoom?.img || '');
 
    const [interviewProgres, setinterviewProgres] = useState(false)
    const [Avalableresidence, setAvalableresidence] = useState(true)
@@ -58,14 +59,15 @@ export default function Interview() {
       }
       setSubmitting(true);
       try {
-         const res = await bookInterview({
-            date: selectedDate.value,
-            time: selectedTime,
-            booking_type: 'Tenant Interview',
-            room_id:   roomId,
-            room_name: roomName,
-            client_id: client?.id || '',
-         });
+          const res = await bookInterview({
+             date: selectedDate.value,
+             time: selectedTime,
+             booking_type: 'Tenant Interview',
+             room_id:   roomId,
+             room_name: roomName,
+             room_img:  roomImg,
+             client_id: client?.id || '',
+          });
 
          if (res.success) {
             setConfirmedDate(selectedDate.label);
