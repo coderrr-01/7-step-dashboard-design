@@ -43,6 +43,17 @@ export default function Header({ activeLabel }) {
       await new Promise(r => setTimeout(r, 50));
 
       const token = getToken();
+      // Persist current route BEFORE logout clears the token.
+      // If we don't, any re-render after logout() can cause RouteReporter to
+      // overwrite jrny_last_route with an empty sub, breaking resume-on-login.
+      try {
+         if (token) {
+            const p = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+            const sub = p.sub ? String(p.sub) : '';
+            const path = window.location.pathname || '/';
+            localStorage.setItem('jrny_last_route', JSON.stringify({ sub, path }));
+         }
+      } catch { /* ignore */ }
       logout();
       const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
 
