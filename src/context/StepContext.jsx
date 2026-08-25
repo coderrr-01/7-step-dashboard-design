@@ -33,7 +33,7 @@ function deriveStepsFromClient(client) {
 
   for (const [status, step] of Object.entries(map)) {
     if (leaseStatus === status || leaseStatus.includes(status)) {
-      for (let i = 4; i <= step; i++) steps.push(i);
+      for (let i = 3; i <= step; i++) steps.push(i);
       break;
     }
   }
