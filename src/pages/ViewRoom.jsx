@@ -337,7 +337,7 @@ export default function ViewRoom() {
                      </div>
                   </div>
                   {/* Right Column: Sidebar */}
-                  <div className="col-xl-4">
+                  <div className="col-xl-4 h-100">
                      <div className="parchment-card summary-card shadow-lg p-4">
                         <h2 className="h4 text-primary mb-4">Booking Summary</h2>
                         <div className="mb-4">
