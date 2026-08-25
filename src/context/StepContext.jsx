@@ -64,29 +64,35 @@ export function StepProvider({ children }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  // Mount pe server se data fetch karo
   useEffect(() => {
     if (!getToken()) return;
+    getClientData()
+      .then(data => {
+        if (!data?.success) return;
+        const serverSteps = deriveStepsFromClient(data.data);
+        if (serverSteps) setCompletedSteps(serverSteps);
+      })
+      .catch(() => {});
+  }, []);
 
+  // Jab bhi user / pe aaye, FRESH server data leke sahi step pe bhejo
+  useEffect(() => {
+    if (!getToken() || pathname !== '/') return;
     getClientData()
       .then(data => {
         if (!data?.success) return;
         const serverSteps = deriveStepsFromClient(data.data);
         if (!serverSteps) return;
-
         setCompletedSteps(serverSteps);
-
-        // Agar user home (/) pe hai toh pehle incomplete step pe redirect karo
-        // (sirf tab jab user ne manually koi step visit nahi kiya)
-        if (pathname === '/') {
-          const nextStep = findFirstIncompleteStep(serverSteps);
-          if (nextStep && nextStep !== '/') {
-            navigate(nextStep, { replace: true });
-          }
+        const nextStep = findFirstIncompleteStep(serverSteps);
+        if (nextStep && nextStep !== '/') {
+          navigate(nextStep, { replace: true });
         }
       })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pathname]);
 
   const completeStep = (stepNumber) => {
     setCompletedSteps(prev =>
