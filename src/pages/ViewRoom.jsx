@@ -103,9 +103,9 @@ export default function ViewRoom() {
                                      <div className="position-relative h-100">
                                         <img alt="Thumb 4" className="w-100 gallery-thumb opacity-50" src={images[3] || images[0]} />
                                         {images.length > 3 && (
-                                           <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                                              <span className="fw-bold text-dark more-photos-label">+{images.length - 3} More</span>
-                                           </div>
+                                          //  <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                          //     <span className="fw-bold text-dark more-photos-label">+{images.length - 3} More</span>
+                                          //  </div>
                                         )}
                                      </div>
                                   </div>
