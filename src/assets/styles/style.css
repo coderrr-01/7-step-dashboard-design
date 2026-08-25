@@ -1015,6 +1015,8 @@ body.page-residence-agreement .form-check-label {
     transition: transform 0.3s ease;
         border-radius: 8px;
     border: 1px solid #d7d7d7;
+    display: flex;
+    flex-direction: column;
 }
 
 .property-card:hover {
@@ -1965,7 +1967,8 @@ background-color: #b8924a;
 }
 
 .card-body-custom {
-    padding: 25px;
+    padding: 18px;
+    flex: 1;
 }
 
 .card-title-row {
@@ -2005,13 +2008,15 @@ background-color: #b8924a;
     color: var(--jrny-text-muted);
     font-style: italic;
     margin: 0px;
-    /* margin-bottom: 25px; */
-    min-height: 54px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 3;
         font-family: 'Barlow';
 }
 
 .card-footer-custom {
-    padding: 0 25px 25px;
+    padding: 0 18px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;

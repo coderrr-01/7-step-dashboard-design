@@ -39,26 +39,23 @@ export default function Header({ activeLabel }) {
 
    async function handleLogout() {
       setLoggingOut(true);
+      // Let React paint the spinner before any navigation can unmount the component.
+      await new Promise(r => setTimeout(r, 50));
+
       const token = getToken();
-      logout(); // clears the local token and remembers it so ?token cannot auto-restore
+      logout();
       const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
 
-      // Still notify the WP parent (if embedded) so it can run the genuine
-      // wp-login.php?action=logout — but DO NOT depend on it: the redirect and
-      // server-session invalidation below run regardless of whether the parent
-      // listens. Relying only on this postMessage is why logout appeared to do nothing.
       if (window.parent !== window) {
          try { window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*'); } catch { /* ignore */ }
       }
 
-      // Await the server-side session invalidation so the loader stays visible
-      // until logout is actually complete.
+      // Await server-side session invalidation so the spinner stays visible.
       try {
          await wpServerLogout(token);
       } catch { /* best-effort: still redirect even if server call fails */ }
 
-      // Send the whole page (top window, breaking out of the dashboard iframe) to
-      // the login page. Falls back to this frame if top navigation is blocked.
+      // Redirect to login page.
       try {
          if (window.top && window.top !== window) {
             window.top.location.replace(loginUrl);
