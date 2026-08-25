@@ -46,8 +46,8 @@ export default function Header({ activeLabel }) {
       const token = getToken();
       const path = pathname || '/';
 
-      // 1) Save route to SERVER (cross-device resume)
-      try { saveLastRoute(path); } catch { /* fire-and-forget */ }
+      // 1) Save route to SERVER (cross-device resume) — await so it saves before redirect
+      try { await saveLastRoute(path); } catch { /* best-effort */ }
 
       // 2) Also save to localStorage (same-device fast resume)
       try {

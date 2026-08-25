@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getClientData, getUserSub, getToken } from '../services/api';
-import { resumeMeta } from '../resumeMeta';
+import { getClientData, getUserSub, getToken, getLastRoute } from '../services/api';
 
 export const STEP_PATHS = {
   1: '/',
@@ -15,33 +14,26 @@ export const STEP_PATHS = {
 
 const StepContext = createContext(null);
 
-// User-scoped key — different users never share step state
 function stepsKey() {
   const sub = getUserSub();
   return sub ? `jrny_completed_steps_${sub}` : 'jrny_completed_steps';
 }
 
-// Derive completed steps from WP client data
 function deriveStepsFromClient(client) {
   if (!client) return null;
   const steps = [];
-  const leaseStatus   = client.lease_status   || '';
-  const signedLease   = client.signed_lease   || '';
+  const leaseStatus = client.lease_status || '';
+  const signedLease = client.signed_lease || '';
 
   const hasSubmitted = !!leaseStatus;
-  // Only 1–2 are automatic (form submitted + Zoho verification). Step 3
-  // (ROOM SEARCH) needs a real user action — RoomSearch.jsx calls completeStep(3)
-  // when a room is chosen — so it must never be derived as done from server data.
-  // Auto-pushing it made fresh approved users see Room Search as "Completed"
-  // in the timeline before ever visiting it.
   if (hasSubmitted) steps.push(1, 2);
 
   const map = {
     'Interview Scheduled': 4,
-    'Booking Secured':     5,
-    'Signed':              6,
-    'Extended':            6,
-    'Payment Complete':    7,
+    'Booking Secured': 5,
+    'Signed': 6,
+    'Extended': 6,
+    'Payment Complete': 7,
   };
 
   for (const [status, step] of Object.entries(map)) {
@@ -51,17 +43,12 @@ function deriveStepsFromClient(client) {
     }
   }
   if (signedLease && !steps.includes(6)) steps.push(6);
-  // Both payments settled ("Total Due Now: 0") means the ENTIRE journey is
-  // finished — mark every step complete so the timeline shows all Completed
-  // next to the celebration screen, even if a middle step (e.g. ROOM SEARCH
-  // recorded only in another browser's localStorage) is missing here.
   if (client.deposit_paid && client.rent_paid) {
     return [1, 2, 3, 4, 5, 6, 7];
   }
   return [...new Set(steps)].sort((a, b) => a - b);
 }
 
-// Instant read from user-scoped localStorage key
 function getInitialCompleted() {
   try {
     const saved = localStorage.getItem(stepsKey());
@@ -70,80 +57,65 @@ function getInitialCompleted() {
   return [];
 }
 
+// Read last route from localStorage (same-device, instant)
+function getLocalLastRoute() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('jrny_last_route') || 'null');
+    if (raw && raw.path && raw.path.length > 1 && raw.sub === (getUserSub() || '')) {
+      return raw.path;
+    }
+  } catch {}
+  return null;
+}
+
 export function StepProvider({ children }) {
   const [completedSteps, setCompletedSteps] = useState(getInitialCompleted);
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // Persist to user-scoped key whenever steps change
   useEffect(() => {
     localStorage.setItem(stepsKey(), JSON.stringify(completedSteps));
   }, [completedSteps]);
 
-  // Background fetch from WP on mount — syncs steps with server state, then
-  // places the user on the step the SERVER says they are on. This is what
-  // makes a wiped-cache re-login resume correctly: local resume keys
-  // (last-route / completed-steps) are gone, so the server's derived progress
-  // is the only remaining source of truth. Fully-paid users land on
-  // /payment-screen through the same rule (serverSteps = [1..7] → cur = 7).
+  // Single mount effect — decides where the user should be.
+  // Priority:
+  // 1. localStorage last route (same-device, instant)
+  // 2. Server last route (cross-device, async)
+  // 3. Home `/` (new user, no history)
+  // Once the correct screen is determined, update completed steps from server
+  // but NEVER force-redirect away from the user's chosen/resumed screen.
   useEffect(() => {
-    // Captured at mount: this redirect is about where the user LANDED,
-    // not about later in-app navigation.
     const landedPath = pathname;
-    const knownAtMount = completedSteps;
     if (!getToken()) return;
+
+    // Step 1: check localStorage (same-device fast path)
+    const localRoute = getLocalLastRoute();
+    if (localRoute && localRoute !== landedPath) {
+      navigate(localRoute, { replace: true });
+      return;
+    }
+
+    // Step 2: if on home and no local route, try server (cross-device)
+    if (landedPath === '/' && !localRoute) {
+      getLastRoute().then(serverPath => {
+        if (serverPath && serverPath !== '/') {
+          navigate(serverPath, { replace: true });
+        }
+      }).catch(() => {});
+    }
+
+    // Step 3: fetch client data to sync completed steps (for timeline, etc.)
+    // but NEVER redirect based on server data — the route is already decided
+    // by localStorage (step 1) or server (step 2) or home (default).
     getClientData()
       .then(data => {
         if (!data?.success) return;
-        // One-shot: did this page load resume from the user's last route?
-        // Check both the in-memory flag AND localStorage directly (the flag
-        // can be missed if a module re-evaluation or async gap resets it).
-        let cameFromLastRoute = resumeMeta.fromLastRoute;
-        resumeMeta.fromLastRoute = false;
-        if (!cameFromLastRoute) {
-          try {
-            const saved = JSON.parse(localStorage.getItem('jrny_last_route') || 'null');
-            const sub = getUserSub() || '';
-            if (saved && saved.path === landedPath && saved.sub === sub) {
-              cameFromLastRoute = true;
-            }
-          } catch { /* ignore */ }
-        }
-
         const serverSteps = deriveStepsFromClient(data.data);
         if (!serverSteps) return;
-
-        // Merge: keep any locally completed steps + add server steps
         setCompletedSteps(prev => {
           const merged = [...new Set([...prev, ...serverSteps])].sort((a, b) => a - b);
-          // Only update if different to avoid unnecessary re-renders
           return JSON.stringify(merged) !== JSON.stringify(prev) ? merged : prev;
         });
-
-        // The screen restored from jrny_last_route is where the user chose
-        // to be when they logged out — the server sync must never yank them
-        // elsewhere (e.g. back to room-search because a local step record is
-        // missing). The ONLY override, per product rule: both payments done
-        // → the congratulations screen always takes over.
-        const journeyDone = !!(data.data?.deposit_paid && data.data?.rent_paid);
-        if (cameFromLastRoute && !journeyDone) return;
-
-        // If user landed on home (/) and is NOT resuming from a saved route,
-        // never hijack them — home is always the correct first screen.
-        if (landedPath === '/' && !cameFromLastRoute) return;
-
-        // Redirect only between known step pages — sub-pages like
-        // /view-room or /residence-agreement are never hijacked.
-        const isKnownStepPath = Object.values(STEP_PATHS).includes(landedPath);
-        if (!isKnownStepPath) return;
-
-        const known = [...new Set([...knownAtMount, ...serverSteps])].sort((a, b) => a - b);
-        let cur = 1;
-        while (cur < 7 && known.includes(cur)) cur++;
-        const target = STEP_PATHS[cur];
-        if (target && landedPath !== target) {
-          navigate(target, { replace: true });
-        }
       })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
