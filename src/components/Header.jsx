@@ -16,6 +16,7 @@ export default function Header({ activeLabel }) {
    const { client } = useClientData();
    const [open, setOpen] = useState(false);
    const [dropdown, setdropdown] = useState(false);
+   const [loggingOut, setLoggingOut] = useState(false);
    const ref = useRef(null);
    const ddRef = useRef(null);
    // Viewport coords for the portaled dropdown — computed from the trigger
@@ -36,7 +37,8 @@ export default function Header({ activeLabel }) {
       setdropdown(!dropdown);
    };
 
-   function handleLogout() {
+   async function handleLogout() {
+      setLoggingOut(true);
       const token = getToken();
       logout(); // clears the local token and remembers it so ?token cannot auto-restore
       const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
@@ -49,26 +51,21 @@ export default function Header({ activeLabel }) {
          try { window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*'); } catch { /* ignore */ }
       }
 
+      // Await the server-side session invalidation so the loader stays visible
+      // until logout is actually complete.
+      try {
+         await wpServerLogout(token);
+      } catch { /* best-effort: still redirect even if server call fails */ }
+
       // Send the whole page (top window, breaking out of the dashboard iframe) to
       // the login page. Falls back to this frame if top navigation is blocked.
-      const goToLogin = () => {
-         try {
-            if (window.top && window.top !== window) {
-               window.top.location.replace(loginUrl);
-               return;
-            }
-         } catch { /* cross-origin / sandbox: fall through to same-frame redirect */ }
-         window.location.replace(loginUrl);
-      };
-
-      // Redirect SYNCHRONOUSLY inside the click handler. iOS Safari keeps the
-      // tap's user-activation alive only briefly — awaiting the server call
-      // first expired it, and the cross-origin top-navigation was then refused,
-      // so iPhone users never left the dashboard (Android was lenient).
-      // Session invalidation below continues best-effort with keepalive so it
-      // survives the navigation.
-      goToLogin();
-      wpServerLogout(token).catch(() => {});
+      try {
+         if (window.top && window.top !== window) {
+            window.top.location.replace(loginUrl);
+            return;
+         }
+      } catch { /* cross-origin / sandbox: fall through to same-frame redirect */ }
+      window.location.replace(loginUrl);
    }
 
    // close when click outside (trigger wrapper OR the portaled dropdown itself)
@@ -183,7 +180,7 @@ export default function Header({ activeLabel }) {
                                    handleLogout();
                                 }
                              }}
-                           ><span><IoLogOut /></span> Logout</li>
+                           ><span><IoLogOut /></span> Logout {loggingOut && <span className="logout-spinner"></span>}</li>
                         </ul>
                      </div>,
                      document.body,
