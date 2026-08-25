@@ -9,7 +9,7 @@ import { FaFileCircleCheck } from "react-icons/fa6";
 import { FaSackDollar } from "react-icons/fa6";
 import { MdOutlineAddIcCall } from "react-icons/md";
 import { CiSettings } from "react-icons/ci";
-import { logout, getToken, wpServerLogout } from "../services/api";
+import { logout, getToken, wpServerLogout, saveLastRoute } from "../services/api";
 import { useClientData } from "../hooks/useClientData";
 import { useLocation } from "react-router-dom";
 
@@ -41,21 +41,23 @@ export default function Header({ activeLabel }) {
 
    async function handleLogout() {
       setLoggingOut(true);
-      // Let React paint the spinner before any navigation can unmount the component.
       await new Promise(r => setTimeout(r, 50));
 
       const token = getToken();
-      // Persist current route BEFORE logout clears the token.
-      // If we don't, any re-render after logout() can cause RouteReporter to
-      // overwrite jrny_last_route with an empty sub, breaking resume-on-login.
+      const path = pathname || '/';
+
+      // 1) Save route to SERVER (cross-device resume)
+      try { saveLastRoute(path); } catch { /* fire-and-forget */ }
+
+      // 2) Also save to localStorage (same-device fast resume)
       try {
          if (token) {
             const p = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
             const sub = p.sub ? String(p.sub) : '';
-             const path = pathname || '/';
             localStorage.setItem('jrny_last_route', JSON.stringify({ sub, path }));
          }
       } catch { /* ignore */ }
+
       logout();
       const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
 

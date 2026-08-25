@@ -387,6 +387,33 @@ export function getCachedClient() {
   }
 }
 
+// ─── LAST ROUTE (server-side, cross-device) ──────────────────────────────────
+export async function saveLastRoute(path) {
+  const sub = getUserSub();
+  if (!sub || !path) return;
+  try {
+    await fetch(`${JRNY}/last-route`, {
+      method: 'POST',
+      credentials: 'include',
+      keepalive: true,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+      },
+      body: JSON.stringify({ sub, path }),
+    });
+  } catch { /* best-effort */ }
+}
+
+export async function getLastRoute() {
+  try {
+    const res = await apiFetch(`${JRNY}/last-route?_=${Date.now()}`, { method: 'GET' });
+    const data = await res.json();
+    if (data.success && data.path) return data.path;
+  } catch { /* fall through to localStorage */ }
+  return null;
+}
+
 // ─── PAYMENT UI (iframe HTML from WP shortcodes) ─────────────────────────────
 export async function getPaymentUI(method, section) {
   const params = new URLSearchParams({ method, section, _: String(Date.now()) });
