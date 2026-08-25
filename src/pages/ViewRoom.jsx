@@ -100,7 +100,7 @@ export default function ViewRoom() {
                                      <img alt="Thumb 3" className="w-100 gallery-thumb" src={images[2] || images[0]} onClick={() => setMainImg(2)} style={{ cursor: 'pointer' }} />
                                   </div>
                                    <div className="col-lg-3 col-sm-6 col-6">
-                                         <img alt="Thumb 4" className="w-100 gallery-thumb opacity-50" src={images[3] || images[0]} onClick={() => setMainImg(3)} style={{ cursor: 'pointer' }} />
+                                         <img alt="Thumb 4" className="w-100 gallery-thumb" src={images[3] || images[0]} onClick={() => setMainImg(3)} style={{ cursor: 'pointer' }} />
                                    </div>
                               </div>
                            </div>
