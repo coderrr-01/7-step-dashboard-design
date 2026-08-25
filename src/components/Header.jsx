@@ -9,13 +9,11 @@ import { FaFileCircleCheck } from "react-icons/fa6";
 import { FaSackDollar } from "react-icons/fa6";
 import { MdOutlineAddIcCall } from "react-icons/md";
 import { CiSettings } from "react-icons/ci";
-import { logout, getToken, wpServerLogout, saveLastRoute } from "../services/api";
+import { logout, getToken, wpServerLogout } from "../services/api";
 import { useClientData } from "../hooks/useClientData";
-import { useLocation } from "react-router-dom";
 
 export default function Header({ activeLabel }) {
    const { client } = useClientData();
-   const { pathname } = useLocation();
    const [open, setOpen] = useState(false);
    const [dropdown, setdropdown] = useState(false);
    const [loggingOut, setLoggingOut] = useState(false);
@@ -42,21 +40,6 @@ export default function Header({ activeLabel }) {
    async function handleLogout() {
       setLoggingOut(true);
       await new Promise(r => setTimeout(r, 50));
-
-      const token = getToken();
-      const path = pathname || '/';
-
-      // 1) Save route to SERVER (cross-device resume) — await so it saves before redirect
-      try { await saveLastRoute(path); } catch { /* best-effort */ }
-
-      // 2) Also save to localStorage (same-device fast resume)
-      try {
-         if (token) {
-            const p = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-            const sub = p.sub ? String(p.sub) : '';
-            localStorage.setItem('jrny_last_route', JSON.stringify({ sub, path }));
-         }
-      } catch { /* ignore */ }
 
       logout();
       const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
