@@ -11,9 +11,11 @@ import { MdOutlineAddIcCall } from "react-icons/md";
 import { CiSettings } from "react-icons/ci";
 import { logout, getToken, wpServerLogout } from "../services/api";
 import { useClientData } from "../hooks/useClientData";
+import { useLocation } from "react-router-dom";
 
 export default function Header({ activeLabel }) {
    const { client } = useClientData();
+   const { pathname } = useLocation();
    const [open, setOpen] = useState(false);
    const [dropdown, setdropdown] = useState(false);
    const [loggingOut, setLoggingOut] = useState(false);
@@ -50,7 +52,7 @@ export default function Header({ activeLabel }) {
          if (token) {
             const p = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
             const sub = p.sub ? String(p.sub) : '';
-            const path = window.location.pathname || '/';
+             const path = pathname || '/';
             localStorage.setItem('jrny_last_route', JSON.stringify({ sub, path }));
          }
       } catch { /* ignore */ }

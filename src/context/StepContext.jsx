@@ -96,8 +96,19 @@ export function StepProvider({ children }) {
       .then(data => {
         if (!data?.success) return;
         // One-shot: did this page load resume from the user's last route?
-        const cameFromLastRoute = resumeMeta.fromLastRoute;
+        // Check both the in-memory flag AND localStorage directly (the flag
+        // can be missed if a module re-evaluation or async gap resets it).
+        let cameFromLastRoute = resumeMeta.fromLastRoute;
         resumeMeta.fromLastRoute = false;
+        if (!cameFromLastRoute) {
+          try {
+            const saved = JSON.parse(localStorage.getItem('jrny_last_route') || 'null');
+            const sub = getUserSub() || '';
+            if (saved && saved.path === landedPath && saved.sub === sub) {
+              cameFromLastRoute = true;
+            }
+          } catch { /* ignore */ }
+        }
 
         const serverSteps = deriveStepsFromClient(data.data);
         if (!serverSteps) return;
