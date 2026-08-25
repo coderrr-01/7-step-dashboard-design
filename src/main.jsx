@@ -11,7 +11,6 @@ import "react-toastify/dist/ReactToastify.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { StepProvider, STEP_PATHS } from "./context/StepContext";
 import { saveToken, getLoggedOutToken, clearLoggedOutToken, getUserSub } from "./services/api";
-import { resumeMeta } from "./resumeMeta";
 
 // Auto-login: read JWT from ?token param (WP iframe) or window.jrnyData.
 // This MUST run before StepProvider mounts so stepsKey() finds the token
@@ -54,9 +53,6 @@ const _lastRoute = (() => {
 // 4. Home/Apply (Step 1) for brand-new users with no progress.
 function resumeInitialEntry() {
   if (_lastRoute && _lastRoute.sub === (getUserSub() || '') && _lastRoute.path.length > 1) {
-    // Tell StepContext the landing is intentional — its server-sync redirect
-    // must not move the user off the screen they logged out from.
-    resumeMeta.fromLastRoute = true;
     return _lastRoute.path;
   }
   if (_step && _step !== 'apply') return '/' + _step;

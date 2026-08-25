@@ -41,10 +41,7 @@ export default function Navigator({ activeStep = 1, totalSteps = 7, title }) {
     // completion was already recorded. Completed must therefore be checked
     // AFTER active, otherwise the current step renders as "Completed".
     if (stepNumber === activeStep) return "active";
-    // Any step BEFORE the one the user is on is finished by definition —
-    // e.g. reaching Review via "View Review Status" must show APPLY as
-    // Completed, never Upcoming.
-    if (completedSteps.includes(stepNumber) || stepNumber < activeStep) return "completed";
+    if (completedSteps.includes(stepNumber)) return "completed";
     if (!canAccessStep(stepNumber)) return "muted";
     return "inactive";
   };
