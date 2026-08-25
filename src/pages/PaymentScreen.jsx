@@ -528,7 +528,7 @@ export default function PaymentScreen() {
                         <div className="p-4 border-bottom checkout-summary-header">
                            <h3 className="h5 mb-4">Reservation Summary</h3>
                            <div className="d-flex gap-3">
-                              <img alt={unitLabel || "Reserved Room"} className="property-img" src={roomImage} />
+                              <img src={roomImage} alt={unitLabel || "Reserved Room"} className="property-img"  />
                               <div>
                                  <h4 className="h6 mb-1 fw-bold">{unitLabel}</h4>
                                  <p className="small text-muted mb-2">{roomMeta}</p>
