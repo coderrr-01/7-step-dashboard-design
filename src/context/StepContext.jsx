@@ -14,7 +14,6 @@ export const STEP_PATHS = {
 
 const StepContext = createContext(null);
 
-// Zoho/server data se completed steps nikalo
 function deriveStepsFromClient(client) {
   if (!client) return null;
   const steps = [];
@@ -35,7 +34,6 @@ function deriveStepsFromClient(client) {
 
   for (const [status, step] of Object.entries(map)) {
     if (leaseStatus === status || leaseStatus.includes(status)) {
-      // Step 7 (Payment) sirf tab complete jab DONO payments ho jayein
       const maxStep = (step === 7 && !rentPaid) ? 6 : step;
       for (let i = 3; i <= maxStep; i++) steps.push(i);
       break;
@@ -43,7 +41,6 @@ function deriveStepsFromClient(client) {
   }
   if (signedLease && !steps.includes(6)) steps.push(6);
 
-  // Dono payments done → journey complete
   if (depositPaid && rentPaid) {
     return [1, 2, 3, 4, 5, 6, 7];
   }
@@ -51,45 +48,35 @@ function deriveStepsFromClient(client) {
   return [...new Set(steps)].sort((a, b) => a - b);
 }
 
-// Pehla incomplete step nikalo, ya sab complete toh payment-screen
 function findFirstIncompleteStep(serverSteps) {
   for (let i = 1; i <= 7; i++) {
     if (!serverSteps.includes(i)) return STEP_PATHS[i];
   }
-  return STEP_PATHS[7]; // sab complete → payment-screen (congratulations)
+  return STEP_PATHS[7];
 }
 
 export function StepProvider({ children }) {
   const [completedSteps, setCompletedSteps] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // Mount pe server se data fetch karo
+  // Mount pe server se data fetch karo, tab tak loader dikhao
   useEffect(() => {
-    if (!getToken()) return;
+    if (!getToken()) { setLoading(false); return; }
     getClientData()
       .then(data => {
-        if (!data?.success) return;
+        if (!data?.success) { setLoading(false); return; }
         const serverSteps = deriveStepsFromClient(data.data);
         if (serverSteps) setCompletedSteps(serverSteps);
+        setLoading(false);
       })
-      .catch(() => {});
+      .catch(() => setLoading(false));
   }, []);
 
-  // Jab bhi user / pe aaye, pehle stale data se turant redirect karo (no flash),
-  // phir fresh data leke redirect update karo (in case step complete ho gaya).
+  // Jab bhi user / pe aaye, fresh data leke sahi step pe bhejo
   useEffect(() => {
-    if (!getToken() || pathname !== '/') return;
-
-    // Instant redirect with already-loaded steps (no apply screen flash)
-    if (completedSteps.length > 0) {
-      const nextStep = findFirstIncompleteStep(completedSteps);
-      if (nextStep && nextStep !== '/') {
-        navigate(nextStep, { replace: true });
-      }
-    }
-
-    // Also fetch fresh data so latest Zoho status reflects immediately
+    if (!getToken() || pathname !== '/' || loading) return;
     getClientData()
       .then(data => {
         if (!data?.success) return;
@@ -103,7 +90,7 @@ export function StepProvider({ children }) {
       })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [pathname, loading]);
 
   const completeStep = (stepNumber) => {
     setCompletedSteps(prev =>
@@ -122,6 +109,22 @@ export function StepProvider({ children }) {
     }
     return 7;
   })();
+
+  if (loading) {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, display: 'flex', alignItems: 'center',
+        justifyContent: 'center', background: '#fff', zIndex: 9999,
+      }}>
+        <div style={{
+          width: 40, height: 40, border: '4px solid #e0e0e0',
+          borderTopColor: '#0071e3', borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite',
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
 
   return (
     <StepContext.Provider value={{ completedSteps, completeStep, canAccessStep, currentStep, clientLoading: false }}>
