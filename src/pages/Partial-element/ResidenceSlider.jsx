@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import "../../assets/styles/slider-style.css"
 
+const FALLBACK_IMAGES = [
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLIVJXsIscLTS8nP6Dbmcv1vsoRkem09JkmvrDOgiZBWN63o7ikKL9Dqs&s=10"
+];
 
-function ResidenceSlider() {
+function ResidenceSlider({ images: propImages }) {
 
 
-    const images = [
-
-        // "https://lh3.googleusercontent.com/aida-public/AB6AXuAyxb-niOqojyB9NLOCEf03t3XTgG4lYmI46J2ZrJxZgFgrJKNAOVpPP9UCVHlZR3fsDS4PUpumNrdG9E6mZiSzDa1ZSQqT_TqNzbgJc_pAczRGnSBJgq-lGHZA3sz16-L4SoefO_xyCkM_NYsjey-e_moju4s9uHEH3ltiA5efzSfBUAo39zdBglNI1OS9hID5xS3BW_E-Gt3Zhsz66VJEJxPe-d9d4d0unKjAOstgOvMyE0gJmNNMmJtVmUmMBU6UX03edP49RUg8",
-
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLIVJXsIscLTS8nP6Dbmcv1vsoRkem09JkmvrDOgiZBWN63o7ikKL9Dqs&s=10"
-
-    ];
+    const images = (Array.isArray(propImages) && propImages.length > 0)
+        ? propImages
+        : FALLBACK_IMAGES;
 
 
 
@@ -19,7 +18,9 @@ function ResidenceSlider() {
 
     const [animate, setAnimate] = useState(true);
 
-
+    useEffect(() => {
+        setActive(0);
+    }, [images]);
 
     useEffect(() => {
 
@@ -51,7 +52,7 @@ function ResidenceSlider() {
         return () => clearInterval(timer);
 
 
-    }, []);
+    }, [images.length]);
 
 
 

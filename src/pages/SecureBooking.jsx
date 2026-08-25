@@ -94,6 +94,13 @@ export default function SecureBooking() {
          ? `$${Number(selectedRoom.price).toLocaleString()}/mo`
          : (client?.rent_amount ? `$${Number(client.rent_amount).toLocaleString()}/mo` : ''));
 
+   const roomImages = (() => {
+      if (!selectedRoom) return [];
+      if (Array.isArray(selectedRoom.images) && selectedRoom.images.length) return selectedRoom.images;
+      if (selectedRoom.img) return [selectedRoom.img];
+      return [];
+   })();
+
    return (
       <PageLayout page="SecureBooking">
          {Avalableresidence && (
@@ -109,7 +116,7 @@ export default function SecureBooking() {
                      {/* Selected Residence Summary */}
                      <div className="selected-residence-header">
                         <span className="selected-badge">SELECTED</span>
-                        <ResidenceSlider />
+                         <ResidenceSlider images={roomImages} />
                         <div className="p-3 w-50 d-flex flex-column" data-purpose="residence-details">
                            <div className="d-flex justify-content-between setPricingblock">
                               <div>
