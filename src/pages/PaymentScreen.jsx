@@ -6,7 +6,7 @@ import Revoulticon from "../assets/icons/revsult.svg";
 import bankicon from "../assets/icons/bank.svg";
 import CashIcon from "../assets/icons/cash.svg";
 import { useClientData } from "../hooks/useClientData";
-import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getRevolutStatus, getPaymentUI } from "../services/api";
+import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getRevolutStatus, getPaymentUI, getRooms } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
@@ -95,10 +95,29 @@ export default function PaymentScreen() {
       catch { return null; }
    });
 
+   const [fallbackRoom, setFallbackRoom] = useState(null);
+
+   useEffect(() => {
+      if (selectedRoom || !client?.room_id) return;
+      let cancelled = false;
+      (async () => {
+         try {
+            const res = await getRooms();
+            if (res?.success && Array.isArray(res.rooms)) {
+               const match = res.rooms.find(r => String(r.id) === String(client.room_id));
+               if (match && !cancelled) setFallbackRoom(match);
+            }
+         } catch {}
+      })();
+      return () => { cancelled = true; };
+   }, [selectedRoom, client?.room_id]);
+
+   const activeRoom = selectedRoom || fallbackRoom;
+
    const roomImages = (() => {
-      if (!selectedRoom) return [];
-      if (Array.isArray(selectedRoom.images) && selectedRoom.images.length) return selectedRoom.images;
-      if (selectedRoom.img) return [selectedRoom.img];
+      if (!activeRoom) return [];
+      if (Array.isArray(activeRoom.images) && activeRoom.images.length) return activeRoom.images;
+      if (activeRoom.img) return [activeRoom.img];
       return [];
    })();
    const roomImage = roomImages[0] || '';
