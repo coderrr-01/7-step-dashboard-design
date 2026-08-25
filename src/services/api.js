@@ -242,6 +242,11 @@ export async function getRooms() {
   return res.json();
 }
 
+export async function getRoomById(roomId) {
+  const res = await apiFetch(`${JRNY}/rooms/${encodeURIComponent(roomId)}?_=${Date.now()}`, { method: 'GET' });
+  return res.json();
+}
+
 // ─── APPLY FORM ──────────────────────────────────────────────────────────────
 export async function applyForm(data) {
   const res = await fetch(`${JRNY}/apply`, {

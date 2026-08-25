@@ -6,7 +6,7 @@ import Revoulticon from "../assets/icons/revsult.svg";
 import bankicon from "../assets/icons/bank.svg";
 import CashIcon from "../assets/icons/cash.svg";
 import { useClientData } from "../hooks/useClientData";
-import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getRevolutStatus, getPaymentUI, getRooms } from "../services/api";
+import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getRevolutStatus, getPaymentUI, getRoomById } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
@@ -102,10 +102,9 @@ export default function PaymentScreen() {
       let cancelled = false;
       (async () => {
          try {
-            const res = await getRooms();
-            if (res?.success && Array.isArray(res.rooms)) {
-               const match = res.rooms.find(r => String(r.id) === String(client.room_id));
-               if (match && !cancelled) setFallbackRoom(match);
+            const res = await getRoomById(client.room_id);
+            if (res?.success && res.room && !cancelled) {
+               setFallbackRoom(res.room);
             }
          } catch {}
       })();
