@@ -333,14 +333,14 @@ export default function DocumentSign() {
                 </p>
               </div>
             </div>
-            <div className="ds-header-actions">
+            {/* <div className="ds-header-actions">
               <button className="ds-header-btn">
                 <FaDownload /> Download PDF
               </button>
-              {/* <button className="ds-header-btn">
+              <button className="ds-header-btn">
                 <FaPrint /> Print
-              </button> */}
-            </div>
+              </button>
+            </div> */}
           </div>
 
           <div className="ds-layout">
