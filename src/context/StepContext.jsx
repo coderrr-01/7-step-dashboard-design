@@ -128,6 +128,16 @@ export function StepProvider({ children }) {
         const journeyDone = !!(data.data?.deposit_paid && data.data?.rent_paid);
         if (cameFromLastRoute && !journeyDone) return;
 
+        // NEW USER / FRESH LOGIN: if the user landed on the home page and
+        // there is no saved last-route (naya user hai ya pehli baar login),
+        // don't hijack them to a later step — show the first screen.
+        if (landedPath === '/' && !cameFromLastRoute) {
+          try {
+            const saved = JSON.parse(localStorage.getItem('jrny_last_route') || 'null');
+            if (!saved) return; // no previous route = new user → stay on home
+          } catch { return; }
+        }
+
         // Redirect only between known step pages — sub-pages like
         // /view-room or /residence-agreement are never hijacked.
         const isKnownStepPath = Object.values(STEP_PATHS).includes(landedPath);
