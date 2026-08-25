@@ -612,7 +612,7 @@ export default function PaymentScreen() {
                            <p className="mb-0">211 E 43rd Street, New York, NY 10029</p>
                            <p className="mb-0">Tel: <a className="text-primary-container fw-bold text-decoration-none" href="tel:+12125550198">+1 (212) 555-0198</a></p>
                         </div>
-                        <a className="text-primary-container fw-bold small text-decoration-none d-flex align-items-center justify-content-center gap-2 mb-3" onClick={(e) => {
+                        <a href="#" className="text-primary-container fw-bold small text-decoration-none d-flex align-items-center justify-content-center gap-2 mb-3" onClick={(e) => {
                            e.preventDefault();
                            if (window.$zoho && window.$zoho.salesiq && window.$zoho.salesiq.floatwindow) {
                               window.$zoho.salesiq.floatwindow.open();
