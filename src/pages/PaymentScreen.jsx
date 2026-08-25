@@ -9,7 +9,7 @@ import { useClientData } from "../hooks/useClientData";
 import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getRevolutStatus, getPaymentUI, getRoomById } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
-// import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
+import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
 
 export default function PaymentScreen() {
    const { client, loading: clientLoading, refetch } = useClientData({ preferCachedData: false });
