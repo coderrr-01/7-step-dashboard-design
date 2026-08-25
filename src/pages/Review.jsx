@@ -203,11 +203,11 @@ export default function Review() {
                         <TrustSecurity />
                      </div>
 
-                     {!approved && (
+                     {/* {!approved && (
                         <p className="ver-complete-sub text-center mt-4 mb-0">
                            Checking automatically every 15 seconds.
                         </p>
-                     )}
+                     )} */}
                      {approved && (
                         <button className="btn btn-jrny-dark w-100 shadow-lg mt-4" onClick={handleNext}>
                            Continue to Room Search
