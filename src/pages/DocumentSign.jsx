@@ -135,6 +135,7 @@ export default function DocumentSign() {
         completeStep(6);
         toast.success("Lease signed successfully!");
         await refetch();
+        navigate('/payment-screen');
       } else {
         toast.error(res.message || "Signing failed. Please try again.");
       }
@@ -301,7 +302,7 @@ export default function DocumentSign() {
                   </div>
                 </div>
               </div>
-              <button type="button" onClick={paymentbtn} className="btn btn-black mt-5 mobile-view-btn">SECURE PAYMENT NOW <i class="bi bi-arrow-right"></i></button>
+              <button type="button" onClick={paymentbtn} className="btn btn-black mt-5 mobile-view-btn">SECURE PAYMENT NOW <i className="bi bi-arrow-right"></i></button>
             </div>
           </div>
         </main>
@@ -332,14 +333,14 @@ export default function DocumentSign() {
                 </p>
               </div>
             </div>
-            {/* <div className="ds-header-actions">
+            <div className="ds-header-actions">
               <button className="ds-header-btn">
                 <FaDownload /> Download PDF
               </button>
-              <button className="ds-header-btn">
+              {/* <button className="ds-header-btn">
                 <FaPrint /> Print
-              </button>
-            </div> */}
+              </button> */}
+            </div>
           </div>
 
           <div className="ds-layout">

@@ -49,7 +49,10 @@ export default function Navbar() {
     const isActive    = activePath === step[1];
     // The step the user is on must render as active, never as completed —
     // skip the completed class for it even when its completion is recorded.
-    const isCompleted = !isActive && completedSteps.includes(step[2]);
+    // Steps BEFORE the current one are finished by definition (same rule as
+    // the Navigator timeline), so APPLY shows Completed once REVIEW is open.
+    const isCompleted = !isActive &&
+      (completedSteps.includes(step[2]) || step[2] < activeStep);
     const isLocked    = !isActive && !canAccessStep(step[2]);
     const isFirst     = step[2] === 1;
     const isLast      = step[2] === steps.length;
