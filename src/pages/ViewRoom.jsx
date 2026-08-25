@@ -21,12 +21,15 @@ export default function ViewRoom() {
 
    if (!room) return null;
 
-   // Support both the new catalogue shape and the old WP /rooms shape
-   const rawImages = Array.isArray(room.images)
-      ? room.images
-      : typeof room.images === 'string'
-         ? room.images.split(',').map((u) => u.trim()).filter(Boolean)
+   // Support both the new catalogue shape and the old WP /rooms shape.
+   // Images may be separated by commas, newlines, or both.
+   const splitImages = (val) =>
+      typeof val === 'string'
+         ? val.split(/[,\n]/).map((u) => u.trim()).filter(Boolean)
          : [];
+   const rawImages = Array.isArray(room.images)
+      ? room.images.flatMap((img) => splitImages(img))
+      : splitImages(room.images);
    const images = rawImages.length
       ? rawImages
       : [room.img || ''];
