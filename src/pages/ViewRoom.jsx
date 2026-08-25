@@ -99,16 +99,9 @@ export default function ViewRoom() {
                                   <div className="col-lg-3 col-sm-6 col-6">
                                      <img alt="Thumb 3" className="w-100 gallery-thumb" src={images[2] || images[0]} onClick={() => setMainImg(2)} style={{ cursor: 'pointer' }} />
                                   </div>
-                                  <div className="col-lg-3 col-sm-6 col-6">
-                                     <div className="position-relative h-100">
-                                        <img alt="Thumb 4" className="w-100 gallery-thumb opacity-50" src={images[3] || images[0]} />
-                                        {images.length > 3 && (
-                                          //  <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                                          //     <span className="fw-bold text-dark more-photos-label">+{images.length - 3} More</span>
-                                          //  </div>
-                                        )}
-                                     </div>
-                                  </div>
+                                   <div className="col-lg-3 col-sm-6 col-6">
+                                         <img alt="Thumb 4" className="w-100 gallery-thumb opacity-50" src={images[3] || images[0]} onClick={() => setMainImg(3)} style={{ cursor: 'pointer' }} />
+                                   </div>
                               </div>
                            </div>
                         </div>
