@@ -9,10 +9,12 @@ import { useClientData } from "../hooks/useClientData";
 import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getRevolutStatus, getPaymentUI } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
+import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
 
 export default function PaymentScreen() {
-   const { client, loading: clientLoading, refetch } = useClientData();
+   const { client, loading: clientLoading, refetch } = useClientData({ preferCachedData: false });
    const { completeStep } = useSteps();
+   const [paymentHydrated, setPaymentHydrated] = useState(false);
    const [activeStep, setActiveStep] = useState("Security");
    const [activePayment, setActivePayment] = useState(0);
    const [submitting, setSubmitting] = useState(false);
@@ -20,13 +22,25 @@ export default function PaymentScreen() {
    const [iframeHtml, setIframeHtml] = useState({});
    const [iframeLoading, setIframeLoading] = useState({});
    const [iframeError, setIframeError] = useState({});
-   const methodNames = ['stripe', 'paypal', 'revolut', 'bank', 'cash'];
+   const paymentMethods = [
+      { name: "Stripe", icon: stripeIcon },
+      { name: "PayPal", icon: paypalIcon },
+      { name: "Revolut", icon: Revoulticon },
+      { name: "Bank", icon: bankicon },
+      { name: "Cash", icon: CashIcon },
+   ];
 
    const methodIndexFor = (method) => {
-      const normalized = String(method || '').trim().toLowerCase();
+      const normalized = normalizePaymentMethod(method);
       if (!normalized) return -1;
-      return paymentMethods.findIndex(m => m.name.toLowerCase() === normalized);
+      return paymentMethods.findIndex(m => normalizePaymentMethod(m.name) === normalized);
    };
+
+   useEffect(() => {
+      if (!clientLoading && client) {
+         setPaymentHydrated(true);
+      }
+   }, [clientLoading, client]);
 
    const loadPaymentUI = async (method, section, force = false) => {
       const key = `${method}_${section}`;
@@ -37,18 +51,15 @@ export default function PaymentScreen() {
          const res = await getPaymentUI(method, section);
          if (res?.success && res.html) {
             setIframeHtml(prev => ({ ...prev, [key]: res.html }));
-            if (res.deposit_paid && !depositPaidNow) {
-               setDepositPaidNow(true);
+            if (res.deposit_paid) {
+               setOptimisticDepositPaid(true);
                const paidMethodIndex = methodIndexFor(res.deposit_method) >= 0
                   ? methodIndexFor(res.deposit_method)
                   : methodIndexFor(method);
-               setDepositMethod(paidMethodIndex >= 0 ? paidMethodIndex : null);
-               if (storageKey) localStorage.setItem(storageKey, '1');
-               if (storageMethodKey && paidMethodIndex >= 0) localStorage.setItem(storageMethodKey, String(paidMethodIndex));
+               if (paidMethodIndex >= 0) setOptimisticDepositMethod(paidMethodIndex);
             }
-            if (res.rent_paid && !rentPaidNow) {
-               setRentPaidNow(true);
-               if (rentStorageKey) localStorage.setItem(rentStorageKey, '1');
+            if (res.rent_paid) {
+               setOptimisticRentPaid(true);
             }
          } else {
             setIframeError(prev => ({ ...prev, [key]: true }));
@@ -66,17 +77,18 @@ export default function PaymentScreen() {
          Object.keys(next).forEach(k => { if (k.endsWith(`_${section}`)) delete next[k]; });
          return next;
       });
-      const method = methodNames[activePayment];
+      const method = paymentMethods[activePayment]?.name?.toLowerCase();
       if (method && method !== 'cash') {
          loadPaymentUI(method, activeStep === 'Rent' ? 'rent' : 'deposit', true);
       }
    };
 
    useEffect(() => {
-      const method = methodNames[activePayment];
+      if (!paymentHydrated || clientLoading) return;
+      const method = paymentMethods[activePayment]?.name?.toLowerCase();
       if (!method || method === 'cash') return;
       loadPaymentUI(method, activeStep === 'Rent' ? 'rent' : 'deposit');
-   }, [activePayment, activeStep]);
+   }, [activePayment, activeStep, paymentHydrated, clientLoading]);
 
    const [selectedRoom] = useState(() => {
       try { return JSON.parse(localStorage.getItem('jrny_selected_room') || 'null'); }
@@ -91,80 +103,39 @@ export default function PaymentScreen() {
    })();
    const roomImage = roomImages[0] || '';
 
-   const storageKey = client?.id ? `jrny_deposit_paid_${client.id}` : null;
-   const storageMethodKey = client?.id ? `jrny_deposit_method_${client.id}` : null;
-   const rentStorageKey = client?.id ? `jrny_rent_paid_${client.id}` : null;
-
-   const [depositPaidNow, setDepositPaidNow] = useState(() => {
-      if (!storageKey) return false;
-      return localStorage.getItem(storageKey) === '1';
-   });
-
-   const [depositMethod, setDepositMethod] = useState(() => {
-      if (!storageMethodKey) return null;
-      const v = localStorage.getItem(storageMethodKey);
-      return v !== null ? parseInt(v, 10) : null;
-   });
-
-   const [rentPaidNow, setRentPaidNow] = useState(() => {
-      if (!rentStorageKey) return false;
-      return localStorage.getItem(rentStorageKey) === '1';
-   });
+   const [optimisticDepositPaid, setOptimisticDepositPaid] = useState(false);
+   const [optimisticDepositMethod, setOptimisticDepositMethod] = useState(null);
+   const [optimisticRentPaid, setOptimisticRentPaid] = useState(false);
 
    // Celebration screen is shown first when everything is paid; "View Details"
    // dismisses it for the session so the user can inspect the checkout UI.
    const [successDismissed, setSuccessDismissed] = useState(false);
 
-   useEffect(() => {
-      if (client?.deposit_paid && !depositPaidNow) {
-         setDepositPaidNow(true);
-         const paidMethodIndex = methodIndexFor(client?.deposit_method);
-         if (paidMethodIndex >= 0) {
-            setDepositMethod(paidMethodIndex);
-            if (storageMethodKey) localStorage.setItem(storageMethodKey, String(paidMethodIndex));
-         }
-         if (storageKey) localStorage.setItem(storageKey, '1');
-         reloadPaymentUI('deposit');
-      }
-   }, [client?.deposit_paid, client?.deposit_method, storageKey, storageMethodKey]);
+   const paymentState = getPaymentState(client);
+   const depositPaid = optimisticDepositPaid || paymentState.depositPaid;
+   const rentPaid = optimisticRentPaid || paymentState.rentPaid;
+   const depositMethod = optimisticDepositMethod ?? (methodIndexFor(paymentState.depositMethod) >= 0 ? methodIndexFor(paymentState.depositMethod) : null);
+   const rentMethod = methodIndexFor(paymentState.rentMethod) >= 0 ? methodIndexFor(paymentState.rentMethod) : null;
 
    useEffect(() => {
-      if (client?.rent_paid && !rentPaidNow) {
-         setRentPaidNow(true);
-         if (rentStorageKey) localStorage.setItem(rentStorageKey, '1');
-         reloadPaymentUI('rent');
-      }
-   }, [client?.rent_paid, client?.rent_method, rentStorageKey]);
+      if (!paymentHydrated || clientLoading) return;
 
-   const paymentMethods = [
-      { name: "Stripe", icon: stripeIcon },
-      { name: "PayPal", icon: paypalIcon },
-      { name: "Revolut", icon: Revoulticon },
-      { name: "Bank", icon: bankicon },
-      { name: "Cash", icon: CashIcon },
-   ];
-
-   useEffect(() => {
-      if (clientLoading) return;
-
-      const preferredIndex = depositMethod ?? methodIndexFor(client?.deposit_method || client?.rent_method);
+      const preferredIndex = depositMethod ?? rentMethod ?? methodIndexFor(paymentState.depositMethod || paymentState.rentMethod);
       if (preferredIndex >= 0 && activePayment !== preferredIndex) {
          setActivePayment(preferredIndex);
       }
-   }, [activeStep, clientLoading, client?.deposit_method, client?.rent_method, depositMethod]);
-
-   const depositPaid = depositPaidNow || !!client?.deposit_paid;
-   const rentPaid = rentPaidNow || !!client?.rent_paid;
+   }, [paymentHydrated, clientLoading, depositMethod, rentMethod, paymentState.depositMethod, paymentState.rentMethod]);
 
    // "Total Due Now: 0" (both payments done) must mark SECURE PAYMENT as
    // completed in the timeline — covers users returning to an already-paid
    // account where no payment handler runs again.
    useEffect(() => {
-      if (!clientLoading && depositPaid && rentPaid) completeStep(7);
-   }, [clientLoading, depositPaid, rentPaid]);
+      if (!paymentHydrated || clientLoading) return;
+      if (depositPaid && rentPaid) completeStep(7);
+   }, [paymentHydrated, clientLoading, depositPaid, rentPaid]);
 
-   const visibleMethods = depositPaid && depositMethod !== null
-      ? paymentMethods.filter((_, i) => i === depositMethod && i !== 4)
+   const visibleMethods = depositPaid
+      ? paymentMethods.filter((_, i) => i !== 4 && (depositMethod === null ? true : i === depositMethod))
       : paymentMethods;
 
    const rawDeposit = client?.security_deposit
@@ -234,13 +205,12 @@ export default function PaymentScreen() {
          if (res?.success) {
             if (type === 'deposit') {
                toast.success('Security deposit recorded! Pending verification.');
-               setDepositPaidNow(true);
-               setDepositMethod(activePayment);
-               if (storageKey) localStorage.setItem(storageKey, '1');
-               if (storageMethodKey) localStorage.setItem(storageMethodKey, String(activePayment));
+               setOptimisticDepositPaid(true);
+               setOptimisticDepositMethod(activePayment);
                setActiveStep("Rent");
             } else {
                toast.success('Rent payment recorded! Pending verification.');
+               setOptimisticRentPaid(true);
                completeStep(7);
             }
             reloadPaymentUI(type);
@@ -308,14 +278,11 @@ export default function PaymentScreen() {
                setSubmitting(false);
                toast.success(pollingType === 'deposit' ? 'Security deposit paid successfully!' : 'Rent payment received successfully!');
                if (pollingType === 'deposit') {
-                  setDepositPaidNow(true);
-                  setDepositMethod(2);
-                  if (storageKey) localStorage.setItem(storageKey, '1');
-                  if (storageMethodKey) localStorage.setItem(storageMethodKey, String(2));
+                  setOptimisticDepositPaid(true);
+                  setOptimisticDepositMethod(2);
                   setActiveStep("Rent");
                } else {
-                  setRentPaidNow(true);
-                  if (rentStorageKey) localStorage.setItem(rentStorageKey, '1');
+                  setOptimisticRentPaid(true);
                   completeStep(7);
                }
                reloadPaymentUI(pollingType);
@@ -342,7 +309,7 @@ export default function PaymentScreen() {
       tick();
 
       return () => { stopped = true; clearInterval(interval); };
-   }, [pollingType, storageKey, storageMethodKey, rentStorageKey]);
+   }, [pollingType]);
 
    const ChevronTabs = () => (
       <div className="chevron-tabs-container mb-4">
@@ -434,7 +401,7 @@ export default function PaymentScreen() {
    // replaced by a congratulatory membership confirmation. Shown on every
    // visit while payments stay complete — server flags drive this, so it
    // survives logout/login and wiped browser caches.
-   if (!clientLoading && depositPaid && rentPaid && !successDismissed) {
+   if (paymentHydrated && !clientLoading && depositPaid && rentPaid && !successDismissed) {
       const methodUsed = paymentMethods[depositMethod]?.name || 'Online';
       const firstName = clientName ? clientName.split(' ')[0] : '';
       return (
@@ -509,7 +476,7 @@ export default function PaymentScreen() {
    // Payment status is not yet known (fresh login — local flags were cleared on
    // logout). Hold on a spinner instead of flashing the checkout UI, so users
    // with both payments done land straight on the celebration screen.
-   if (clientLoading) {
+   if (!paymentHydrated || clientLoading) {
       return (
          <PageLayout page="PaymentScreen">
             <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">

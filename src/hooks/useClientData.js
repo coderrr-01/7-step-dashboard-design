@@ -5,9 +5,9 @@ import { getClientData, getCachedClient } from '../services/api';
  * useClientData — fetches Zoho CRM data for the logged-in WP user.
  * Returns { client, loading, error, refetch }
  */
-export function useClientData() {
-  const [client,  setClient]  = useState(getCachedClient);
-  const [loading, setLoading] = useState(!getCachedClient());
+export function useClientData({ preferCachedData = true } = {}) {
+  const [client,  setClient]  = useState(() => (preferCachedData ? getCachedClient() : null));
+  const [loading, setLoading] = useState(preferCachedData ? !getCachedClient() : true);
   const [error,   setError]   = useState(null);
 
   const fetch = async () => {
