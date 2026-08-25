@@ -51,12 +51,12 @@ function deriveStepsFromClient(client) {
   return [...new Set(steps)].sort((a, b) => a - b);
 }
 
-// Pehla incomplete step nikalo
+// Pehla incomplete step nikalo, ya sab complete toh payment-screen
 function findFirstIncompleteStep(serverSteps) {
   for (let i = 1; i <= 7; i++) {
     if (!serverSteps.includes(i)) return STEP_PATHS[i];
   }
-  return null; // sab complete
+  return STEP_PATHS[7]; // sab complete → payment-screen (congratulations)
 }
 
 export function StepProvider({ children }) {
