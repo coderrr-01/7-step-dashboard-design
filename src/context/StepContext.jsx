@@ -20,6 +20,8 @@ function deriveStepsFromClient(client) {
   const steps = [];
   const leaseStatus = client.lease_status || '';
   const signedLease = client.signed_lease || '';
+  const depositPaid = !!client.deposit_paid;
+  const rentPaid = !!client.rent_paid;
 
   if (!!leaseStatus) steps.push(1, 2);
 
@@ -33,14 +35,19 @@ function deriveStepsFromClient(client) {
 
   for (const [status, step] of Object.entries(map)) {
     if (leaseStatus === status || leaseStatus.includes(status)) {
-      for (let i = 3; i <= step; i++) steps.push(i);
+      // Step 7 (Payment) sirf tab complete jab DONO payments ho jayein
+      const maxStep = (step === 7 && !rentPaid) ? 6 : step;
+      for (let i = 3; i <= maxStep; i++) steps.push(i);
       break;
     }
   }
   if (signedLease && !steps.includes(6)) steps.push(6);
-  if (client.deposit_paid && client.rent_paid) {
+
+  // Dono payments done → journey complete
+  if (depositPaid && rentPaid) {
     return [1, 2, 3, 4, 5, 6, 7];
   }
+
   return [...new Set(steps)].sort((a, b) => a - b);
 }
 
