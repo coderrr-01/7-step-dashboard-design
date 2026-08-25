@@ -621,7 +621,7 @@ export default function PaymentScreen() {
     e.stopPropagation();
 console.log("🟡 Customer Support clicked");
 
-window.parent.postMessage(
+window.top.postMessage(
     {
         type: "OPEN_SALESIQ"
     },
