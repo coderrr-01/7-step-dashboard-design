@@ -76,21 +76,13 @@ export function StepProvider({ children }) {
       .catch(() => {});
   }, []);
 
-  // Jab bhi user / pe aaye, FRESH server data leke sahi step pe bhejo
+  // Jab bhi user / pe aaye, already-loaded steps se seedha sahi step pe bhejo
   useEffect(() => {
-    if (!getToken() || pathname !== '/') return;
-    getClientData()
-      .then(data => {
-        if (!data?.success) return;
-        const serverSteps = deriveStepsFromClient(data.data);
-        if (!serverSteps) return;
-        setCompletedSteps(serverSteps);
-        const nextStep = findFirstIncompleteStep(serverSteps);
-        if (nextStep && nextStep !== '/') {
-          navigate(nextStep, { replace: true });
-        }
-      })
-      .catch(() => {});
+    if (!getToken() || pathname !== '/' || completedSteps.length === 0) return;
+    const nextStep = findFirstIncompleteStep(completedSteps);
+    if (nextStep && nextStep !== '/') {
+      navigate(nextStep, { replace: true });
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
