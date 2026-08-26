@@ -424,7 +424,7 @@ export default function PaymentScreen() {
       const firstName = clientName ? clientName.split(' ')[0] : '';
       return (
          <PageLayout page="PaymentScreen">
-            <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 min-vh-100">
+            <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">
                <div className="container container-narrow py-5 px-lg-5 secure-payment-details">
                   <section className="pay-success" aria-live="polite">
                      <span className="pay-spark pay-spark-1" aria-hidden="true"></span>
@@ -497,7 +497,7 @@ export default function PaymentScreen() {
    if (!paymentHydrated || clientLoading) {
       return (
          <PageLayout page="PaymentScreen">
-            <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">
+            <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 min-vh-100">
                <div className="container container-narrow py-5 px-lg-5 secure-payment-details">
                   <div className="pay-loading" role="status" aria-live="polite">
                      <span className="pay-loading-ring" aria-hidden="true"></span>
