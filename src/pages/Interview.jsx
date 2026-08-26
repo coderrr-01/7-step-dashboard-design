@@ -27,7 +27,13 @@ export default function Interview() {
    })();
     const roomName = selectedRoom?.name || '';
     const roomId   = selectedRoom?.id   || '';
-    const roomImg  = (Array.isArray(selectedRoom?.images) && selectedRoom.images.length) ? selectedRoom.images[0] : (selectedRoom?.img || '');
+    const roomImages = (() => {
+       if (!selectedRoom) return [];
+       if (Array.isArray(selectedRoom.images) && selectedRoom.images.length) return selectedRoom.images;
+       if (selectedRoom.img) return [selectedRoom.img];
+       return [];
+    })();
+    const roomImg = client?.room_img || roomImages[0] || '';
 
    const [interviewProgres, setinterviewProgres] = useState(false)
    const [Avalableresidence, setAvalableresidence] = useState(true)
@@ -104,13 +110,6 @@ export default function Interview() {
          ? `$${Number(selectedRoom.price).toLocaleString()}/mo`
          : (client?.rent_amount ? `$${client.rent_amount}/mo` : ''));
 
-   const roomImages = (() => {
-      if (!selectedRoom) return [];
-      if (Array.isArray(selectedRoom.images) && selectedRoom.images.length) return selectedRoom.images;
-      if (selectedRoom.img) return [selectedRoom.img];
-      return [];
-   })();
-
    return (
       <>
 
@@ -158,16 +157,17 @@ export default function Interview() {
                                     </div>
                                  </div>
                               </div>
-                              <InterviewSchedule
-                                 interview_progress={interview_btn}
-                                 onConfirm={handleConfirm}
-                                 onReschedule={handleReschedule}
-                                 confirmedDate={confirmedDate}
-                                 confirmedTime={confirmedTime}
-                                 meetLink={meetLink}
-                                 submitting={submitting}
-                                 roomName={roomName}
-                              />
+                             <InterviewSchedule
+                                  interview_progress={interview_btn}
+                                  onConfirm={handleConfirm}
+                                  onReschedule={handleReschedule}
+                                  confirmedDate={confirmedDate}
+                                  confirmedTime={confirmedTime}
+                                  meetLink={meetLink}
+                                  submitting={submitting}
+                                  roomName={roomName}
+                                  roomImg={roomImg}
+                               />
                            </section>
                         </div>
                      </main></>

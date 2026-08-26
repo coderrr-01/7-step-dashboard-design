@@ -23,7 +23,7 @@ const buildToday = () => {
     return { label: `${months[mo]} ${d}, ${yr}`, value: `${padded}/${moPadded}/${yr}` };
 };
 
-function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName }) {
+function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg }) {
     const [activeTab, setActiveTab] = useState("schedule");
     // Today is selected by default (Calendar already highlights today; this makes
     // it the real selected date so today's slots load on open).
@@ -220,9 +220,9 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                             <div className="row">
                                 <div className="col-md-6">
                                     <div className="confirmation-card">
-                                        <div className="img-set-info">
-                                            <img src={content.img} alt={content.alt} />
-                                        </div>
+                                         <div className="img-set-info">
+                                             <img src={roomImg || content.img} alt={roomImg ? (roomName || content.alt) : content.alt} />
+                                         </div>
 
                                         <h2 className="conf-title">
                                             {content.title}

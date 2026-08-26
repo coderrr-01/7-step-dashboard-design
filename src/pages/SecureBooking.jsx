@@ -100,6 +100,7 @@ export default function SecureBooking() {
       if (selectedRoom.img) return [selectedRoom.img];
       return [];
    })();
+   const roomImg = client?.room_img || roomImages[0] || '';
 
    return (
       <PageLayout page="SecureBooking">
@@ -151,6 +152,7 @@ export default function SecureBooking() {
                         meetLink={meetLink}
                         submitting={submitting}
                         roomName={roomName}
+                        roomImg={roomImg}
                      />
                   </section>
                </div>
