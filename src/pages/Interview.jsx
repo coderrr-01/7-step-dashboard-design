@@ -104,31 +104,12 @@ export default function Interview() {
          ? `$${Number(selectedRoom.price).toLocaleString()}/mo`
          : (client?.rent_amount ? `$${client.rent_amount}/mo` : ''));
 
-   const [fallbackRoom, setFallbackRoom] = useState(null);
-   
-   useEffect(() => {
-      if (selectedRoom || !client?.room_id) return;
-      let cancelled = false;
-      (async () => {
-         try {
-            const res = await getRoomById(client.room_id);
-            if (res?.success && res.room && !cancelled) {
-               setFallbackRoom(res.room);
-            }
-         } catch {}
-      })();
-      return () => { cancelled = true; };
-   }, [selectedRoom, client?.room_id]);
-
-   const activeRoom = selectedRoom || fallbackRoom;
-   
    const roomImages = (() => {
-      if (!activeRoom) return [];
-      if (Array.isArray(activeRoom.images) && activeRoom.images.length) return activeRoom.images;
-      if (activeRoom.img) return [activeRoom.img];
+      if (!selectedRoom) return [];
+      if (Array.isArray(selectedRoom.images) && selectedRoom.images.length) return selectedRoom.images;
+      if (selectedRoom.img) return [selectedRoom.img];
       return [];
    })();
-   const roomImage = client?.room_img || roomImages[0] || '';
 
    return (
       <>
@@ -150,7 +131,7 @@ export default function Interview() {
                            <section className="residency-card">
                               <div className="selected-residence-header">
                                  <span className="selected-badge">SELECTED</span>
-                                  <ResidenceSlider images={roomImage} />
+                                  <ResidenceSlider images={roomImages} />
                                  <div className="p-3 w-50 d-flex flex-column interview-details" data-purpose="residence-details">
                                     <div className="d-flex justify-content-between">
                                        <div>
