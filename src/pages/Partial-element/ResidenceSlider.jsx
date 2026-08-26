@@ -2,15 +2,15 @@ import { useEffect, useState } from "react";
 import "../../assets/styles/slider-style.css"
 
 const FALLBACK_IMAGES = [
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLIVJXsIscLTS8nP6Dbmcv1vsoRkem09JkmvrDOgiZBWN63o7ikKL9Dqs&s=10"
+    "https://www.thespruce.com/thmb/_xQMAqSNbX2bjnfXDKOdtaZRFaI=/2048x0/filters:no_upscale():max_bytes(150000):strip_icc()/put-together-a-perfect-guest-room-1976987-hero-223e3e8f697e4b13b62ad4fe898d492d.jpg"
 ];
 
-function ResidenceSlider({ images: propImages }) {
+function ResidenceSlider({ images: propImages, fallbackSrc }) {
 
 
     const images = (Array.isArray(propImages) && propImages.length > 0)
         ? propImages
-        : FALLBACK_IMAGES;
+        : (fallbackSrc ? [fallbackSrc] : FALLBACK_IMAGES);
 
 
 

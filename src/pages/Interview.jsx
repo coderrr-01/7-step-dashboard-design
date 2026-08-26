@@ -130,7 +130,7 @@ export default function Interview() {
                            <section className="residency-card">
                               <div className="selected-residence-header">
                                  <span className="selected-badge">SELECTED</span>
-                                  <ResidenceSlider images={roomImages} />
+                                  <ResidenceSlider images={roomImages} fallbackSrc={client?.room_img} />
                                  <div className="p-3 w-50 d-flex flex-column interview-details" data-purpose="residence-details">
                                     <div className="d-flex justify-content-between">
                                        <div>
