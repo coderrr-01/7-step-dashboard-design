@@ -10,7 +10,7 @@ export const roomsData = [
     location: "Loading...",
     city: "Loading...",
     tier: "Loading...",
-    price: 1850,
+    price: "Loading...",
     availableFrom: "Loading...",
     status: "Loading...",
     lat: 51.4977,
