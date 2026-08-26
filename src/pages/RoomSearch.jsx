@@ -131,7 +131,7 @@ export default function RoomSearch() {
 
    return (
       <PageLayout page="RoomSearch">
-         <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 bg-field py-5 px-lg-5 min-vh-100">
+         <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 bg-field py-5 px-lg-5">
             <div className="container container-narrow">
                <section className="mb-4 ">
                    <div className="row">
