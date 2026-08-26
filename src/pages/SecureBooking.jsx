@@ -100,6 +100,7 @@ export default function SecureBooking() {
       if (selectedRoom.img) return [selectedRoom.img];
       return [];
    })();
+   const roomImage = client?.room_img || roomImages[0] || '';
 
    return (
       <PageLayout page="SecureBooking">
@@ -116,7 +117,7 @@ export default function SecureBooking() {
                      {/* Selected Residence Summary */}
                      <div className="selected-residence-header">
                         <span className="selected-badge">SELECTED</span>
-                         <ResidenceSlider images={roomImages} />
+                         <ResidenceSlider images={roomImage} />
                         <div className="p-3 w-50 d-flex flex-column" data-purpose="residence-details">
                            <div className="d-flex justify-content-between setPricingblock">
                               <div>
