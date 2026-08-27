@@ -6,7 +6,7 @@ import InterviewSchedule from "./Partial-element/InterviewSchedule.jsx";
 import Timeslot from "./Partial-element/Timeslot.jsx";
 import { useNavigate } from 'react-router-dom';
 import { useClientData } from "../hooks/useClientData";
-import { secureBooking, releaseSlot } from "../services/api";
+import { secureBooking, releaseSlot, selectRoom } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
@@ -84,6 +84,21 @@ export default function SecureBooking() {
       setMeetLink('');
    };
 
+   // "SIGN LEASE NOW": persist the selected room to the Zoho tenant record so the
+   // backend payment gateways can resolve the room's rent/deposit amounts, then
+   // proceed to lease signing. Best-effort — always navigate regardless.
+   const handleLeaseNow = async () => {
+      try {
+         await selectRoom({
+            client_id: client?.id || '',
+            room_id:   roomId,
+            room_name: roomName,
+            room_img:  roomImg,
+         });
+      } catch { /* non-blocking */ }
+      navigate('/document-sign');
+   };
+
    // Dynamic labels — same pattern as Interview
    // Title/price reflect the SELECTED room first (same source the meta line uses),
    // falling back to the Zoho client record only when no room is selected.
@@ -142,18 +157,19 @@ export default function SecureBooking() {
                            {/* View Room is intentionally not rendered on Secure Booking. */}
                         </div>
                      </div>
-                     <InterviewSchedule
-                        datatext="securePlaneblock"
-                        interview_progress={interview_btn}
-                        onConfirm={handleConfirm}
-                        onReschedule={handleReschedule}
-                        confirmedDate={confirmedDate}
-                        confirmedTime={confirmedTime}
-                        meetLink={meetLink}
-                        submitting={submitting}
-                        roomName={roomName}
-                        roomImg={roomImg}
-                     />
+                      <InterviewSchedule
+                         datatext="securePlaneblock"
+                         interview_progress={interview_btn}
+                         onConfirm={handleConfirm}
+                         onReschedule={handleReschedule}
+                         confirmedDate={confirmedDate}
+                         confirmedTime={confirmedTime}
+                         meetLink={meetLink}
+                         submitting={submitting}
+                         roomName={roomName}
+                         roomImg={roomImg}
+                         onLeaseNow={handleLeaseNow}
+                      />
                   </section>
                </div>
             </main>

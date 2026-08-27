@@ -23,7 +23,7 @@ const buildToday = () => {
     return { label: `${months[mo]} ${d}, ${yr}`, value: `${padded}/${moPadded}/${yr}` };
 };
 
-function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg }) {
+function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg, onLeaseNow }) {
     const [activeTab, setActiveTab] = useState("schedule");
     // Today is selected by default (Calendar already highlights today; this makes
     // it the real selected date so today's slots load on open).
@@ -128,6 +128,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
     };
 
     const leasebtn = () => {
+        if (onLeaseNow) { onLeaseNow(); return; }
         navigate('/document-sign');
     }
     const securebtn = () => {

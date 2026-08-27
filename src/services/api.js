@@ -248,6 +248,18 @@ export async function getRoomById(roomId) {
   return res.json();
 }
 
+// Persist the selected room onto the Zoho tenant record (Room_ID / Room_Name /
+// Room_Img) so the backend payment gateways can resolve the room's rent and
+// security-deposit amounts even when the user skipped the booking steps.
+export async function selectRoom({ client_id, room_id, room_name, room_img }) {
+  const nonce = await getNonce();
+  const res = await apiFetch(`${JRNY}/select-room`, {
+    method: 'POST', headers: { 'X-WP-Nonce': nonce },
+    body: JSON.stringify({ client_id, room_id, room_name, room_img }),
+  });
+  return res.json();
+}
+
 // ─── APPLY FORM ──────────────────────────────────────────────────────────────
 export async function applyForm(data) {
   const res = await fetch(`${JRNY}/apply`, {
