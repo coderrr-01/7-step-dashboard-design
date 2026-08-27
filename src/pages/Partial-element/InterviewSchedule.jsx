@@ -221,7 +221,8 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                 <div className="col-md-6">
                                     <div className="confirmation-card">
                                          <div className="img-set-info">
-                                             <img src={roomImg || content.img} alt={roomImg ? (roomName || content.alt) : content.alt} />
+                                             {/* <img src={roomImg || content.img} alt={roomImg ? (roomName || content.alt) : content.alt} /> */}
+                                              <img src={content.img} alt={content.alt} />
                                          </div>
 
                                         <h2 className="conf-title">
