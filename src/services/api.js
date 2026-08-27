@@ -98,6 +98,7 @@ export function logout() {
   const keepKeys = [
     sub ? `jrny_completed_steps_${sub}` : null,
     'jrny_last_route',
+    'jrny_selected_room',
   ].filter(Boolean);
   Object.keys(localStorage)
     .filter(k => k.startsWith('jrny_') && !keepKeys.includes(k))
