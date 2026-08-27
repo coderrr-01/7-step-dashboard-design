@@ -180,7 +180,7 @@ export default function PaymentScreen() {
          activeRoom.unit_number ? `Unit ${activeRoom.unit_number}` : null,
          activeRoom.size_sq_ft ? `${activeRoom.size_sq_ft} sq.ft` : null,
          // activeRoom.status ? activeRoom.status : null,
-         activeRoom.status ? Occupied : null,
+         activeRoom.status ? 'Occupied' : null,
       ].filter(Boolean);
       if (parts.length) return parts.join(' • ');
       return [activeRoom.roomNumber, activeRoom.city].filter(Boolean).join(' • ');
