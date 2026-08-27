@@ -148,8 +148,23 @@ export default function DocumentSign() {
 
   // ── Derived values from Zoho CRM client ───────────────────────────────────
   const name = client?.name || "";
-  const unit = client?.unit || client?.room_name || "";
-  const address = client?.address || "";
+
+  // Unit / Address: prefer the Zoho client record, falling back to the selected
+  // room (e.g. when the user skipped straight to "SIGN LEASE NOW" and Zoho has
+  // not populated the client's unit / address yet).
+  const unit =
+    client?.unit ||
+    client?.room_name ||
+    selectedRoom?.unit_number ||
+    selectedRoom?.roomNumber ||
+    selectedRoom?.name ||
+    "";
+  const address =
+    client?.address ||
+    selectedRoom?.address ||
+    selectedRoom?.location ||
+    selectedRoom?.city ||
+    "";
   const effectiveDate = client?.effective_date || "";
   const extStatus = client?.extension_status || "";
   const extensionPdf = client?.extension_signed_pdf || "";
