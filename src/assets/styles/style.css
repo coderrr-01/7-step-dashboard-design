@@ -4066,3 +4066,12 @@ body .stepper-row{
     .pay-halo,
     .pay-spark { animation: none !important; opacity: .5; }
 }
+
+.review-page-bg{
+    min-height: calc(100vh - 280px);
+}
+@media(max-width: 767px){
+    .review-page-bg{
+        min-height: calc(100vh - 380px);
+    }
+}
