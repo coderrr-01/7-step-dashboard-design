@@ -156,14 +156,30 @@ export default function DocumentSign() {
 
   // Use requested dates when extension is Approved; otherwise consume the
   // server-resolved start/end dates from the API (no hardcoded fallbacks).
-  const startDate =
+  const resolvedStartDate =
     extStatus === "Approved" && client?.requested_start_date
       ? client.requested_start_date
       : client?.start_date || "";
-  const endDate =
+  const resolvedEndDate =
     extStatus === "Approved" && client?.requested_end_date
       ? client.requested_end_date
       : client?.end_date || "";
+
+  // When the server has not populated lease dates (e.g. the user skipped
+  // straight to "SIGN LEASE NOW"), derive them from the tenant application's
+  // move-in date: start = move-in date, end = start + 1 year.
+  let startDate = resolvedStartDate;
+  let endDate = resolvedEndDate;
+  if (!startDate && client?.move_in_date) {
+    startDate = client.move_in_date;
+  }
+  if (!endDate && startDate) {
+    const d = new Date(startDate);
+    if (!isNaN(d.getTime())) {
+      d.setFullYear(d.getFullYear() + 1);
+      endDate = d.toISOString().slice(0, 10);
+    }
+  }
 
   // Amounts: prefer the Zoho client record, fall back to the persisted
   // selected room (which carries the Zoho monthly_rent / security_deposit).
