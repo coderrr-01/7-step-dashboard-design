@@ -135,7 +135,6 @@ export default function DocumentSign() {
         completeStep(6);
         toast.success("Lease signed successfully!");
         await refetch();
-        navigate('/payment-screen');
       } else {
         toast.error(res.message || "Signing failed. Please try again.");
       }
