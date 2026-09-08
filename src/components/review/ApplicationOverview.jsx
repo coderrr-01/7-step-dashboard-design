@@ -38,12 +38,12 @@ function ApplicationOverview({ data }) {
         ))}
       </div>
 
-      {a.message && (
+      {/* {a.message && (
         <div className="ver-overview-message">
           <span className="ver-overview-label">Message</span>
           <p>{a.message}</p>
         </div>
-      )}
+      )} */}
     </section>
   );
 }
