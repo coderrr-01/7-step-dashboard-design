@@ -715,34 +715,64 @@ h1, h2, h3, h4, h5, h6 {
    transform: translateY(0) scale(0.98);
 }
 
-/* Added when "Search your room" unlocks (interview approved) — a neon
-   highlight that travels around the button border in a loop. */
+/* Added when "Search your room" unlocks (interview approved) — spinning
+   conic ring + pulsing glow around the border, theme gold only. */
 .enabled-glow {
+   animation: enabledGlowPulse 2s linear infinite;
    position: relative;
-   z-index: 0;
-   isolation: isolate;
-   border-radius: 12px;
+   overflow: hidden;
 }
 
 .enabled-glow::before {
    content: "";
    position: absolute;
-   inset: -4px;
-   z-index: -1;
-   border-radius: inherit;
+   top: 50%;
+   left: 50%;
+   aspect-ratio: 1/1;
+   width: 150%;
+   height: auto;
+   border-radius: 50%;
    background: conic-gradient(
-      transparent 0deg,
-      #ffd97d 30deg,
-      #b7872e 100deg,
-      transparent 160deg,
+      #bf9b7c 0%,
+      transparent 6%,
+      #cbb59f 35deg,
+      #bb9a7e 120deg,
+      transparent 180deg,
       transparent 360deg
    );
-   animation: enabledRingSpin 2.2s linear infinite;
+   animation: enabledSpin 2s linear infinite;
+   transform: translate(-50%, -50%);
 }
 
-@keyframes enabledRingSpin {
-   to {
-      transform: rotate(360deg);
+.enabled-glow::after {
+   content: "";
+   position: absolute;
+   inset: 2px;
+   background: linear-gradient(135deg, #bb9a7e, #bf9b7c);
+   border-radius: 12px;
+}
+
+@keyframes enabledSpin {
+   0% {
+      transform: translate(-50%, -50%) rotate(0deg);
+   }
+   100% {
+      transform: translate(-50%, -50%) rotate(360deg);
+   }
+}
+
+@keyframes enabledGlowPulse {
+   0% {
+      border: 0 transparent solid;
+   }
+   25% {
+      border: 6px #bf9b7c solid;
+   }
+   50% {
+      border: 12px transparent solid;
+   }
+   100% {
+      border: 0 transparent solid;
    }
 }
 
