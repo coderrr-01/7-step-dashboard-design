@@ -36,6 +36,7 @@ function saveInterviewApproved() {
 // treat a bare res.approved as interview approval (that flag means the
 // *application review* passed, not the interview).
 const APPROVED_WORDS = ['approv', 'success', 'confirm', 'complete', 'done', 'yes', 'true', 'paid', 'active', 'verified', 'accepted', 'eligible'];
+const INTERVIEW_WORDS = ['interview', 'tenant interview'];
 
 function deepInterviewApproved(obj, interviewCtx = false, seen = new Set()) {
    if (!obj || typeof obj !== 'object') return false;
@@ -75,6 +76,20 @@ function deepInterviewApproved(obj, interviewCtx = false, seen = new Set()) {
    return false;
 }
 
+// Check if a bare response carries an interview-approved signal via the status
+// VALUE (e.g. { status: "Interview Approved" }). The main deepInterviewApproved
+// walker only looks at keys for the "interview" hint, so a flat Zoho response
+// like { approved: true, status: "Interview Approved" } was missed because
+// neither the "approved" nor "status" key contains the word "interview".
+function bareInterviewStatusCheck(obj) {
+   if (!obj || typeof obj !== 'object') return false;
+   const status = String(obj.status || '').toLowerCase();
+   if (!status) return false;
+   const hasInterviewWord = INTERVIEW_WORDS.some(w => status.includes(w));
+   const hasApprovedWord = APPROVED_WORDS.some(w => status.includes(w));
+   return hasInterviewWord && hasApprovedWord;
+}
+
 export default function Interview() {
    const navigate = useNavigate();
    const { client } = useClientData();
@@ -107,24 +122,24 @@ export default function Interview() {
             { name: 'client-data', call: getClientData },
             { name: 'step-status', call: getStepStatus },
          ];
-         let matched = null;
-         for (const s of sources) {
-            try {
-               const res = await s.call();
-               const ok = deepInterviewApproved(res);
-               if (ok) matched = s.name;
-               console.log(`[jrny] poll ${s.name} → ${ok ? 'APPROVED ✓' : 'no'}`,
-                  JSON.stringify(res).slice(0, 600));
-            } catch (e) {
-               console.log(`[jrny] poll ${s.name} → error:`, e && e.message ? e.message : e);
-            }
-         }
-         if (matched) {
-            saveInterviewApproved();
-            setInterviewApproved(true);
-            clearInterval(pollRef.current);
-            console.log(`[jrny] interview approved detected via ${matched}`);
-         }
+          let matched = null;
+          for (const s of sources) {
+             try {
+                const res = await s.call();
+                const ok = deepInterviewApproved(res) || bareInterviewStatusCheck(res);
+                if (ok) matched = s.name;
+                console.log(`[jrny] poll ${s.name} → ${ok ? 'APPROVED ✓' : 'no'}`,
+                   JSON.stringify(res).slice(0, 600));
+             } catch (e) {
+                console.log(`[jrny] poll ${s.name} → error:`, e && e.message ? e.message : e);
+             }
+          }
+          if (matched) {
+             saveInterviewApproved();
+             setInterviewApproved(true);
+             clearInterval(pollRef.current);
+             console.log(`[jrny] interview approved detected via ${matched}`);
+          }
       };
 
       // Mount: single immediate check (covers already-approved interviews).
