@@ -25,17 +25,18 @@ function PropertyMap({ location, rooms, onReset, loadingRooms }) {
       center: [DEFAULT_MAP_CENTER.lat, DEFAULT_MAP_CENTER.lng],
       zoom: DEFAULT_MAP_ZOOM,
       zoomControl: false,
-      attributionControl: true,
+      attributionControl: false,
     });
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
+    // OpenStreetMap standard tiles — free, no API key, no error/attribution
+    // text rendered on the map (unlike CARTO, which can serve "API key
+    // required" error tiles when accessed without a token).
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
         maxZoom: 19,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
       }
     ).addTo(map);
 
