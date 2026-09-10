@@ -1,11 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import PageLayout from "../components/PageLayout";
 import InterviewSchedule from "./Partial-element/InterviewSchedule.jsx";
 import { useNavigate } from 'react-router-dom';
 import { useClientData } from "../hooks/useClientData";
-import { bookInterview, releaseSlot } from "../services/api";
+import { bookInterview, releaseSlot, getApplicationStatus, getUserSub } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
+
+// Interview approval gate: the "Continue to Room Search" button stays disabled
+// until Zoho marks the interview approved via the application-status endpoint.
+// User-scoped cache so approval persists across reloads (same pattern as the
+// Review step) and polling stops once approved.
+function interviewApprovedKey() {
+  const sub = getUserSub();
+  return sub ? `jrny_interview_approved_${sub}` : null;
+}
+
+function getCachedInterviewApproved() {
+  const key = interviewApprovedKey();
+  if (!key) return false;
+  try { return localStorage.getItem(key) === '1'; } catch { return false; }
+}
+
+function saveInterviewApproved() {
+  const key = interviewApprovedKey();
+  if (!key) return;
+  try { localStorage.setItem(key, '1'); } catch { /* non-blocking */ }
+}
+
+// Accept the interview-specific approval signal from the application-status
+// response. Deliberately does NOT fall back to res.approved (that flag means
+// the *application review* passed, not the interview).
+function isInterviewApproved(res) {
+  if (!res) return false;
+  const candidates = [
+    res.interview_approved,
+    res.interviewApproved,
+    res.interview_approval,
+    res.interviewApproval,
+  ];
+  const truthy = ['1', 'true', 'yes', 'y', 'approved', 'success', 'completed', 'active', 'verified'];
+  const flagOk = candidates.some((v) =>
+    typeof v === 'boolean' ? v === true : truthy.includes(String(v).toLowerCase())
+  );
+  const textOk = typeof res.status === 'string' &&
+    /interview.*approved/i.test(res.status);
+  return flagOk || textOk;
+}
 
 export default function Interview() {
    const navigate = useNavigate();
@@ -18,6 +59,30 @@ export default function Interview() {
    const [confirmedDate, setConfirmedDate] = useState('');
    const [confirmedTime, setConfirmedTime] = useState('');
    const [meetLink, setMeetLink] = useState('');
+   const [interviewApproved, setInterviewApproved] = useState(getCachedInterviewApproved());
+   const pollRef = useRef(null);
+
+   // Poll Zoho for interview approval only while the "In Review" screen is
+   // open. The moment approval arrives the button enables and polling stops.
+   useEffect(() => {
+      if (!interviewProgres) return;
+      if (getCachedInterviewApproved()) { setInterviewApproved(true); return; }
+
+      const checkApproval = async () => {
+         try {
+            const res = await getApplicationStatus();
+            if (isInterviewApproved(res)) {
+               saveInterviewApproved();
+               setInterviewApproved(true);
+               clearInterval(pollRef.current);
+            }
+         } catch { /* keep polling */ }
+      };
+
+      checkApproval();
+      pollRef.current = setInterval(checkApproval, 15000);
+      return () => clearInterval(pollRef.current);
+   }, [interviewProgres]);
 
    const interview_btn = () => {
       setinterviewProgres(true)
@@ -194,15 +259,21 @@ export default function Interview() {
                                        <p className="text-muted small mb-0">Your uploaded files have been encrypted and stored in our secure private vault.</p>
                                     </div>
                                  </div>
-                              </div>
-                              <div>
-                                 <button
-                                    className="btn btn-jrny-dark w-100 shadow-lg"
-                                    onClick={() => { completeStep(3); navigate('/room-search'); }}
-                                 >
-                                    Please Wait For Our Response
-                                 </button>
-                              </div>
+{!interviewApproved && (
+                                     <p className="text-muted small mb-4">
+                                        Your interview is awaiting approval. The button below will unlock once your interview is approved.
+                                     </p>
+                                  )}
+                               </div>
+                               <div>
+                                  <button
+                                     className="btn btn-jrny-dark w-100 shadow-lg"
+                                     disabled={!interviewApproved}
+                                     onClick={() => { if (interviewApproved) { completeStep(3); navigate('/room-search'); } }}
+                                  >
+                                     {interviewApproved ? 'Continue to Room Search' : 'Please Wait For Our Response'}
+                                  </button>
+                               </div>
                            </div>
                            <p className="mt-4 text-center text-md-start fst-italic text-muted small">
                               "Preserving legacy through meticulous verification."
