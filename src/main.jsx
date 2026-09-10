@@ -10,7 +10,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { StepProvider } from "./context/StepContext";
-import { saveToken, getLoggedOutToken, clearLoggedOutToken, getUserSub } from "./services/api";
+import { saveToken, getLoggedOutToken, clearLoggedOutToken } from "./services/api";
 
 // Auto-login: read JWT from ?token param (WP iframe) or window.jrnyData.
 const _params = new URLSearchParams(window.location.search);
@@ -27,12 +27,6 @@ function RouteReporter() {
   React.useEffect(() => {
     const slug = pathname === '/' ? 'apply' : pathname.replace(/^\//, '');
     window.parent.postMessage({ type: 'jrny_route', slug }, '*');
-    // Remember the exact screen so a refresh / re-login resumes here instead
-    // of bouncing to a server-derived step. Scoped per user.
-    const sub = getUserSub();
-    try {
-      localStorage.setItem(sub ? `jrny_last_route_${sub}` : 'jrny_last_route', pathname);
-    } catch {}
   }, [pathname]);
   return null;
 }
