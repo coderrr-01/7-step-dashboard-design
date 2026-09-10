@@ -2292,17 +2292,34 @@ body.page-room-search .page-description {
     cursor: not-allowed;
 }
 
-/* Added when "Search your room" unlocks (interview approved). */
+/* Added when "Search your room" unlocks (interview approved) — neon
+   highlight traveling around the border in a loop. */
 .enabled-glow {
-    animation: enabledBounce 1.8s ease-in-out infinite !important;
+    position: relative;
+    z-index: 0;
+    isolation: isolate;
+    border-radius: 12px;
 }
 
-@keyframes enabledBounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-5px);
+.enabled-glow::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+        transparent 0deg,
+        #ffd97d 30deg,
+        #b7872e 100deg,
+        transparent 160deg,
+        transparent 360deg
+    );
+    animation: enabledRingSpin 2.2s linear infinite;
+}
+
+@keyframes enabledRingSpin {
+    to {
+        transform: rotate(360deg);
     }
 }
 

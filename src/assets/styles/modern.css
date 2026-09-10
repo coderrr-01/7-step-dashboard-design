@@ -715,18 +715,34 @@ h1, h2, h3, h4, h5, h6 {
    transform: translateY(0) scale(0.98);
 }
 
-/* Added when "Search your room" unlocks (interview approved) — soft, smooth
-   continuous bounce so the newly-enabled state reads clearly. */
+/* Added when "Search your room" unlocks (interview approved) — a neon
+   highlight that travels around the button border in a loop. */
 .enabled-glow {
-   animation: enabledBounce 1.8s ease-in-out infinite !important;
+   position: relative;
+   z-index: 0;
+   isolation: isolate;
+   border-radius: 12px;
 }
 
-@keyframes enabledBounce {
-   0%, 100% {
-      transform: translateY(0);
-   }
-   50% {
-      transform: translateY(-5px);
+.enabled-glow::before {
+   content: "";
+   position: absolute;
+   inset: -4px;
+   z-index: -1;
+   border-radius: inherit;
+   background: conic-gradient(
+      transparent 0deg,
+      #ffd97d 30deg,
+      #b7872e 100deg,
+      transparent 160deg,
+      transparent 360deg
+   );
+   animation: enabledRingSpin 2.2s linear infinite;
+}
+
+@keyframes enabledRingSpin {
+   to {
+      transform: rotate(360deg);
    }
 }
 
