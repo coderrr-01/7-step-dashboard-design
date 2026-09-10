@@ -3,7 +3,7 @@ import PageLayout from "../components/PageLayout";
 import InterviewSchedule from "./Partial-element/InterviewSchedule.jsx";
 import { useNavigate } from 'react-router-dom';
 import { useClientData } from "../hooks/useClientData";
-import { bookInterview, releaseSlot, getApplicationStatus, getUserSub } from "../services/api";
+import { bookInterview, releaseSlot, getApplicationStatus, getClientData, getStepStatus, getUserSub } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
@@ -93,18 +93,33 @@ export default function Interview() {
    const approvalPolling = interviewProgres || interviewBooked;
    useEffect(() => {
       const checkApproval = async () => {
-         try {
-            const res = await getApplicationStatus();
-            if (res && typeof res === 'object') {
-               console.log('[jrny] application-status poll:', JSON.stringify(res, null, 2));
+         // Zoho reflects interview approval through one of several endpoints, so
+         // poll all of them. Deep-scan each response; any one carrying the
+         // approval signal unlocks the button. Logs each source so the exact
+         // field/API that carries the flag is visible in the console.
+         const sources = [
+            { name: 'application-status', call: getApplicationStatus },
+            { name: 'client-data', call: getClientData },
+            { name: 'step-status', call: getStepStatus },
+         ];
+         let matched = null;
+         for (const s of sources) {
+            try {
+               const res = await s.call();
+               const ok = deepInterviewApproved(res);
+               if (ok) matched = s.name;
+               console.log(`[jrny] poll ${s.name} → ${ok ? 'APPROVED ✓' : 'no'}`,
+                  JSON.stringify(res).slice(0, 600));
+            } catch (e) {
+               console.log(`[jrny] poll ${s.name} → error:`, e && e.message ? e.message : e);
             }
-            if (deepInterviewApproved(res)) {
-               saveInterviewApproved();
-               setInterviewApproved(true);
-               clearInterval(pollRef.current);
-               console.log('[jrny] interview approved detected');
-            }
-         } catch { /* keep polling */ }
+         }
+         if (matched) {
+            saveInterviewApproved();
+            setInterviewApproved(true);
+            clearInterval(pollRef.current);
+            console.log(`[jrny] interview approved detected via ${matched}`);
+         }
       };
 
       // Mount: single immediate check (covers already-approved interviews).
