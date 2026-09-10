@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getClientData, getToken, isInterviewApprovedCached } from '../services/api';
+import { getClientData, getToken } from '../services/api';
 
 export const STEP_PATHS = {
   1: '/',
@@ -80,10 +80,10 @@ export function StepProvider({ children }) {
   }, []);
 
   // Jab bhi user / pe aaye, fresh data leke sahi screen pe bhejo — based on the
-  // data that actually reached Zoho (server-derived steps), exactly as before.
-  // The only hard gate: room-search is never hit automatically before the
-  // interview is approved. With approval it IS a valid data-driven target
-  // (refresh on /room-search lands back on /room-search).
+  // data that actually reached Zoho (server-derived steps). Hard rule: the app
+  // NEVER auto-navigates to /room-search. The user must click "Search your room"
+  // to advance past the interview gate — even if the interview is already
+  // approved.
   useEffect(() => {
     if (!getToken() || pathname !== '/' || loading) return;
     getClientData()
@@ -93,9 +93,9 @@ export function StepProvider({ children }) {
         if (!serverSteps) return;
         setCompletedSteps(serverSteps);
         let nextStep = findFirstIncompleteStep(serverSteps);
-        // Interview gate: room-search requires interview approval first. The
-        // user advances past it by clicking "Search your room".
-        if (nextStep === '/room-search' && !isInterviewApprovedCached()) {
+        // Always hold at /interview — room-search is only reached by clicking
+        // the "Search your room" button. This is the hard interview gate.
+        if (nextStep === '/room-search') {
           nextStep = '/interview';
         }
         if (nextStep && nextStep !== pathname) {
