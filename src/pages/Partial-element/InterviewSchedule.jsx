@@ -292,7 +292,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                         <div className="mb-3">
                                             <button
                                                 type="button"
-                                                className="btn btn-gold"
+                                                className={`btn btn-gold ${searchRoomApproved ? "enabled-glow" : ""}`}
                                                 disabled={!searchRoomApproved}
                                                 onClick={onSearchRoom}
                                             >

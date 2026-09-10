@@ -2292,6 +2292,20 @@ body.page-room-search .page-description {
     cursor: not-allowed;
 }
 
+/* Added when "Search your room" unlocks (interview approved). */
+.enabled-glow {
+    animation: enabledBounce 1s ease-in-out infinite !important;
+}
+
+@keyframes enabledBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-7px);
+    }
+}
+
 .btn-check:checked+.btn,
 .btn.active,
 .btn.show,

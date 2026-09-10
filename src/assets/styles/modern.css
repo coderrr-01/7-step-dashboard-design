@@ -715,6 +715,21 @@ h1, h2, h3, h4, h5, h6 {
    transform: translateY(0) scale(0.98);
 }
 
+/* Added when "Search your room" unlocks (interview approved) — continuous
+   bounce so the newly-enabled state is clearly visible without user input. */
+.enabled-glow {
+   animation: enabledBounce 1s ease-in-out infinite !important;
+}
+
+@keyframes enabledBounce {
+   0%, 100% {
+      transform: translateY(0);
+   }
+   50% {
+      transform: translateY(-7px);
+   }
+}
+
 .btn-gold-outline,
 .btn-outline-elite,
 .btn-premium-outline {
