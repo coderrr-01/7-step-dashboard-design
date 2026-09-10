@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getClientData, getToken } from '../services/api';
+import { getClientData, getToken, getUserSub } from '../services/api';
 
 export const STEP_PATHS = {
   1: '/',
@@ -93,10 +93,14 @@ export function StepProvider({ children }) {
         if (!serverSteps) return;
         setCompletedSteps(serverSteps);
         let nextStep = findFirstIncompleteStep(serverSteps);
-        // Always hold at /interview — room-search is only reached by clicking
-        // the "Search your room" button. This is the hard interview gate.
+        // The user must click "Search your room" to advance past the interview.
+        // If they haven't clicked yet, hold at /interview even if the backend
+        // already says room-search is the next step. Once they click, the flag
+        // persists so a refresh lands back on /room-search.
         if (nextStep === '/room-search') {
-          nextStep = '/interview';
+          const sub = getUserSub();
+          const entered = sub ? localStorage.getItem(`jrny_room_search_entered_${sub}`) === '1' : false;
+          if (!entered) nextStep = '/interview';
         }
         if (nextStep && nextStep !== pathname) {
           navigate(nextStep, { replace: true });

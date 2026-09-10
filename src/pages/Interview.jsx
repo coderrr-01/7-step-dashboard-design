@@ -192,6 +192,13 @@ export default function Interview() {
 
    const handleSearchRoom = () => {
       if (!interviewApproved) return;
+      // Mark that the user has explicitly entered room-search via the button.
+      // StepContext uses this to allow /room-search on refresh; without it,
+      // the app always holds at /interview until the user clicks.
+      const sub = getUserSub();
+      try {
+         localStorage.setItem(sub ? `jrny_room_search_entered_${sub}` : 'jrny_room_search_entered', '1');
+      } catch {}
       completeStep(3);
       navigate('/room-search');
    }
