@@ -54,11 +54,16 @@ function deepInterviewApproved(obj, interviewCtx = false, seen = new Set()) {
          continue;
       }
 
-      if (hasInterview && typeof val === 'string' && hasStatusWord) {
+      // 1) status-ish field whose VALUE mentions interview + an approval word,
+      //    e.g. application-status → { status: "Interview Approved" }.
+      //    "Interview Scheduled" is NOT approved — it just means booked.
+      if (hasStatusWord && typeof val === 'string') {
          const v = val.toLowerCase();
-         if (APPROVED_WORDS.some((w) => v.includes(w))) return true;
+         const mentionsInterview = v.includes('interview') || interviewCtx;
+         if (mentionsInterview && APPROVED_WORDS.some((w) => v.includes(w))) return true;
          continue;
       }
+
       if (!hasInterview) continue;
 
       const v = typeof val === 'string' ? val.toLowerCase() : '';
