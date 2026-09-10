@@ -66,6 +66,15 @@ export function getUserSub() {
   } catch { return null; }
 }
 
+// Interview approval cache (written by the Interview page once Zoho marks the
+// interview approved). Shared here so StepContext can gate the resume/redirect
+// logic: the user must NOT be auto-pushed to /room-search until approved.
+export function isInterviewApprovedCached() {
+  const sub = getUserSub();
+  if (!sub) return false;
+  try { return localStorage.getItem(`jrny_interview_approved_${sub}`) === '1'; } catch { return false; }
+}
+
 // Best-effort removal of any JS-accessible session cookies the app may own.
 // Only the app's own namespace (jrny_*) or known session names are removed —
 // unrelated cookies are never touched.

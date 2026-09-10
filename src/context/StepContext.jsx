@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getClientData, getToken } from '../services/api';
+import { getClientData, getToken, isInterviewApprovedCached } from '../services/api';
 
 export const STEP_PATHS = {
   1: '/',
@@ -74,7 +74,10 @@ export function StepProvider({ children }) {
       .catch(() => setLoading(false));
   }, []);
 
-  // Jab bhi user / pe aaye, fresh data leke sahi step pe bhejo
+  // Jab bhi user / pe aaye, fresh data leke sahi step pe bhejo.
+  // IMPORTANT: room-search must NEVER be reached automatically — it is gated
+  // behind interview approval. Until approval is cached, the user is held on
+  // /interview (button disabled) instead of being auto-pushed to /room-search.
   useEffect(() => {
     if (!getToken() || pathname !== '/' || loading) return;
     getClientData()
@@ -83,7 +86,10 @@ export function StepProvider({ children }) {
         const serverSteps = deriveStepsFromClient(data.data);
         if (!serverSteps) return;
         setCompletedSteps(serverSteps);
-        const nextStep = findFirstIncompleteStep(serverSteps);
+        let nextStep = findFirstIncompleteStep(serverSteps);
+        if (nextStep === '/room-search' && !isInterviewApprovedCached()) {
+          nextStep = '/interview';
+        }
         if (nextStep && nextStep !== pathname) {
           navigate(nextStep, { replace: true });
         }
