@@ -28,6 +28,24 @@ function saveInterviewApproved() {
   try { localStorage.setItem(key, '1'); } catch { /* non-blocking */ }
 }
 
+// Convert Zoho's "2026-09-12" into a display label like the Calendar emits
+// ("Sep 12, 2026") and into the "dd/mm/yyyy" the booked-slots/release-slot
+// APIs expect, so an already-booked interview reopens on the confirmed screen.
+function formatIsoDate(iso) {
+  if (!iso) return '';
+  const [y, m, d] = String(iso).split('-').map(Number);
+  if (!y || !m || !d) return iso;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${months[m - 1]} ${d}, ${y}`;
+}
+
+function isoToDmy(iso) {
+  if (!iso) return '';
+  const [y, m, d] = String(iso).split('-');
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y}`;
+}
+
 // Accept the interview-specific approval signal anywhere in the
 // application-status response. Walks EVERY nested object (wrappers like
 // res.data, res.application_status, res.booking ...) and treats the whole
@@ -104,6 +122,19 @@ export default function Interview() {
    const [interviewApproved, setInterviewApproved] = useState(getCachedInterviewApproved());
    const [interviewBooked, setInterviewBooked] = useState(false);
    const pollRef = useRef(null);
+
+   // Returning user (refresh / re-login with the same ID): Zoho already has the
+   // booking, so restore the confirmed state from client data instead of making
+   // the user book the interview again. Also starts the approval polling so the
+   // "Search your room" button unlocks without any re-booking.
+   const alreadyBooked = !!(client?.interview_date && client?.interview_time);
+   useEffect(() => {
+      if (!alreadyBooked) return;
+      setConfirmedDate(formatIsoDate(client.interview_date));
+      setConfirmedTime(client.interview_time);
+      setMeetLink(client.meeting_link || '');
+      setInterviewBooked(true);
+   }, [client?.interview_date, client?.interview_time, client?.meeting_link]);
 
    // Approval polling runs as soon as the interview is booked (so the "Search
    // your room" button on the confirmed screen unlocks) and while the
@@ -249,6 +280,8 @@ export default function Interview() {
                                    showLeaseNow={false}
                                    searchRoomApproved={interviewApproved}
                                    onSearchRoom={handleSearchRoom}
+                                   initialBooked={alreadyBooked}
+                                   initialLastBooked={alreadyBooked ? { date: isoToDmy(client.interview_date), time: client.interview_time } : null}
                                />
                            </section>
                         </div>

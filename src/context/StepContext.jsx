@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getClientData, getToken, isInterviewApprovedCached } from '../services/api';
+import { getClientData, getToken } from '../services/api';
 
 export const STEP_PATHS = {
   1: '/',
@@ -76,8 +76,10 @@ export function StepProvider({ children }) {
 
   // Jab bhi user / pe aaye, fresh data leke sahi step pe bhejo.
   // IMPORTANT: room-search must NEVER be reached automatically — it is gated
-  // behind interview approval. Until approval is cached, the user is held on
-  // /interview (button disabled) instead of being auto-pushed to /room-search.
+  // behind interview approval. The user always advances by clicking the
+  // "Search your room" button (whether the interview is pending or already
+  // approved). Until then they are held on /interview (button disabled until
+  // approved), never auto-pushed to /room-search.
   useEffect(() => {
     if (!getToken() || pathname !== '/' || loading) return;
     getClientData()
@@ -87,7 +89,10 @@ export function StepProvider({ children }) {
         if (!serverSteps) return;
         setCompletedSteps(serverSteps);
         let nextStep = findFirstIncompleteStep(serverSteps);
-        if (nextStep === '/room-search' && !isInterviewApprovedCached()) {
+        // room-search must NEVER be reached automatically: the user always
+        // advances past the interview gate by clicking the "Search your room"
+        // button, even if the interview is already approved (returning user).
+        if (nextStep === '/room-search') {
           nextStep = '/interview';
         }
         if (nextStep && nextStep !== pathname) {

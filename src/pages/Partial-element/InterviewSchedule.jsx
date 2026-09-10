@@ -23,8 +23,12 @@ const buildToday = () => {
     return { label: `${months[mo]} ${d}, ${yr}`, value: `${padded}/${moPadded}/${yr}` };
 };
 
-function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg, onLeaseNow, securePath = '/secure-booking', showSecureBook = true, showLeaseNow = true, searchRoomApproved = false, onSearchRoom }) {
-    const [activeTab, setActiveTab] = useState("schedule");
+function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg, onLeaseNow, securePath = '/secure-booking', showSecureBook = true, showLeaseNow = true, searchRoomApproved = false, onSearchRoom, initialBooked = false, initialLastBooked = null }) {
+    // When the interview is already booked (e.g. returning user after a refresh
+    // / re-login), reopen on the CONFIRMED tab instead of the scheduling form so
+    // the interview is never asked for a second time. Only the explicit
+    // "Reschedule" action sends the user back to scheduling.
+    const [activeTab, setActiveTab] = useState(initialBooked ? "confirm" : "schedule");
     // Today is selected by default (Calendar already highlights today; this makes
     // it the real selected date so today's slots load on open).
     const [selectedDate, setSelectedDate] = useState(buildToday);
@@ -34,8 +38,8 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
     // Booking lifecycle: once confirmed, the schedule tab is locked; Reschedule
     // releases the old slot and reopens scheduling. slotsLoading/slotsError let
     // us distinguish "all slots booked" from a loading or failed fetch.
-    const [booked, setBooked] = useState(false);
-    const [lastBooked, setLastBooked] = useState(null);
+    const [booked, setBooked] = useState(initialBooked);
+    const [lastBooked, setLastBooked] = useState(initialLastBooked);
     const [slotsLoading, setSlotsLoading] = useState(false);
     const [slotsError, setSlotsError] = useState('');
     const [refreshKey, setRefreshKey] = useState(0);
