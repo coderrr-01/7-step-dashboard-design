@@ -1955,6 +1955,7 @@ background-color: #b8924a;
     align-items: center;
     color: #000;
     border-radius: 6px;
+    z-index: 99;
 }
 
 .property-card .status-dot {
