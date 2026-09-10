@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getClientData, getToken } from '../services/api';
+import { getClientData, getToken, getUserSub, isInterviewApprovedCached } from '../services/api';
 
 export const STEP_PATHS = {
   1: '/',
@@ -10,6 +10,30 @@ export const STEP_PATHS = {
   5: '/secure-booking',
   6: '/document-sign',
   7: '/payment-screen',
+};
+
+// Maps every route (including child pages) to its wizard step number, so the
+// resume decision can compare the last visited screen against what is reachable.
+const STEP_INDEX_BY_PATH = {
+  '/': 1,
+  '/review': 2,
+  '/interview': 3,
+  '/room-search': 4,
+  '/view-room': 4,
+  '/Viewphoto': 4,
+  '/secure-booking': 5,
+  '/document-sign': 6,
+  '/residence-agreement': 6,
+  '/payment-screen': 7,
+};
+
+const lastRouteKey = () => {
+  const sub = getUserSub();
+  return sub ? `jrny_last_route_${sub}` : 'jrny_last_route';
+};
+
+const readLastRoute = () => {
+  try { return localStorage.getItem(lastRouteKey()) || null; } catch { return null; }
 };
 
 const StepContext = createContext(null);
@@ -74,12 +98,12 @@ export function StepProvider({ children }) {
       .catch(() => setLoading(false));
   }, []);
 
-  // Jab bhi user / pe aaye, fresh data leke sahi step pe bhejo.
-  // IMPORTANT: room-search must NEVER be reached automatically — it is gated
-  // behind interview approval. The user always advances by clicking the
-  // "Search your room" button (whether the interview is pending or already
-  // approved). Until then they are held on /interview (button disabled until
-  // approved), never auto-pushed to /room-search.
+  // Jab bhi user / pe aaye (fresh load / refresh / re-login), fresh data leke
+  // sahi screen pe bhejo. Prefer resuming to the exact screen the user was on
+  // (lastRoute) when it is still within reach; otherwise fall back to the next
+  // incomplete server step. The interview gate is always enforced: room-search
+  // must NEVER be reached automatically before the interview is approved — the
+  // user always advances by clicking the "Search your room" button.
   useEffect(() => {
     if (!getToken() || pathname !== '/' || loading) return;
     getClientData()
@@ -88,15 +112,30 @@ export function StepProvider({ children }) {
         const serverSteps = deriveStepsFromClient(data.data);
         if (!serverSteps) return;
         setCompletedSteps(serverSteps);
-        let nextStep = findFirstIncompleteStep(serverSteps);
-        // room-search must NEVER be reached automatically: the user always
-        // advances past the interview gate by clicking the "Search your room"
-        // button, even if the interview is already approved (returning user).
-        if (nextStep === '/room-search') {
-          nextStep = '/interview';
+        const nextStep = findFirstIncompleteStep(serverSteps);
+        const nextIndex = STEP_INDEX_BY_PATH[nextStep] || 7;
+
+        const approved = isInterviewApprovedCached();
+        // Interview gate: screen 4+ reachable only after approval.
+        let allowedMax = approved ? nextIndex : Math.min(nextIndex, 3);
+        // Room already selected (this device) → secure-booking may still be
+        // reachable even when the backend has not advanced lease_status yet.
+        try {
+          if (localStorage.getItem('jrny_selected_room')) allowedMax = Math.max(allowedMax, 5);
+        } catch {}
+
+        const lastPath = readLastRoute();
+        const lastIndex = lastPath ? STEP_INDEX_BY_PATH[lastPath] : null;
+
+        let target = null;
+        if (lastIndex && lastIndex <= allowedMax) {
+          target = lastPath;
+        } else {
+          target = nextStep;
+          if (target === '/room-search' && !approved) target = '/interview';
         }
-        if (nextStep && nextStep !== pathname) {
-          navigate(nextStep, { replace: true });
+        if (target && target !== pathname) {
+          navigate(target, { replace: true });
         }
       })
       .catch(() => {});

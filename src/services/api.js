@@ -107,7 +107,7 @@ export function logout() {
   const keepKeys = [
     sub ? `jrny_completed_steps_${sub}` : null,
     sub ? `jrny_interview_approved_${sub}` : null,
-    'jrny_last_route',
+    sub ? `jrny_last_route_${sub}` : null,
     'jrny_selected_room',
   ].filter(Boolean);
   Object.keys(localStorage)
