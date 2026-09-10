@@ -28,24 +28,46 @@ function saveInterviewApproved() {
   try { localStorage.setItem(key, '1'); } catch { /* non-blocking */ }
 }
 
-// Accept the interview-specific approval signal from the application-status
-// response. Deliberately does NOT fall back to res.approved (that flag means
-// the *application review* passed, not the interview).
-function isInterviewApproved(res) {
-  if (!res) return false;
-  const candidates = [
-    res.interview_approved,
-    res.interviewApproved,
-    res.interview_approval,
-    res.interviewApproval,
-  ];
-  const truthy = ['1', 'true', 'yes', 'y', 'approved', 'success', 'completed', 'active', 'verified'];
-  const flagOk = candidates.some((v) =>
-    typeof v === 'boolean' ? v === true : truthy.includes(String(v).toLowerCase())
-  );
-  const textOk = typeof res.status === 'string' &&
-    /interview.*approved/i.test(res.status);
-  return flagOk || textOk;
+// Accept the interview-specific approval signal anywhere in the
+// application-status response. Walks EVERY nested object (wrappers like
+// res.data, res.application_status, res.booking ...) and treats the whole
+// subtree as "interview context" once a key mentions interview, so
+// { interview: { status: "Approved" } } also matches. Deliberately does NOT
+// treat a bare res.approved as interview approval (that flag means the
+// *application review* passed, not the interview).
+const APPROVED_WORDS = ['approv', 'success', 'confirm', 'complete', 'done', 'yes', 'true', 'paid', 'active', 'verified', 'accepted', 'eligible'];
+
+function deepInterviewApproved(obj, interviewCtx = false, seen = new Set()) {
+   if (!obj || typeof obj !== 'object') return false;
+   if (seen.has(obj)) return false;
+   seen.add(obj);
+
+   for (const [key, val] of Object.entries(obj)) {
+      const k = String(key).toLowerCase();
+      const hasInterview = interviewCtx || k.includes('interview');
+      const hasStatusWord =
+         k.includes('status') || k.includes('approved') ||
+         k.includes('approval') || k.includes('stage') || k.includes('state');
+
+      if (val && typeof val === 'object') {
+         if (deepInterviewApproved(val, hasInterview, seen)) return true;
+         continue;
+      }
+
+      if (hasInterview && typeof val === 'string' && hasStatusWord) {
+         const v = val.toLowerCase();
+         if (APPROVED_WORDS.some((w) => v.includes(w))) return true;
+         continue;
+      }
+      if (!hasInterview) continue;
+
+      const v = typeof val === 'string' ? val.toLowerCase() : '';
+      const valOk = typeof val === 'boolean'
+         ? val === true
+         : APPROVED_WORDS.some((w) => v.includes(w));
+      if (valOk) return true;
+   }
+   return false;
 }
 
 export default function Interview() {
@@ -66,21 +88,32 @@ export default function Interview() {
    // Approval polling runs as soon as the interview is booked (so the "Search
    // your room" button on the confirmed screen unlocks) and while the
    // "In Review" screen is open. It NEVER navigates — the user has to click.
+   // A one-shot check also runs on mount so an interview that is ALREADY
+   // approved in the backend unlocks the button without booking/refreshing.
    const approvalPolling = interviewProgres || interviewBooked;
    useEffect(() => {
-      if (!approvalPolling) return;
-      if (getCachedInterviewApproved()) { setInterviewApproved(true); return; }
-
       const checkApproval = async () => {
          try {
             const res = await getApplicationStatus();
-            if (isInterviewApproved(res)) {
+            if (res && typeof res === 'object') {
+               console.log('[jrny] application-status poll:', JSON.stringify(res, null, 2));
+            }
+            if (deepInterviewApproved(res)) {
                saveInterviewApproved();
                setInterviewApproved(true);
                clearInterval(pollRef.current);
+               console.log('[jrny] interview approved detected');
             }
          } catch { /* keep polling */ }
       };
+
+      // Mount: single immediate check (covers already-approved interviews).
+      if (!approvalPolling) {
+         checkApproval();
+         return;
+      }
+
+      if (getCachedInterviewApproved()) { setInterviewApproved(true); return; }
 
       checkApproval();
       pollRef.current = setInterval(checkApproval, 15000);
