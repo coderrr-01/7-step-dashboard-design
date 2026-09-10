@@ -2294,7 +2294,7 @@ body.page-room-search .page-description {
 
 /* Added when "Search your room" unlocks (interview approved). */
 .enabled-glow {
-    animation: enabledBounce 1s ease-in-out infinite !important;
+    animation: enabledBounce 1.8s ease-in-out infinite !important;
 }
 
 @keyframes enabledBounce {
@@ -2302,7 +2302,7 @@ body.page-room-search .page-description {
         transform: translateY(0);
     }
     50% {
-        transform: translateY(-7px);
+        transform: translateY(-5px);
     }
 }
 
