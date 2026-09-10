@@ -197,6 +197,22 @@ export default function Interview() {
       navigate('/room-search');
    }
 
+   // As soon as the interview is approved (the "Search your room" button
+   // becomes enabled) AND the interview is booked, advance automatically —
+   // the user no longer has to click. Short delay so the button enabling is
+   // visible, then bounce to /room-search.
+   const bouncedRef = useRef(false);
+   useEffect(() => {
+      if (bouncedRef.current) return;
+      if (!interviewApproved || !interviewBooked) return;
+      bouncedRef.current = true;
+      const t = setTimeout(() => {
+         completeStep(3);
+         navigate('/room-search');
+      }, 800);
+      return () => clearTimeout(t);
+   }, [interviewApproved, interviewBooked, completeStep, navigate]);
+
    // Called when user clicks "Confirm Time Slot"
    const handleConfirm = async (selectedDate, selectedTime, onSuccess) => {
       if (!selectedDate || !selectedTime) {
