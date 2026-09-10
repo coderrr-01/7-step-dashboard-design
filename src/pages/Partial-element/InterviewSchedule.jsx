@@ -23,7 +23,7 @@ const buildToday = () => {
     return { label: `${months[mo]} ${d}, ${yr}`, value: `${padded}/${moPadded}/${yr}` };
 };
 
-function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg, onLeaseNow }) {
+function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg, onLeaseNow, securePath = '/secure-booking', showSecureBook = true, showLeaseNow = true }) {
     const [activeTab, setActiveTab] = useState("schedule");
     // Today is selected by default (Calendar already highlights today; this makes
     // it the real selected date so today's slots load on open).
@@ -132,7 +132,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
         navigate('/document-sign');
     }
     const securebtn = () => {
-        navigate('/secure-booking');
+        navigate(securePath);
     }
     return (
         <div>
@@ -200,16 +200,20 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                     >
                                         {submitting ? 'Booking...' : 'Confirm Time Slot'}
                                     </button>
-                                    <div className="divider-text">
-                                        OR
-                                    </div>
-                                    <button type="button" className="btn btn-black" onClick={leasebtn}>
-                                        SIGN LEASE NOW
-                                        <i className="bi bi-arrow-right"></i>
-                                    </button>
-                                    <div className="text-center mt-3 tour-note">
-                                        Proceeds directly to step 6 (Lease Signing).
-                                    </div>
+                                    {showLeaseNow && (
+                                        <>
+                                            <div className="divider-text">
+                                                OR
+                                            </div>
+                                            <button type="button" className="btn btn-black" onClick={leasebtn}>
+                                                SIGN LEASE NOW
+                                                <i className="bi bi-arrow-right"></i>
+                                            </button>
+                                            <div className="text-center mt-3 tour-note">
+                                                Proceeds directly to step 6 (Lease Signing).
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -255,7 +259,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                                 Room
                                             </span>
                                             <span className="detail-value">
-                                                {roomName || ''}
+                                                {roomName || 'To be selected'}
                                             </span>
                                         </div>
                                     </div>
@@ -281,7 +285,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                         Booking context. This component is shared: the Secure
                                         Booking page renders it with datatext="securePlaneblock",
                                         and in that case the button must not appear. */}
-                                    {datatext !== "securePlaneblock" && (
+                                    {datatext !== "securePlaneblock" && showSecureBook && (
                                         <button
                                             type="button"
                                             className="btn btn-black mobile-view-btn"
@@ -291,16 +295,20 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                             <i className="bi bi-arrow-right"></i>
                                         </button>
                                     )}
-                                    <div className="divider-text">
-                                        OR
-                                    </div>
-                                    <button type="button" onClick={leasebtn} className="btn btn-black">
-                                        SIGN LEASE NOW
-                                        <i className="bi bi-arrow-right"></i>
-                                    </button>
-                                    <div className="text-center mt-2 tour-note">
-                                        Proceeds directly to step 6 (Lease Signing).
-                                    </div>
+                                    {showLeaseNow && (
+                                        <>
+                                            <div className="divider-text">
+                                                OR
+                                            </div>
+                                            <button type="button" onClick={leasebtn} className="btn btn-black">
+                                                SIGN LEASE NOW
+                                                <i className="bi bi-arrow-right"></i>
+                                            </button>
+                                            <div className="text-center mt-2 tour-note">
+                                                Proceeds directly to step 6 (Lease Signing).
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>

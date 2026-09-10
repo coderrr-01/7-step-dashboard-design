@@ -230,7 +230,7 @@ export default function ViewRoom() {
                          </div>
                         <div className="d-grid gap-3 mb-4">
                            {/* <button className="btn btn-primary-elite">Lock In Residency</button> */}
-                           <Link to="/interview"><button className="btn btn-outline-elite">Schedule Interview</button></Link>
+                           <Link to="/secure-booking"><button className="btn btn-outline-elite">Book Your Tour</button></Link>
                         </div>
                         <p className="text-center small text-muted text-uppercase mb-0 summary-disclaimer">
                            By clicking 'Lock In', you agree to the preliminary institutional residency terms and the immediate payment of the holding deposit.

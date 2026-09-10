@@ -13,15 +13,15 @@ const stepsConfig = [
   },
   {
     number: 3,
-    label: "ROOM SEARCH",
-    path: "/room-search",
-    description: "Browse and select your preferred residence and floor plan.",
-  },
-  {
-    number: 4,
     label: "INTERVIEW",
     path: "/interview",
     description: "Board review and legal attestation of heritage membership.",
+  },
+  {
+    number: 4,
+    label: "ROOM SEARCH",
+    path: "/room-search",
+    description: "Browse and select your preferred residence and floor plan.",
   },
   {
     number: 5,

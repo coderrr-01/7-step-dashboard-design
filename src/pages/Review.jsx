@@ -131,7 +131,7 @@ export default function Review() {
 
    const handleNext = () => {
       completeStep(2);
-      navigate('/room-search');
+      navigate('/interview');
    };
 
    // Merge server status + client data over the static mock so the new UI stays data-driven
@@ -210,7 +210,7 @@ export default function Review() {
                      )} */}
                      {approved && (
                         <button className="btn btn-jrny-dark w-100 shadow-lg mt-4" onClick={handleNext}>
-                           Continue to Room Search
+                           Continue to Interview
                         </button>
                      )}
                   </>

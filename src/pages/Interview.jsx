@@ -1,39 +1,16 @@
 import { useState } from "react";
 import PageLayout from "../components/PageLayout";
-import Calendar from "./Partial-element/Calendar.jsx";
 import InterviewSchedule from "./Partial-element/InterviewSchedule.jsx";
-import ResidenceSlider from "./Partial-element/ResidenceSlider.jsx";
-import Timeslot from "./Partial-element/Timeslot.jsx";
 import { useNavigate } from 'react-router-dom';
 import { useClientData } from "../hooks/useClientData";
-import { bookInterview, releaseSlot, selectRoom } from "../services/api";
+import { bookInterview, releaseSlot } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
 export default function Interview() {
    const navigate = useNavigate();
-   const { client, loading } = useClientData();
+   const { client } = useClientData();
    const { completeStep } = useSteps();
-
-   const viewroombtn = () => {
-      // Clear ONLY the previously selected room before viewing rooms again.
-      try { localStorage.removeItem('jrny_selected_room'); } catch {}
-      navigate('/view-room');
-   }
-
-   // Load selected room from localStorage
-   const selectedRoom = (() => {
-      try { return JSON.parse(localStorage.getItem('jrny_selected_room') || 'null'); } catch { return null; }
-   })();
-    const roomName = selectedRoom?.name || '';
-    const roomId   = selectedRoom?.id   || '';
-    const roomImages = (() => {
-       if (!selectedRoom) return [];
-       if (Array.isArray(selectedRoom.images) && selectedRoom.images.length) return selectedRoom.images;
-       if (selectedRoom.img) return [selectedRoom.img];
-       return [];
-    })();
-    const roomImg = client?.room_img || roomImages[0] || '';
 
    const [interviewProgres, setinterviewProgres] = useState(false)
    const [Avalableresidence, setAvalableresidence] = useState(true)
@@ -69,9 +46,6 @@ export default function Interview() {
              date: selectedDate.value,
              time: selectedTime,
              booking_type: 'Tenant Interview',
-             room_id:   roomId,
-             room_name: roomName,
-             room_img:  roomImg,
              client_id: client?.id || '',
           });
 
@@ -79,7 +53,7 @@ export default function Interview() {
             setConfirmedDate(selectedDate.label);
             setConfirmedTime(selectedTime);
             setMeetLink(res.meet_link || '');
-            completeStep(4);
+            completeStep(3);
             toast.success('Interview booked successfully!');
             onSuccess();
          } else {
@@ -101,30 +75,6 @@ export default function Interview() {
       setMeetLink('');
    };
 
-   // "SIGN LEASE NOW": persist the selected room to the Zoho tenant record so the
-   // backend payment gateways can resolve the room's rent/deposit amounts, then
-   // proceed to lease signing. Best-effort — always navigate regardless.
-   const handleLeaseNow = async () => {
-      try {
-         await selectRoom({
-            client_id: client?.id || '',
-            room_id:   roomId,
-            room_name: roomName,
-            room_img:  roomImg,
-         });
-      } catch { /* non-blocking */ }
-      navigate('/document-sign');
-   };
-
-   // Title/price reflect the SELECTED room first (same source the meta line uses),
-   // falling back to the Zoho client record only when no room is selected.
-   const unitLabel = selectedRoom?.name || (client?.unit ? `Unit ${client.unit}` : roomName);
-   const rentLabel = selectedRoom?.monthly_rent
-      ? `$${Number(selectedRoom.monthly_rent).toLocaleString()}/mo`
-      : (selectedRoom?.price
-         ? `$${Number(selectedRoom.price).toLocaleString()}/mo`
-         : (client?.rent_amount ? `$${client.rent_amount}/mo` : ''));
-
    return (
       <>
 
@@ -138,40 +88,11 @@ export default function Interview() {
 
                            <div className="row mb-5">
                               <div className="col-lg-12">
-                                 <h1 className="display-4 serif-heading heading-hero mb-3 hero-title">Available Residences</h1>
-                                 <p className="mb-0 text-muted fs-5 heading-lead-wide">Browse our curated collection of heritage-preserved living spaces. Each residence has been meticulously restored to offer contemporary comfort within a historical framework.</p>
+                                 <h1 className="display-4 serif-heading heading-hero mb-3 hero-title">Interview Scheduling</h1>
+                                 <p className="mb-0 text-muted fs-5 heading-lead-wide">Choose a preferred date and time for your interview. Once your interview is scheduled, you can browse and select your residence.</p>
                               </div>
                            </div>
                            <section className="residency-card">
-                              <div className="selected-residence-header">
-                                 <span className="selected-badge">SELECTED</span>
-                                  <ResidenceSlider images={roomImages} fallbackSrc={client?.room_img} />
-                                 <div className="p-3 w-50 d-flex flex-column interview-details" data-purpose="residence-details">
-                                    <div className="d-flex justify-content-between">
-                                       <div>
-                                          <h4 className="serif-font mb-0 residence-title">{unitLabel}</h4>
-                                          <p className="mb-0 residence-meta">
-                                             {selectedRoom?.roomNumber ? `${selectedRoom.roomNumber}` : ''}
-                                             {selectedRoom?.floor ? ` • Floor ${selectedRoom.floor}` : ''}
-                                             {selectedRoom?.unit_number ? ` • Unit ${selectedRoom.unit_number}` : ''}
-                                             {selectedRoom?.size_sq_ft ? ` • ${selectedRoom.size_sq_ft} sq.ft` : ''}
-                                             {selectedRoom?.status ? ` • ${selectedRoom.status}` : ''}
-                                          </p>
-                                       </div>
-                                       <div className="text-end">
-                                          <div className="fw-bold residence-price">{rentLabel}</div>
-                                          <div className="residence-price-note">Inclusive of Concierge</div>
-                                       </div>
-                                    </div>
-                                    {/* <div className="d-flex gap-4 mt-3 residence-features">
-                                       <span><i className="bi bi-snow2 text-gold me-1"></i> Climate Controlled</span>
-                                       <span><i className="bi bi-wifi text-gold me-1"></i> Gigabit Fiber</span>
-                                    </div> */}
-                                     <div className="mt-4">
-                                       <button className="btn btn-gold mb-2 w-50" onClick={viewroombtn}>Back to View Room</button>
-                                    </div>
-                                 </div>
-                              </div>
                               <InterviewSchedule
                                    interview_progress={interview_btn}
                                    onConfirm={handleConfirm}
@@ -180,9 +101,9 @@ export default function Interview() {
                                    confirmedTime={confirmedTime}
                                    meetLink={meetLink}
                                    submitting={submitting}
-                                   roomName={roomName}
-                                   roomImg={roomImg}
-                                   onLeaseNow={handleLeaseNow}
+                                   securePath="/room-search"
+                                   showSecureBook={false}
+                                   showLeaseNow={false}
                                />
                            </section>
                         </div>
@@ -277,7 +198,7 @@ export default function Interview() {
                               <div>
                                  <button
                                     className="btn btn-jrny-dark w-100 shadow-lg"
-                                    onClick={() => { completeStep(4); navigate('/secure-booking'); }}
+                                    onClick={() => { completeStep(3); navigate('/room-search'); }}
                                  >
                                     Please Wait For Our Response
                                  </button>

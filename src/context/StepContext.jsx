@@ -5,8 +5,8 @@ import { getClientData, getToken } from '../services/api';
 export const STEP_PATHS = {
   1: '/',
   2: '/review',
-  3: '/room-search',
-  4: '/interview',
+  3: '/interview',
+  4: '/room-search',
   5: '/secure-booking',
   6: '/document-sign',
   7: '/payment-screen',
@@ -25,7 +25,7 @@ function deriveStepsFromClient(client) {
   if (!!leaseStatus) steps.push(1, 2);
 
   const map = {
-    'Interview Scheduled': 4,
+    'Interview Scheduled': 3,
     'Booking Secured': 5,
     'Signed': 6,
     'Extended': 6,

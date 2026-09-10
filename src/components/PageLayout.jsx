@@ -6,8 +6,8 @@ import Footer from "./Footer";
 const steps = [
   ["APPLY", "/"],
   ["REVIEW", "/review"],
-  ["ROOM SEARCH", "/room-search"],
   ["INTERVIEW", "/interview"],
+  ["ROOM SEARCH", "/room-search"],
   ["SECURE BOOKING", "/secure-booking"],
   ["LEASE SIGN", "/document-sign"],
   ["SECURE PAYMENT", "/payment-screen"],

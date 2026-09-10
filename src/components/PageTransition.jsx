@@ -4,8 +4,8 @@ import { Routes, useLocation } from "react-router-dom";
 const steps = [
    { label: "APPLY", path: "/" },
    { label: "REVIEW", path: "/review" },
-   { label: "ROOM SEARCH", path: "/room-search" },
    { label: "INTERVIEW", path: "/interview" },
+   { label: "ROOM SEARCH", path: "/room-search" },
    { label: "SECURE BOOKING", path: "/secure-booking" },
    { label: "LEASE SIGN", path: "/document-sign" },
    { label: "SECURE PAYMENT", path: "/payment-screen" },

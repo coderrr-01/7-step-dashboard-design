@@ -33,8 +33,8 @@ function VerificationComplete({ data }) {
         </div>
       </div>
 
-      <Link to="/room-search" className="ver-complete-cta">
-        Continue to Room Search
+      <Link to="/interview" className="ver-complete-cta">
+        Continue to Interview
       </Link>
     </section>
   );

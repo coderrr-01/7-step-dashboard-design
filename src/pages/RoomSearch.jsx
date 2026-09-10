@@ -123,8 +123,8 @@ export default function RoomSearch() {
    };
 
    const handleViewRoom = (room) => {
-      completeStep(3);
-      // Store selected room for ViewRoom / Interview / SecureBooking pages
+      completeStep(4);
+      // Store selected room for ViewRoom / SecureBooking pages
       localStorage.setItem('jrny_selected_room', JSON.stringify(room));
       navigate('/view-room');
    };
