@@ -25,8 +25,13 @@ function deriveStepsFromClient(client) {
   if (!!leaseStatus) steps.push(1, 2);
 
   const map = {
+    // Zoho → wizard step reached. Every status the backend may produce is
+    // mapped so the screen reflects exactly what reached Zoho.
     'Interview Scheduled': 3,
+    'Interview Approved': 3,
+    'Interview Complete': 3,
     'Booking Secured': 5,
+    'Lease Signed': 6,
     'Signed': 6,
     'Extended': 6,
     'Payment Complete': 7,
