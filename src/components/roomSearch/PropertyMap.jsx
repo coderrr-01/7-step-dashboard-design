@@ -30,10 +30,12 @@ function PropertyMap({ location, rooms, onReset, loadingRooms }) {
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
-    // CARTO light basemap (same map as before). attributionControl is off and
-    // no attribution string is passed, so no "carto.com/..." text renders.
+    // Esri World Light Gray Base — free, no API key, no error tiles. It looks
+    // like the original CARTO light_all basemap (minimal light-gray) without
+    // the "API key required" tiles CARTO serves in some regions. attribution
+    // control is off, so no attribution text renders on the map.
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
       {
         maxZoom: 19,
       }
