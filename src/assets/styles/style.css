@@ -2292,64 +2292,47 @@ body.page-room-search .page-description {
     cursor: not-allowed;
 }
 
-/* Added when "Search your room" unlocks (interview approved) — spinning
-   conic ring + pulsing glow, theme gold only. */
+/* Added when "Search your room" unlocks (interview approved) — soft gold glow
+   pulse + light sheen sweeping across the button. */
 .enabled-glow {
-    animation: enabledGlowPulse 2s linear infinite;
     position: relative;
     overflow: hidden;
+    animation: enabledSoftGlow 2.6s ease-in-out infinite;
 }
 
 .enabled-glow::before {
     content: "";
     position: absolute;
-    top: 50%;
-    left: 50%;
-    aspect-ratio: 1/1;
-    width: 150%;
-    height: auto;
-    border-radius: 50%;
-    background: conic-gradient(
-        #bf9b7c 0%,
-        transparent 6%,
-        #cbb59f 35deg,
-        #bb9a7e 120deg,
-        transparent 180deg,
-        transparent 360deg
-    );
-    animation: enabledSpin 2s linear infinite;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: -80%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    transform: skewX(-20deg);
+    animation: enabledSheen 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-.enabled-glow::after {
-    content: "";
-    position: absolute;
-    inset: 2px;
-    background: linear-gradient(135deg, #bb9a7e, #bf9b7c);
-    border-radius: 12px;
+/* Keep the button content (icon + label) above the sheen streak. */
+.enabled-glow > * {
+    position: relative;
+    z-index: 1;
 }
 
-@keyframes enabledSpin {
+@keyframes enabledSheen {
     0% {
-        transform: translate(-50%, -50%) rotate(0deg);
+        transform: translateX(0) skewX(-20deg);
     }
-    100% {
-        transform: translate(-50%, -50%) rotate(360deg);
+    55%, 100% {
+        transform: translateX(360%) skewX(-20deg);
     }
 }
 
-@keyframes enabledGlowPulse {
-    0% {
-        border: 0 transparent solid;
-    }
-    25% {
-        border: 6px #bf9b7c solid;
+@keyframes enabledSoftGlow {
+    0%, 100% {
+        box-shadow: 0 14px 34px -14px rgba(187, 154, 126, 0.5);
     }
     50% {
-        border: 12px transparent solid;
-    }
-    100% {
-        border: 0 transparent solid;
+        box-shadow: 0 0 0 6px rgba(191, 155, 124, 0.14);
     }
 }
 
