@@ -60,12 +60,15 @@ export default function Interview() {
    const [confirmedTime, setConfirmedTime] = useState('');
    const [meetLink, setMeetLink] = useState('');
    const [interviewApproved, setInterviewApproved] = useState(getCachedInterviewApproved());
+   const [interviewBooked, setInterviewBooked] = useState(false);
    const pollRef = useRef(null);
 
-   // Poll Zoho for interview approval only while the "In Review" screen is
-   // open. The moment approval arrives the button enables and polling stops.
+   // Approval polling runs as soon as the interview is booked (so the "Search
+   // your room" button on the confirmed screen unlocks) and while the
+   // "In Review" screen is open. It NEVER navigates — the user has to click.
+   const approvalPolling = interviewProgres || interviewBooked;
    useEffect(() => {
-      if (!interviewProgres) return;
+      if (!approvalPolling) return;
       if (getCachedInterviewApproved()) { setInterviewApproved(true); return; }
 
       const checkApproval = async () => {
@@ -82,11 +85,17 @@ export default function Interview() {
       checkApproval();
       pollRef.current = setInterval(checkApproval, 15000);
       return () => clearInterval(pollRef.current);
-   }, [interviewProgres]);
+   }, [approvalPolling]);
 
    const interview_btn = () => {
       setinterviewProgres(true)
       setAvalableresidence(false)
+   }
+
+   const handleSearchRoom = () => {
+      if (!interviewApproved) return;
+      completeStep(3);
+      navigate('/room-search');
    }
 
    // Called when user clicks "Confirm Time Slot"
@@ -119,6 +128,7 @@ export default function Interview() {
             setConfirmedTime(selectedTime);
             setMeetLink(res.meet_link || '');
             completeStep(3);
+            setInterviewBooked(true);
             toast.success('Interview booked successfully!');
             onSuccess();
          } else {
@@ -169,6 +179,8 @@ export default function Interview() {
                                    securePath="/room-search"
                                    showSecureBook={false}
                                    showLeaseNow={false}
+                                   searchRoomApproved={interviewApproved}
+                                   onSearchRoom={handleSearchRoom}
                                />
                            </section>
                         </div>

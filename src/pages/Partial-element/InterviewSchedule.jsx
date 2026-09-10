@@ -23,7 +23,7 @@ const buildToday = () => {
     return { label: `${months[mo]} ${d}, ${yr}`, value: `${padded}/${moPadded}/${yr}` };
 };
 
-function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg, onLeaseNow, securePath = '/secure-booking', showSecureBook = true, showLeaseNow = true }) {
+function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg, onLeaseNow, securePath = '/secure-booking', showSecureBook = true, showLeaseNow = true, searchRoomApproved = false, onSearchRoom }) {
     const [activeTab, setActiveTab] = useState("schedule");
     // Today is selected by default (Calendar already highlights today; this makes
     // it the real selected date so today's slots load on open).
@@ -281,6 +281,27 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                     >
                                         Reschedule
                                     </button>
+                                    {/* "Search your room": unlocked only once the
+                                        interview is approved by Zoho. Never auto-
+                                        navigates — the user clicks to continue. */}
+                                    {datatext !== "securePlaneblock" && (
+                                        <div className="mb-3">
+                                            <button
+                                                type="button"
+                                                className="btn btn-gold"
+                                                disabled={!searchRoomApproved}
+                                                onClick={onSearchRoom}
+                                            >
+                                                <i className="bi bi-search me-2"></i>
+                                                Search your room
+                                            </button>
+                                            {!searchRoomApproved && (
+                                                <p className="text-muted small mb-0 mt-2">
+                                                    Available once your interview is approved.
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
                                     {/* "Secure Booking Now" belongs only to the Interview
                                         Booking context. This component is shared: the Secure
                                         Booking page renders it with datatext="securePlaneblock",
