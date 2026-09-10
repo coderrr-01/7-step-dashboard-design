@@ -30,11 +30,10 @@ function PropertyMap({ location, rooms, onReset, loadingRooms }) {
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
-    // OpenStreetMap standard tiles — free, no API key, no error/attribution
-    // text rendered on the map (unlike CARTO, which can serve "API key
-    // required" error tiles when accessed without a token).
+    // CARTO light basemap (same map as before). attributionControl is off and
+    // no attribution string is passed, so no "carto.com/..." text renders.
     L.tileLayer(
-      "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
       {
         maxZoom: 19,
       }
