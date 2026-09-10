@@ -122,7 +122,6 @@ export default function Interview() {
    const [interviewApproved, setInterviewApproved] = useState(getCachedInterviewApproved());
    const [interviewBooked, setInterviewBooked] = useState(false);
    const pollRef = useRef(null);
-   const liveApprovedRef = useRef(false);
 
    // Returning user (refresh / re-login with the same ID): Zoho already has the
    // booking, so restore the confirmed state from client data instead of making
@@ -167,10 +166,6 @@ export default function Interview() {
           }
           if (matched) {
              saveInterviewApproved();
-             // Only a LIVE Zoho approval counts for the auto-advance. A button
-             // that is merely enabled from a previously cached approval does
-             // NOT bounce — polling keeps going until a live signal arrives.
-             liveApprovedRef.current = true;
              setInterviewApproved(true);
              clearInterval(pollRef.current);
              console.log(`[jrny] interview approved detected via ${matched}`);
@@ -200,23 +195,6 @@ export default function Interview() {
       completeStep(3);
       navigate('/room-search');
    }
-
-   // As soon as a LIVE Zoho approval arrives (the "Search your room" button
-   // changes from disabled → enabled) AND the interview is booked, advance
-   // automatically to /room-search. A button merely enabled from cached
-   // approval does NOT bounce — polling keeps going until a live signal
-   // arrives (or the user clicks). Short delay so the enabling is visible.
-   const bouncedRef = useRef(false);
-   useEffect(() => {
-      if (bouncedRef.current) return;
-      if (!liveApprovedRef.current || !interviewApproved || !interviewBooked) return;
-      bouncedRef.current = true;
-      const t = setTimeout(() => {
-         completeStep(3);
-         navigate('/room-search');
-      }, 800);
-      return () => clearTimeout(t);
-   }, [interviewApproved, interviewBooked, completeStep, navigate]);
 
    // Called when user clicks "Confirm Time Slot"
    const handleConfirm = async (selectedDate, selectedTime, onSuccess) => {
