@@ -2325,6 +2325,18 @@ body.page-room-search .page-description {
 .no-cursor{
     cursor: not-allowed;
 }
+button.no-cursor:disabled {
+    pointer-events: auto;
+    cursor: not-allowed;
+}
+button.no-cursor:disabled:hover,
+button.no-cursor:disabled:active {
+    background-color: inherit !important;
+    transform: none !important;
+}
+button.no-cursor:disabled:hover .bi {
+    transform: none !important;
+}
 
 /* Added when "Search your room" unlocks (interview approved) — soft gold glow
    pulse + light sheen sweeping across the button. */
