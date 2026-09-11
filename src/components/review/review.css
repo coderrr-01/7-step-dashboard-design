@@ -1255,4 +1255,31 @@
   .ver-scan {
     transform: scale(0.92);
   }
+  .ver-card-title{
+    font-size:14px
+  }
+}
+
+/* ---------- Mobile card order (<=767px only) ----------
+   Cards live in three containers (Application Overview, the grid, and the
+   bottom pair). On mobile we flatten those wrappers so `order` can re-arrange
+   every card as one stack: Status, Progress, Overview, Timeline, Trust, then
+   Current Verification and the Checklist last. Desktop/tablet untouched. */
+@media (max-width: 767px) {
+  .verification-stack {
+    display: grid;
+    gap: 24px;
+  }
+  .verification-stack > .verification-grid,
+  .verification-stack > .verification-grid-bottom {
+    display: contents;
+  }
+  .verification-stack .vg-status    { order: 1; }
+  .verification-stack .vg-progress  { order: 2; }
+  .verification-stack .ver-overview-card { order: 3; }
+  .verification-stack .ver-time-card { order: 4; }
+  .verification-stack .ver-trust-card { order: 5; }
+  .verification-stack .vg-review    { order: 6; }
+  .verification-stack .vg-checklist { order: 7; }
+  .verification-stack > .ver-overview-card { margin-bottom: 0; }
 }

@@ -18,7 +18,6 @@ const SecurityDeposit = ({ rentTitle }) => {
                 <h3>Rent Deposit</h3>
             )}
             <div className="bank-details">
-
                 <div className="row">
                     <b>Bank</b>
                     <span>Your Bank Name</span>

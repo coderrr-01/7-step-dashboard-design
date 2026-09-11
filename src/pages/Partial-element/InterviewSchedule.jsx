@@ -268,12 +268,12 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                         </div>
                                     </div>
                                     {meetLink ? (
-                                        <a href={meetLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp mb-3 d-inline-block">
+                                        <a    disabled={searchRoomApproved} href={meetLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp mb-3 d-inline-block">
                                             <i className="bi bi-whatsapp me-2"></i>
                                             Join Google Meet
                                         </a>
                                     ) : (
-                                        <button type="button" className="btn btn-whatsapp mb-3" onClick={interview_progress}>
+                                        <button type="button" className="btn btn-whatsapp mb-3"    disabled={searchRoomApproved} onClick={interview_progress}>
                                             <i className="bi bi-whatsapp me-2"></i>
                                             Interview with Najat
                                         </button>
@@ -282,6 +282,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                         type="button"
                                         className="btn btn-black mb-3"
                                         onClick={handleReschedule}
+                                        disabled={searchRoomApproved}
                                     >
                                         Reschedule
                                     </button>

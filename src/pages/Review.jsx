@@ -163,7 +163,7 @@ export default function Review() {
 
    return (
       <PageLayout page="Review">
-         <main className="review-page-bg">
+         <main className="review-page-bg verification-grid">
             <div className="review-ambient">
                <span className="rev-blob rev-blob-1"></span>
                <span className="rev-blob rev-blob-2"></span>
@@ -185,23 +185,25 @@ export default function Review() {
                   <VerificationFailed data={data} />
                ) : (
                   <>
-                     <VerificationHeader />
-                     <ApplicationOverview data={data} />
+<VerificationHeader />
+                      <div className="verification-stack">
+                         <ApplicationOverview data={data} />
 
-                     <div className={`verification-grid ${data.status === "action-required" ? "has-action" : ""}`}>
-                        <VerificationStatus data={data} />
-                        <VerificationProgress data={data} />
-                        {data.status === "action-required" && (
-                           <VerificationActionRequired data={data} />
-                        )}
-                        <CurrentVerification data={data} />
-                        <VerificationChecklist data={data} />
-                     </div>
+                         <div className={`verification-grid ${data.status === "action-required" ? "has-action" : ""}`}>
+                            <VerificationStatus data={data} />
+                            <VerificationProgress data={data} />
+                            {data.status === "action-required" && (
+                               <VerificationActionRequired data={data} />
+                            )}
+                            <CurrentVerification data={data} />
+                            <VerificationChecklist data={data} />
+                         </div>
 
-                     <div className="verification-grid-bottom">
-                        <ReviewTimeline data={data} />
-                        <TrustSecurity />
-                     </div>
+                         <div className="verification-grid-bottom">
+                            <ReviewTimeline data={data} />
+                            <TrustSecurity />
+                         </div>
+                      </div>
 
                      {/* {!approved && (
                         <p className="ver-complete-sub text-center mt-4 mb-0">
