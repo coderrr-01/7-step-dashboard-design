@@ -10,6 +10,7 @@ import { searchLocations } from "../components/roomSearch/geocode";
 import { getRooms } from "../services/api";
 import "../components/roomSearch/roomSearch.css";
 import { useSteps } from "../context/StepContext";
+import { isRoomAvailable } from "../components/roomSearch/roomStatus";
 
 const locationwise = [
    "London",
@@ -19,10 +20,6 @@ const locationwise = [
    "New York",
    "Los Angeles",
 ];
-
-function isRoomAvailable(room) {
-   return String(room?.status || "").toLowerCase().includes("available");
-}
 
 export default function RoomSearch() {
    const navigate = useNavigate();

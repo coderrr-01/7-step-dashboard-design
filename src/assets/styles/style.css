@@ -1056,6 +1056,36 @@ body.page-residence-agreement .form-check-label {
         font-family: 'Barlow';
 }
 
+/* ---------- Occupied room banner (ViewRoom summary) ---------- */
+.rs-occupied-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fdf2f2;
+    border: 1px solid #f5c6c6;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    color: #9b2c2c;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+}
+.rs-occupied-banner-icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* Disabled tour button (occupied) */
+.btn-outline-elite.disabled,
+.btn-outline-elite:disabled {
+    opacity: 0.55;
+    pointer-events: none;
+    background: transparent;
+    border-color: #c4bfb4;
+    color: #8a8171;
+}
+
 .merchant-footer {
     background-color: rgba(255, 255, 255, 0.3);
     border: 1px dashed var(--primary-container);

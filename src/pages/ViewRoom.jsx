@@ -3,6 +3,7 @@ import PageLayout from "../components/PageLayout";
 import Calendar from "./Partial-element/Calendar";
 import { IoArrowBack } from "react-icons/io5";
 import { useState, useEffect } from "react";
+import { isRoomOccupied } from "../components/roomSearch/roomStatus";
 
 export default function ViewRoom() {
    const navigate = useNavigate();
@@ -20,6 +21,8 @@ export default function ViewRoom() {
    }, []);
 
    if (!room) return null;
+
+   const occupied = isRoomOccupied(room);
 
    // Support both the new catalogue shape and the old WP /rooms shape.
    // Images may be separated by commas, newlines, or both.
@@ -205,19 +208,26 @@ export default function ViewRoom() {
                      </div>
                   </div>
                   {/* Right Column: Sidebar */}
-                  <div className="col-xl-4 h-100">
-                     <div className="parchment-card summary-card shadow-lg p-4">
-                        <h2 className="h4 text-primary mb-4">Booking Summary</h2>
-                        <div className="mb-4">
-                           <div className="d-flex justify-content-between align-items-center mb-1">
-                              <span className="small text-muted text-uppercase fw-bold summary-label">Unit Specification</span>
-                              {/* <a className="small text-primary text-decoration-underline" href="#">Change</a> */}
-                           </div>
-                            <div className="h6 fw-bold mb-0">{roomName}, {roomNumber}</div>
+                   <div className="col-xl-4 h-100">
+                      <div className="parchment-card summary-card shadow-lg p-4">
+                         {occupied && (
+                            <div className="rs-occupied-banner">
+                               <div className="rs-occupied-banner-icon">
+                                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#d64545"/></svg>
+                               </div>
+                               <span>This room is currently <strong>occupied</strong> and not available for booking.</span>
+                            </div>
+                         )}
+                         <h2 className="h4 text-primary mb-4">Booking Summary</h2>
+                         <div className="mb-4">
+                            <div className="d-flex justify-content-between align-items-center mb-1">
+                               <span className="small text-muted text-uppercase fw-bold summary-label">Unit Specification</span>
+                            </div>
+                             <div className="h6 fw-bold mb-0">{roomName}, {roomNumber}</div>
                          </div>
                          <div className="mb-4">
-                            <span className="small text-muted text-uppercase fw-bold d-block mb-1 summary-label">Agreement Type</span>
-                               <div className="h6 mb-0">{agreementType}</div>
+                             <span className="small text-muted text-uppercase fw-bold d-block mb-1 summary-label">Agreement Type</span>
+                                <div className="h6 mb-0">{agreementType}</div>
                          </div>
                          <hr className="my-4 opacity-10" />
                          <div className="d-flex justify-content-between align-items-center mb-3 gap-2">
@@ -228,16 +238,20 @@ export default function ViewRoom() {
                             <span className="fw-bold">Holding Deposit</span>
                             <span className="h5 mb-0 fw-bold text-muted">${depositAmt}</span>
                          </div>
-                        <div className="d-grid gap-3 mb-4">
-                           {/* <button className="btn btn-primary-elite">Lock In Residency</button> */}
-                           <Link to="/secure-booking"><button className="btn btn-outline-elite">Book Your Tour</button></Link>
-                        </div>
-                        <p className="text-center small text-muted text-uppercase mb-0 summary-disclaimer">
-                           By clicking 'Lock In', you agree to the preliminary institutional residency terms and the immediate payment of the holding deposit.
-                        </p>
-                     </div>
-                     {/* Trust Badge */}
-                  </div>
+                         {occupied ? (
+                            <div className="d-grid gap-3 mb-4">
+                               <button className="btn btn-outline-elite disabled" disabled aria-disabled="true">Room Occupied</button>
+                            </div>
+                         ) : (
+                            <div className="d-grid gap-3 mb-4">
+                               <Link to="/secure-booking"><button className="btn btn-outline-elite">Book Your Tour</button></Link>
+                            </div>
+                         )}
+                         <p className="text-center small text-muted text-uppercase mb-0 summary-disclaimer">
+                            By clicking 'Lock In', you agree to the preliminary institutional residency terms and the immediate payment of the holding deposit.
+                         </p>
+                      </div>
+                   </div>
                </div>
             </div>
          </main>
