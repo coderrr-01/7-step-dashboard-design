@@ -230,7 +230,17 @@ export default function RoomSearch() {
                    </div>
                </section>
 
-{/* Status Tabs */}
+{/* Interactive Map */}
+                <section className="mb-5">
+                   <PropertyMap
+                      location={location}
+                      rooms={tabRooms}
+                      onReset={handleReset}
+                      loadingRooms={roomsLoading}
+                   />
+                </section>
+
+                {/* Status Tabs */}
                 <div className="rs-status-tabs" role="tablist">
                    <button
                       type="button"
@@ -253,16 +263,6 @@ export default function RoomSearch() {
                       Available
                    </button>
                 </div>
-
-                {/* Interactive Map */}
-                <section className="mb-5">
-                   <PropertyMap
-                      location={location}
-                      rooms={tabRooms}
-                      onReset={handleReset}
-                      loadingRooms={roomsLoading}
-                   />
-                </section>
 
                 {/* Results header */}
                 <div className="rs-results-head mb-4">
