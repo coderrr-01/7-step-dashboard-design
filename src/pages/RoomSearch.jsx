@@ -33,7 +33,7 @@ export default function RoomSearch() {
    const [location, setLocation] = useState(null);
    const [locSearching, setLocSearching] = useState(false);
    const [locError, setLocError] = useState("");
-   const [activeTab, setActiveTab] = useState("occupied");
+   const [activeTab, setActiveTab] = useState("available");
 
    // Dynamic Zoho rooms. Static catalogue is only the offline/loading seed.
    const [rooms, setRooms] = useState(roomsData);
