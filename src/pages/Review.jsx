@@ -186,6 +186,9 @@ export default function Review() {
                ) : (
                   <>
 <VerificationHeader />
+
+
+
                       <div className={`verification-stack ${data.status === "action-required" ? "has-action" : ""}`}>
                          <VerificationStatus data={data} />
                          <VerificationProgress data={data} />

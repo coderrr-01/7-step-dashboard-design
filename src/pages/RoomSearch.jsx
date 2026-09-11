@@ -20,6 +20,10 @@ const locationwise = [
    "Los Angeles",
 ];
 
+function isRoomAvailable(room) {
+   return String(room?.status || "").toLowerCase().includes("available");
+}
+
 export default function RoomSearch() {
    const navigate = useNavigate();
    const { completeStep } = useSteps();
@@ -29,6 +33,7 @@ export default function RoomSearch() {
    const [location, setLocation] = useState(null);
    const [locSearching, setLocSearching] = useState(false);
    const [locError, setLocError] = useState("");
+   const [activeTab, setActiveTab] = useState("occupied");
 
    // Dynamic Zoho rooms. Static catalogue is only the offline/loading seed.
    const [rooms, setRooms] = useState(roomsData);
@@ -78,6 +83,13 @@ export default function RoomSearch() {
          return tierOk && locOk;
       });
    }, [location, selected, rooms]);
+
+   const tabRooms = useMemo(() => {
+      return filteredRooms.filter((room) => {
+         const avail = isRoomAvailable(room);
+         return activeTab === "available" ? avail : !avail;
+      });
+   }, [filteredRooms, activeTab]);
 
    const locationType = () => {
       setlocationPrefereance(!locationPrefereance);
@@ -209,56 +221,80 @@ export default function RoomSearch() {
                         </ul>
                      )}
                   </div>
-                  <div className="col-lg-4 col-md-12 text-lg-end pb-1">
-                     <span className="small text-muted fw-bold">
-                        Showing{" "}
-                        <span className="text-dark">{filteredRooms.length}</span>{" "}
-                        Exclusive Units
-                     </span>
-                  </div>
+<div className="col-lg-4 col-md-12 text-lg-end pb-1">
+                      <span className="small text-muted fw-bold">
+                         Showing{" "}
+                         <span className="text-dark">{tabRooms.length}</span>{" "}
+                         {activeTab === "available" ? "Available" : "Occupied"} Units
+                      </span>
+                   </div>
                </section>
 
-               {/* Interactive Map */}
-               <section className="mb-5">
-                  <PropertyMap
-                     location={location}
-                     rooms={filteredRooms}
-                     onReset={handleReset}
-                     loadingRooms={roomsLoading}
-                  />
-               </section>
+{/* Status Tabs */}
+                <div className="rs-status-tabs" role="tablist">
+                   <button
+                      type="button"
+                      role="tab"
+                      className={`rs-status-tab ${activeTab === "occupied" ? "is-active" : ""}`}
+                      onClick={() => setActiveTab("occupied")}
+                     aria-selected={activeTab === "occupied"}
+                   >
+                      <span className={`rs-tab-dot ${activeTab === "occupied" ? "is-occupied" : ""}`}></span>
+                      Occupied
+                   </button>
+                   <button
+                      type="button"
+                      role="tab"
+                      className={`rs-status-tab ${activeTab === "available" ? "is-active" : ""}`}
+                      onClick={() => setActiveTab("available")}
+                     aria-selected={activeTab === "available"}
+                   >
+                      <span className={`rs-tab-dot ${activeTab === "available" ? "is-available" : ""}`}></span>
+                      Available
+                   </button>
+                </div>
 
-               {/* Results header */}
-               <div className="rs-results-head mb-4">
-                  <h2 className="rs-results-title mb-0">
-                     {location ? (
-                        <>
-                           Available Rooms in <span className="rs-loc-tag">📍 {location.name}</span>
-                        </>
-                     ) : (
-                        <>Available Rooms</>
-                     )}
+                {/* Interactive Map */}
+                <section className="mb-5">
+                   <PropertyMap
+                      location={location}
+                      rooms={tabRooms}
+                      onReset={handleReset}
+                      loadingRooms={roomsLoading}
+                   />
+                </section>
+
+                {/* Results header */}
+                <div className="rs-results-head mb-4">
+                   <h2 className="rs-results-title mb-0">
+                      {location ? (
+                         <>
+                            {activeTab === "available" ? "Available" : "Occupied"} Rooms in <span className="rs-loc-tag">📍 {location.name}</span>
+                         </>
+                      ) : (
+                         <>{activeTab === "available" ? "Available" : "Occupied"} Rooms</>
+                      )}
                   </h2>
-                  <span className="rs-results-count">
-                     {filteredRooms.length} room{filteredRooms.length === 1 ? "" : "s"}
-                  </span>
-               </div>
+                   <span className="rs-results-count">
+                      {tabRooms.length} room{tabRooms.length === 1 ? "" : "s"}
+                   </span>
+                </div>
 
                {/* Property Grid */}
-               {filteredRooms.length === 0 ? (
+               {tabRooms.length === 0 ? (
                   <section className="rs-empty-state mb-4">
                      <div className="rs-empty-state-icon"><FaCompass /></div>
-                     <h4>No rooms found in this area yet</h4>
+                     <h4>No {activeTab === "available" ? "available" : "occupied"} rooms found in this area yet</h4>
                      <p>Try another location or change the accommodation tier, or hit Reset Map to see all rooms.</p>
                   </section>
                ) : (
                   <section className="row g-4">
-                     {filteredRooms.map((room) => (
+                     {tabRooms.map((room) => (
                         <div className="col-lg-3 col-md-6" key={room.id}>
                            <div className="property-card">
                               <div className="card-img-container">
-                                 <div className="status-badge">
-                                    <div className="status-dot"></div>
+                                 <div className={`status-badge ${isRoomAvailable(room) ? "st-available" : "st-occupied"}`}>
+                                    <div className={`status-dot ${isRoomAvailable(room) ? "is-available" : "is-occupied"}`}></div>
                                     {room.status}
                                  </div>
                                  <img alt={`${room.name} Interior`} src={room.img} />
@@ -276,11 +312,11 @@ export default function RoomSearch() {
                                     <span className="rent-label">Monthly Rent</span>
                                     <span className="rent-amount">${room.price.toLocaleString()}</span> <span className="rent-period">/mo</span>
                                  </div>
-                                  <button className="btn btn-gold" onClick={() => handleViewRoom(room)}>View Room</button>
-                              </div>
-                           </div>
+<button className="btn btn-gold" onClick={() => handleViewRoom(room)}>View Room</button>
+                            </div>
+                         </div>
                         </div>
-                     ))}
+                      ))}
                   </section>
                )}
             </div>

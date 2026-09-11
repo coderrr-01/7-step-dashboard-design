@@ -269,7 +269,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                     </div>
                                     {meetLink ? (
                                         <a    disabled={searchRoomApproved} href={meetLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp mb-3 d-inline-block">
-                                            <i className="bi bi-whatsapp me-2"></i>
+                                             <i className="bi bi-camera-video-fill me-2"></i>
                                             Join Google Meet
                                         </a>
                                     ) : (
