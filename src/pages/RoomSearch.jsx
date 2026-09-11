@@ -245,22 +245,22 @@ export default function RoomSearch() {
                    <button
                       type="button"
                       role="tab"
-                      className={`rs-status-tab ${activeTab === "occupied" ? "is-active" : ""}`}
-                      onClick={() => setActiveTab("occupied")}
-                     aria-selected={activeTab === "occupied"}
+                      className={`rs-status-tab ${activeTab === "available" ? "is-active" : ""}`}
+                      onClick={() => setActiveTab("available")}
+                      aria-selected={activeTab === "available"}
                    >
-                      <span className={`rs-tab-dot ${activeTab === "occupied" ? "is-occupied" : ""}`}></span>
-                      Occupied
+                      <span className={`rs-tab-dot ${activeTab === "available" ? "is-available" : ""}`}></span>
+                      Available
                    </button>
                    <button
                       type="button"
                       role="tab"
-                      className={`rs-status-tab ${activeTab === "available" ? "is-active" : ""}`}
-                      onClick={() => setActiveTab("available")}
-                     aria-selected={activeTab === "available"}
+                      className={`rs-status-tab ${activeTab === "occupied" ? "is-active" : ""}`}
+                      onClick={() => setActiveTab("occupied")}
+                      aria-selected={activeTab === "occupied"}
                    >
-                      <span className={`rs-tab-dot ${activeTab === "available" ? "is-available" : ""}`}></span>
-                      Available
+                      <span className={`rs-tab-dot ${activeTab === "occupied" ? "is-occupied" : ""}`}></span>
+                      Occupied
                    </button>
                 </div>
 
