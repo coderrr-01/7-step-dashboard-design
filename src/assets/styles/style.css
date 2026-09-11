@@ -2325,34 +2325,6 @@ body.page-room-search .page-description {
 .no-cursor{
     cursor: not-allowed;
 }
-/* Disabled form buttons show pointer-events:none (Bootstrap), which swallows
-   the hover cursor. Re-enable so the not-allowed cursor actually appears,
-   while still staying non-clickable (disabled attribute keeps it inert). */
-button.no-cursor:disabled,
-a.no-cursor[disabled] {
-    pointer-events: auto;
-    cursor: not-allowed;
-}
-button.no-cursor:disabled:hover,
-a.no-cursor[disabled]:hover {
-    cursor: not-allowed;
-}
-/* Disabled buttons must not react to hover (Bootstrap applies background
-   changes on .btn:hover). Equalize transform/background so nothing moves. */
-button.no-cursor:disabled:hover,
-button.no-cursor:disabled:active,
-button.no-cursor:disabled:focus,
-a.no-cursor[disabled]:hover,
-a.no-cursor[disabled]:active,
-a.no-cursor[disabled]:focus {
-    transform: none !important;
-    background-color: inherit !important;
-    color: inherit !important;
-}
-button.no-cursor:disabled:hover .bi,
-a.no-cursor[disabled]:hover .bi {
-    transform: none !important;
-}
 
 /* Added when "Search your room" unlocks (interview approved) — soft gold glow
    pulse + light sheen sweeping across the button. */
