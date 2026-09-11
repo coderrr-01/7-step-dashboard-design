@@ -268,7 +268,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                         </div>
                                     </div>
                                     {meetLink ? (
-                                        <a    disabled={searchRoomApproved} href={meetLink} target="_blank" rel="noreferrer" className="btn btn-whatsapp mb-3 d-inline-block">
+                                        <a  className={`btn btn-whatsapp mb-3 d-inline-block ${searchRoomApproved ? "no-cursor" : ""}`}   disabled={searchRoomApproved} href={meetLink} target="_blank" rel="noreferrer">
                                              <i className="bi bi-camera-video-fill me-2"></i>
                                             Join Google Meet
                                         </a>
@@ -280,7 +280,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                     )}
                                     <button
                                         type="button"
-                                        className="btn btn-black mb-3"
+                                        className={`btn btn-black mb-3 ${searchRoomApproved ? "no-cursor" : ""}`}
                                         onClick={handleReschedule}
                                         disabled={searchRoomApproved}
                                     >

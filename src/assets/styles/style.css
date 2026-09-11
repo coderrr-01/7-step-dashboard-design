@@ -2322,6 +2322,10 @@ body.page-room-search .page-description {
     cursor: not-allowed;
 }
 
+.no-cursor{
+    cursor: not-allowed;
+}
+
 /* Added when "Search your room" unlocks (interview approved) — soft gold glow
    pulse + light sheen sweeping across the button. */
 .enabled-glow {
