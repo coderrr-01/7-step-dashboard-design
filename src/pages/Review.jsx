@@ -163,7 +163,7 @@ export default function Review() {
 
    return (
       <PageLayout page="Review">
-         <main className="review-page-bg verification-grid">
+         <main className="review-page-bg">
             <div className="review-ambient">
                <span className="rev-blob rev-blob-1"></span>
                <span className="rev-blob rev-blob-2"></span>
