@@ -2331,8 +2331,8 @@ button.no-cursor:disabled {
 }
 button.no-cursor:disabled:hover,
 button.no-cursor:disabled:active {
-    background-color: inherit !important;
-    transform: none !important;
+    background-color: black !important;
+    transform: none !important
 }
 button.no-cursor:disabled:hover .bi {
     transform: none !important;
