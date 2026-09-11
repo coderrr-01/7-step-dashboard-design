@@ -1187,48 +1187,50 @@
   margin: 14px 0 0;
 }
 
-/* ---------- Grid ---------- */
-.verification-grid {
+/* ---------- Stack (single container holding every card) ----------
+   DOM order = mobile order. Desktop places each card by class via
+   grid-template-areas, so it never depends on source order. */
+.verification-stack {
   display: grid;
   gap: 24px;
 }
-.verification-grid-bottom {
-  display: grid;
-  gap: 24px;
-  margin-top: 24px;
-}
+.verification-stack > .ver-overview-card { margin-bottom: 0; }
 
 @media (min-width: 992px) {
-  .verification-grid {
+  .verification-stack {
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
+      "overview overview"
       "status progress"
-      "checklist review";
+      "checklist review"
+      "timeline trust";
   }
-  .verification-grid.has-action {
+  .verification-stack.has-action {
     grid-template-areas:
+      "overview overview"
       "status progress"
       "action action"
-      "checklist review";
+      "checklist review"
+      "timeline trust";
   }
-  .verification-grid-bottom {
-    grid-template-columns: 1fr 1fr;
-  }
+  .verification-stack > .ver-overview-card { grid-area: overview; }
+  .verification-stack > .vg-status    { grid-area: status; }
+  .verification-stack > .vg-progress  { grid-area: progress; }
+  .verification-stack > .vg-action    { grid-area: action; }
+  .verification-stack > .vg-review    { grid-area: review; }
+  .verification-stack > .vg-checklist { grid-area: checklist; }
+  .verification-stack > .ver-time-card  { grid-area: timeline; }
+  .verification-stack > .ver-trust-card { grid-area: trust; }
 }
 
-.verification-grid > .vg-status   { grid-area: status; }
-.verification-grid > .vg-progress { grid-area: progress; }
-.verification-grid > .vg-action   { grid-area: action; }
-.verification-grid > .vg-checklist { grid-area: checklist; }
-.verification-grid > .vg-review   { grid-area: review; }
-
-.verification-grid > *:nth-child(1) { animation-delay: 0.08s; }
-.verification-grid > *:nth-child(2) { animation-delay: 0.15s; }
-.verification-grid > *:nth-child(3) { animation-delay: 0.22s; }
-.verification-grid > *:nth-child(4) { animation-delay: 0.29s; }
-.verification-grid > *:nth-child(5) { animation-delay: 0.36s; }
-.verification-grid-bottom > *:nth-child(1) { animation-delay: 0.15s; }
-.verification-grid-bottom > *:nth-child(2) { animation-delay: 0.22s; }
+.verification-stack > *:nth-child(1) { animation-delay: 0.08s; }
+.verification-stack > *:nth-child(2) { animation-delay: 0.15s; }
+.verification-stack > *:nth-child(3) { animation-delay: 0.22s; }
+.verification-stack > *:nth-child(4) { animation-delay: 0.29s; }
+.verification-stack > *:nth-child(5) { animation-delay: 0.36s; }
+.verification-stack > *:nth-child(6) { animation-delay: 0.43s; }
+.verification-stack > *:nth-child(7) { animation-delay: 0.5s; }
+.verification-stack > *:nth-child(8) { animation-delay: 0.57s; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 767px) {
@@ -1258,28 +1260,4 @@
   .ver-card-title{
     font-size:14px
   }
-}
-
-/* ---------- Mobile card order (<=767px only) ----------
-   Cards live in three containers (Application Overview, the grid, and the
-   bottom pair). On mobile we flatten those wrappers so `order` can re-arrange
-   every card as one stack: Status, Progress, Overview, Timeline, Trust, then
-   Current Verification and the Checklist last. Desktop/tablet untouched. */
-@media (max-width: 767px) {
-  .verification-stack {
-    display: grid;
-    gap: 24px;
-  }
-  .verification-stack > .verification-grid,
-  .verification-stack > .verification-grid-bottom {
-    display: contents;
-  }
-  .verification-stack .vg-status    { order: 1; }
-  .verification-stack .vg-progress  { order: 2; }
-  .verification-stack .ver-overview-card { order: 3; }
-  .verification-stack .ver-time-card { order: 4; }
-  .verification-stack .ver-trust-card { order: 5; }
-  .verification-stack .vg-review    { order: 6; }
-  .verification-stack .vg-checklist { order: 7; }
-  .verification-stack > .ver-overview-card { margin-bottom: 0; }
 }
