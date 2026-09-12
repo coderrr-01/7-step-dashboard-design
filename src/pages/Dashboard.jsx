@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import PageLayout from "../components/PageLayout";
 import { useClientData } from "../hooks/useClientData";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
-import { getRoomById } from "../services/api";
-import stepsConfig from "../config/stepsConfig";
-import { useSteps } from "../context/StepContext";
+import { getRoomById, getUserSub } from "../services/api";
 
 const MONTH_MS = 1000 * 60 * 60 * 24 * 30.44;
 
@@ -23,6 +21,13 @@ function progressTone(elapsed) {
   return "green";
 }
 
+function formatPretty(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return value;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
 const METHOD_LABELS = {
   stripe: "Stripe",
   paypal: "PayPal",
@@ -38,14 +43,22 @@ function modularity(value) {
 
 export default function Dashboard() {
   const { client, loading, refetch } = useClientData({ preferCachedData: false });
-  const { completedSteps } = useSteps();
-
   const [fallbackRoom, setFallbackRoom] = useState(null);
 
   const [selectedRoom] = useState(() => {
     try { return JSON.parse(localStorage.getItem("jrny_selected_room") || "null"); }
     catch { return null; }
   });
+
+  // Profile avatar — edited image lives locally (no backend update endpoint).
+  const sub = getUserSub();
+  const profileImgKey = sub ? `jrny_profile_img_${sub}` : null;
+  const [profileImg, setProfileImg] = useState(() => {
+    if (!profileImgKey) return "";
+    try { return localStorage.getItem(profileImgKey) || ""; } catch { return ""; }
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [profileMsg, setProfileMsg] = useState("");
 
   // Paid users only — anyone without BOTH payments done is sent back to the
   // payment screen. Waits for fresh server data (no cached-flag shortcut).
@@ -130,6 +143,9 @@ export default function Dashboard() {
     : "—";
   const depositMethod = modularity(paymentState.depositMethod);
   const rentMethod = modularity(paymentState.rentMethod);
+  const totalPaid = client?.security_deposit && client?.rent_amount
+    ? (parseFloat(client.security_deposit) + parseFloat(client.rent_amount)).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 })
+    : "—";
 
   const unitLabel = activeRoom?.name || client?.unit || client?.room_name || "Your residence";
   const roomMeta = (() => {
@@ -157,14 +173,54 @@ export default function Dashboard() {
   // Extend unlocks only from month 10 (within two months of expiry).
   const extendEnabled = expired || elapsedMonths >= 10;
 
-  const journeyComplete = stepsConfig.every((s) => completedSteps.includes(s.number));
-  const completedCount = stepsConfig.filter((s) => completedSteps.includes(s.number)).length;
-  const completedStepsToday = [...completedSteps].sort((a, b) => a - b);
+  // Sanity: a fully-overdue term should never overflow past the track.
+  const barPct = Math.min(100, Math.max(0, pct));
+
+  // ── Journey timeline — what actually happened, in real order ───────────────
+  const signedPdf = client?.signed_lease || "";
+  const interviewDate = client?.interview_date ? formatPretty(client.interview_date) : "";
+  const interviewTime = client?.interview_time || "";
+  const appliedDate = client?.submitted_at ? formatPretty(client.submitted_at) : "";
+  const leaseSignedDate = signedPdf ? (client?.effective_date ? formatPretty(client.effective_date) : (startDate ? formatPretty(startDate) : "")) : "";
+  const bothPaid = paymentState.depositPaid && paymentState.rentPaid;
+
+  const timeline = [];
+  if (appliedDate) timeline.push({ icon: "form", title: "Application Submitted", text: "Tenant application received by the Board.", date: appliedDate });
+  if (interviewDate) timeline.push({ icon: "chat", title: "Interview Scheduled", text: `Board review session ${interviewTime ? `at ${interviewTime}` : ""}.`.replace(/\s+/g, " "), date: interviewDate });
+  if (unitLabel) timeline.push({ icon: "home", title: "Residence Selected", text: roomMeta || "Residence booking confirmed.", date: client?.move_in_date ? formatPretty(client.move_in_date) : "" });
+  if (signedPdf) timeline.push({ icon: "file", title: "Lease Signed", text: "Residency agreement executed.", date: leaseSignedDate });
+  if (bothPaid) timeline.push({ icon: "pay", title: "Payments Complete", text: "Security deposit + first month's rent settled.", date: "" });
+
+  const profileEmail = client?.email || "—";
+  const profilePhone = client?.phone || "—";
+  const profileDob = client?.date_of_birth ? formatPretty(client.date_of_birth) : "—";
+
+  const handleAvatarUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setProfileMsg("Please choose an image file.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      setProfileImg(dataUrl);
+      if (profileImgKey) {
+        try { localStorage.setItem(profileImgKey, dataUrl); } catch {}
+      }
+      setProfileMsg("Profile picture updated (saved on this device).");
+      setTimeout(() => setProfileMsg(""), 3500);
+    };
+    reader.onerror = () => setProfileMsg("Could not read the image.");
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
 
   const statCards = [
-    { label: "Journey Steps", value: `${completedCount}/${stepsConfig.length}`, done: journeyComplete },
-    { label: "Residence", value: unitLabel, done: !!unitLabel },
-    { label: "Lease Ends", value: endDate ? new Date(endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—", done: !!endDate },
+    { label: "Residence", value: unitLabel, meta: roomMeta || "Booked" },
+    { label: "Lease Ends", value: endDate ? formatPretty(endDate) : "—", meta: `${remainingMonths} month${remainingMonths === 1 ? "" : "s"} left` },
+    { label: "Total Paid", value: totalPaid, meta: bothPaid ? "Settled" : "Pending" },
   ];
 
   return (
@@ -179,22 +235,16 @@ export default function Dashboard() {
               <p className="db-hero-eyebrow">Welcome back</p>
               <h1 className="db-hero-title">Hello, {firstName}!</h1>
               <p className="db-hero-sub">
-                Your membership journey is complete — here is everything that happened
-                along the way, and how your lease is tracking.
+                Your residency is live. Here is everything that happened on your
+                journey, how your lease is tracking, and your membership details.
               </p>
             </div>
-            {journeyComplete ? (
-              <span className="db-complete-badge">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Journey Complete
-              </span>
-            ) : (
-              <span className="db-complete-badge db-complete-badge-progress">
-                {Math.round((completedCount / stepsConfig.length) * 100)}% complete
-              </span>
-            )}
+            <span className="db-complete-badge">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Membership Active
+            </span>
           </section>
 
           {/* Stat cards */}
@@ -202,8 +252,8 @@ export default function Dashboard() {
             {statCards.map((card) => (
               <div key={card.label} className="db-stat-card">
                 <p className="db-stat-label">{card.label}</p>
-                <h3 className="db-stat-value">{card.value}</h3>
-                <p className="db-stat-meta">{card.done ? "Confirmed" : "—"}</p>
+                <h3 className="db-stat-value" title={card.value}>{card.value}</h3>
+                <p className="db-stat-meta">{card.meta}</p>
               </div>
             ))}
           </section>
@@ -216,13 +266,13 @@ export default function Dashboard() {
                 <h2 className="db-section-title">Membership Term</h2>
               </div>
               <div className="db-progress-meta">
-                <span>{startDate ? new Date(startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"} → {endDate ? new Date(endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}</span>
+                <span>{startDate ? formatPretty(startDate) : "—"} → {endDate ? formatPretty(endDate) : "—"}</span>
               </div>
             </div>
 
             <div className="db-progress-bar-wrap">
               <div className="db-progress-track">
-                <div className="db-progress-fill" style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}></div>
+                <div className="db-progress-fill" style={{ width: `${barPct}%` }}></div>
               </div>
               <div className="db-progress-labels">
                 <span>{elapsedMonths} month{elapsedMonths === 1 ? "" : "s"} elapsed</span>
@@ -251,67 +301,129 @@ export default function Dashboard() {
             </div>
           </section>
 
-          {/* Journey summary */}
-          <section className="db-grid-row">
-            <div className="db-card">
-              <p className="db-section-eyebrow">Your Journey</p>
-              <h2 className="db-section-title">7-Step Completion</h2>
-              <div className="db-steps-list">
-                {completedStepsToday.map((n) => {
-                  const step = stepsConfig.find((s) => s.number === n);
-                  if (!step) return null;
-                  return (
-                    <div key={n} className="db-step-item">
-                      <span className="db-step-num">{String(n).padStart(2, "0")}</span>
-                      <div className="db-step-info">
-                        <strong>{step.label}</strong>
-                        <span>{step.description}</span>
-                      </div>
-                      <span className="db-step-check">
-                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                          <path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </span>
+          {/* Journey timeline */}
+          <section className="db-card db-journey-card">
+            <div className="db-section-title-row">
+              <div>
+                <p className="db-section-eyebrow">Your Journey</p>
+                <h2 className="db-section-title">What happened so far</h2>
+              </div>
+              {signedPdf && (
+                <a
+                  className="db-pdf-btn"
+                  href={signedPdf}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M8 1v9M4 7l4 4 4-4M2 14h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Download Signed Lease
+                </a>
+              )}
+            </div>
+
+            {timeline.length ? (
+              <div className="db-timeline">
+                {timeline.map((ev, i) => (
+                  <div key={ev.title} className="db-timeline-item">
+                    <div className="db-timeline-rail">
+                      <span className={`db-timeline-dot ${ev.icon}`}></span>
+                      {i < timeline.length - 1 && <span className="db-timeline-line"></span>}
                     </div>
-                  );
-                })}
-                {completedStepsToday.length === 0 && (
-                  <p className="db-empty">No steps completed yet.</p>
-                )}
-              </div>
-            </div>
-
-            {/* Residence */}
-            <div className="db-card">
-              <p className="db-section-eyebrow">Residence</p>
-              <h2 className="db-section-title">Booked Room</h2>
-              <div className="db-room">
-                {roomImage ? (
-                  <img src={roomImage} alt={unitLabel} className="db-room-img" onError={(e) => { e.currentTarget.style.display = "none"; }} />
-                ) : (
-                  <div className="db-room-img db-room-img-empty">
-                    <span>{Array.from(unitLabel)[0] || "R"}</span>
+                    <div className="db-timeline-body">
+                      <h3>{ev.title}</h3>
+                      <p>{ev.text}</p>
+                    </div>
+                    {ev.date && <span className="db-timeline-date">{ev.date}</span>}
                   </div>
+                ))}
+              </div>
+            ) : (
+              <p className="db-empty">No journey events recorded yet.</p>
+            )}
+          </section>
+
+          {/* Profile */}
+          <section className="db-card db-profile-card">
+            <div className="db-profile-head">
+              <div className="db-profile-avatar" onClick={() => document.getElementById("db-avatar-input")?.click()} title="Click to change picture">
+                {profileImg ? (
+                  <img src={profileImg} alt="Profile" />
+                ) : (
+                  <span>{(client?.name || "U").charAt(0).toUpperCase()}</span>
                 )}
-                <div>
-                  <h3 className="db-room-name">{unitLabel}</h3>
-                  <p className="db-room-meta">{roomMeta || "Residence confirmed"}</p>
-                </div>
+                <span className="db-profile-cam">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M1 5a2 2 0 0 1 2-2h1l1.5-2h3L10 3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                    <circle cx="8" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.4" />
+                  </svg>
+                </span>
+                <input id="db-avatar-input" type="file" accept="image/*" hidden onChange={handleAvatarUpload} />
+              </div>
+              <div>
+                <p className="db-section-eyebrow">Profile</p>
+                <h2 className="db-section-title">{client?.name || "Member"}</h2>
+                <p className="db-profile-msg">
+                  You can update your profile picture. Email and password are locked
+                  and can only be changed by the community team.
+                </p>
+                {profileMsg && <p className="db-profile-toast">{profileMsg}</p>}
               </div>
             </div>
 
-            {/* Payments */}
-            <div className="db-card">
-              <p className="db-section-eyebrow">Payments</p>
-              <h2 className="db-section-title">Membership Fees</h2>
-              <div className="db-pay-rows">
-                <div className="db-pay-row">
-                  <span>Security Deposit</span>
-                  <b>{depositAmount} <em>Paid · {depositMethod}</em></b>
+            <div className="db-profile-fields">
+              <div className="db-profile-field">
+                <span>Email</span>
+                <div className="db-profile-value">
+                  <b>{profileEmail}</b>
+                  <em className="db-lock">
+                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <rect x="3.5" y="7" width="9" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+                      <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" strokeWidth="1.4" />
+                    </svg>
+                    Locked
+                  </em>
                 </div>
-                <div className="db-pay-row">
-                  <span>First Month Rent</span>
-                  <b>{rentAmount} <em>Paid · {rentMethod}</em></b>
+              </div>
+              <div className="db-profile-field">
+                <span>Phone</span>
+                <div className="db-profile-value">
+                  <b>{profilePhone}</b>
+                  <em className="db-lock">
+                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <rect x="3.5" y="7" width="9" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+                      <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" strokeWidth="1.4" />
+                    </svg>
+                    Locked
+                  </em>
+                </div>
+              </div>
+              <div className="db-profile-field">
+                <span>Date of Birth</span>
+                <div className="db-profile-value">
+                  <b>{profileDob}</b>
+                  <em className="db-lock">
+                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <rect x="3.5" y="7" width="9" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+                      <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" strokeWidth="1.4" />
+                    </svg>
+                    Locked
+                  </em>
+                </div>
+              </div>
+              <div className="db-profile-field">
+                <span>Password</span>
+                <div className="db-profile-value">
+                  <b className="db-password">{showPassword ? "••••••••••" : "••••••••••"}</b>
+                  <button
+                    type="button"
+                    className="db-password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label="Toggle password visibility"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
                 </div>
               </div>
             </div>
