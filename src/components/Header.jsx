@@ -1,5 +1,6 @@
 import Navbar from "./Navbar";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
 import { FaRegUser } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
@@ -15,6 +16,7 @@ import { useClientData } from "../hooks/useClientData";
 export default function Header({ activeLabel }) {
    const { client } = useClientData();
    const [open, setOpen] = useState(false);
+   const navigate = useNavigate();
    const [dropdown, setdropdown] = useState(false);
    const [loggingOut, setLoggingOut] = useState(false);
    const ref = useRef(null);
@@ -199,7 +201,7 @@ export default function Header({ activeLabel }) {
                      <button className="close-btn" onClick={() => setOpen(false)}>✕</button>
                      <img src={logo} alt="JRNY Logo" className="drawer-logo" />
                   </div>
-                  <a href="#">Dashboard</a>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setOpen(false); navigate('/dashboard'); }}>Dashboard</a>
                   <a href="#">My profile</a>
                   <a href="#">Lease agreement</a>
                   <a href="#">Payment history</a>

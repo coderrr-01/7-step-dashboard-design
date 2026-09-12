@@ -73,7 +73,9 @@ export default function Navbar() {
 
         {/* Dashboard */}
         {pathname !== "/payment-screen" && (
-          <div className="stepper-dashboard-box">
+          <div className="stepper-dashboard-box" onClick={() => navigate('/dashboard')} role="button" tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/dashboard'); } }}
+            title="Go to Dashboard" style={{ cursor: 'pointer' }}>
             <div className="homepage_icon">
               <FaHome />
               <span className="home-nav">DASHBOARD</span>
