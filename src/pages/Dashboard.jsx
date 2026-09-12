@@ -58,7 +58,6 @@ export default function Dashboard() {
     if (!profileImgKey) return "";
     try { return localStorage.getItem(profileImgKey) || ""; } catch { return ""; }
   });
-  const [showPassword, setShowPassword] = useState(false);
   const [profileMsg, setProfileMsg] = useState("");
   const [localSignedPdf, setLocalSignedPdf] = useState(() => {
     try { return localStorage.getItem("jrny_signed_lease") || ""; } catch { return ""; }
@@ -521,15 +520,7 @@ export default function Dashboard() {
               <div className="db-profile-field">
                 <span>Password</span>
                 <div className="db-profile-value">
-                  <b className="db-password">{showPassword ? "••••••••••" : "••••••••••"}</b>
-                  <button
-                    type="button"
-                    className="db-password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label="Toggle password visibility"
-                  >
-                    {showPassword ? "Hide" : "Show"}
-                  </button>
+                  <b className="db-password">••••••••••</b>
                 </div>
               </div>
             </div>

@@ -4789,20 +4789,6 @@ body .stepper-row{
 .db-password {
     letter-spacing: .12em;
 }
-.db-password-toggle {
-    flex-shrink: 0;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-family: "Poppins", sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    color: #b8924a;
-    padding: 4px 10px;
-    border-radius: 999px;
-    background: rgba(201, 164, 92, .1);
-}
-.db-password-toggle:hover { background: rgba(201, 164, 92, .2); }
 
 /* Room card */
 .db-room { display: flex; gap: 14px; align-items: flex-start; margin-top: 16px; }
