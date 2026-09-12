@@ -177,7 +177,13 @@ export default function Dashboard() {
   const barPct = Math.min(100, Math.max(0, pct));
 
   // ── Journey timeline — what actually happened, in real order ───────────────
-  const signedPdf = client?.signed_lease || "";
+  // Signed lease PDF: prefer the server value, fall back to the local copy
+  // stored by the lease-signing flow (same pattern as DocumentSign).
+  const [localSignedPdf] = useState(() => {
+    try { return localStorage.getItem("jrny_signed_lease") || ""; } catch { return ""; }
+  });
+  const signedPdf = client?.signed_lease || localSignedPdf || "";
+  const extensionPdf = client?.extension_signed_pdf || "";
   const interviewDate = client?.interview_date ? formatPretty(client.interview_date) : "";
   const interviewTime = client?.interview_time || "";
   const appliedDate = client?.submitted_at ? formatPretty(client.submitted_at) : "";
@@ -220,7 +226,7 @@ export default function Dashboard() {
   const statCards = [
     { label: "Residence", value: unitLabel, meta: roomMeta || "Booked" },
     { label: "Lease Ends", value: endDate ? formatPretty(endDate) : "—", meta: `${remainingMonths} month${remainingMonths === 1 ? "" : "s"} left` },
-    { label: "Total Paid", value: totalPaid, meta: bothPaid ? "Settled" : "Pending" },
+    { label: "Deposit Paid", value: client?.security_deposit ? `$${parseFloat(client.security_deposit).toLocaleString("en-US")}` : "—", meta: paymentState.depositPaid ? `via ${depositMethod}` : "Pending" },
   ];
 
   return (
@@ -342,12 +348,88 @@ export default function Dashboard() {
             ) : (
               <p className="db-empty">No journey events recorded yet.</p>
             )}
+
+            {/* Signed lease documents */}
+            <div className="db-docs">
+              <div className="db-doc-item">
+                <div className="db-doc-icon">
+                  <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M5 1h7l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                    <path d="M12 1v4h4M7 8h6M7 11h6M7 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div className="db-doc-info">
+                  <strong>Signed Lease Agreement</strong>
+                  <span>{signedPdf ? (leaseSignedDate ? `Signed ${leaseSignedDate}` : "Your signed lease PDF") : "Not available yet"}</span>
+                </div>
+                {signedPdf ? (
+                  <a className="db-doc-dl-btn" href={signedPdf} download target="_blank" rel="noreferrer">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M8 1v9M4 7l4 4 4-4M2 14h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    Download
+                  </a>
+                ) : (
+                  <span className="db-doc-na">—</span>
+                )}
+              </div>
+
+              {extensionPdf && (
+                <div className="db-doc-item">
+                  <div className="db-doc-icon">
+                    <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                      <path d="M5 1h7l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                      <path d="M12 1v4h4M7 8h6M7 11h6M7 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                  <div className="db-doc-info">
+                    <strong>Extension Lease Agreement</strong>
+                    <span>Signed extension lease PDF</span>
+                  </div>
+                  <a className="db-doc-dl-btn" href={extensionPdf} download target="_blank" rel="noreferrer">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M8 1v9M4 7l4 4 4-4M2 14h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    Download
+                  </a>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Membership fees breakdown */}
+          <section className="db-card db-pay-card">
+            <p className="db-section-eyebrow">Payments</p>
+            <h2 className="db-section-title">Membership Fees</h2>
+            <div className="db-pay-grid">
+              <div className="db-pay-box">
+                <span className="db-pay-box-label">Security Deposit</span>
+                <span className="db-pay-box-value">{depositAmount}</span>
+                <span className={`db-pay-box-status ${paymentState.depositPaid ? "is-paid" : "is-pending"}`}>
+                  {paymentState.depositPaid ? `Paid · ${depositMethod}` : "Pending"}
+                </span>
+              </div>
+              <div className="db-pay-box">
+                <span className="db-pay-box-label">First Month Rent</span>
+                <span className="db-pay-box-value">{rentAmount}</span>
+                <span className={`db-pay-box-status ${paymentState.rentPaid ? "is-paid" : "is-pending"}`}>
+                  {paymentState.rentPaid ? `Paid · ${rentMethod}` : "Pending"}
+                </span>
+              </div>
+              {bothPaid && (
+                <div className="db-pay-box db-pay-box-total">
+                  <span className="db-pay-box-label">Total Paid</span>
+                  <span className="db-pay-box-value">{totalPaid}</span>
+                  <span className="db-pay-box-status is-paid">Settled</span>
+                </div>
+              )}
+            </div>
           </section>
 
           {/* Profile */}
           <section className="db-card db-profile-card">
             <div className="db-profile-head">
-              <div className="db-profile-avatar" onClick={() => document.getElementById("db-avatar-input")?.click()} title="Click to change picture">
+              <label className="db-profile-avatar" htmlFor="db-avatar-input" title="Click to change picture">
                 {profileImg ? (
                   <img src={profileImg} alt="Profile" />
                 ) : (
@@ -360,7 +442,7 @@ export default function Dashboard() {
                   </svg>
                 </span>
                 <input id="db-avatar-input" type="file" accept="image/*" hidden onChange={handleAvatarUpload} />
-              </div>
+              </label>
               <div>
                 <p className="db-section-eyebrow">Profile</p>
                 <h2 className="db-section-title">{client?.name || "Member"}</h2>
