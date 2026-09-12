@@ -1,5 +1,6 @@
 import { Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home";
+import Dashboard from "../pages/Dashboard";
 import DocumentSign from "../pages/DocumentSign";
 import Interview from "../pages/Interview";
 import PaymentScreen from "../pages/PaymentScreen";
@@ -27,6 +28,7 @@ export default function AppRoutes() {
     <PageTransition>
       <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
       <Route path="/apply" element={<Navigate to="/" replace />} />
+      <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
       <Route path="/document-sign" element={<RequireAuth><DocumentSign /></RequireAuth>} />
       <Route path="/interview" element={<RequireAuth><Interview /></RequireAuth>} />
       <Route path="/payment-screen" element={<RequireAuth><PaymentScreen /></RequireAuth>} />

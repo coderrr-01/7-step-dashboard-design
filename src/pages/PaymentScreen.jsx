@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import stripeIcon from "../assets/icons/stripe.svg";
 import paypalIcon from "../assets/icons/paypal.svg";
@@ -14,6 +15,7 @@ import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
 export default function PaymentScreen() {
    const { client, loading: clientLoading, refetch } = useClientData({ preferCachedData: false });
    const { completeStep } = useSteps();
+   const navigate = useNavigate();
    const [paymentHydrated, setPaymentHydrated] = useState(false);
    const [activeStep, setActiveStep] = useState("Security");
    const [activePayment, setActivePayment] = useState(0);
@@ -492,6 +494,18 @@ export default function PaymentScreen() {
                            onClick={() => setSuccessDismissed(true)}
                         >
                            View Details
+                           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8"
+                                 strokeLinecap="round" strokeLinejoin="round" />
+                           </svg>
+                        </button>
+
+                        <button
+                           type="button"
+                           className="pay-dash-btn"
+                           onClick={() => navigate('/dashboard')}
+                        >
+                           Go to Dashboard
                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8"
                                  strokeLinecap="round" strokeLinejoin="round" />
