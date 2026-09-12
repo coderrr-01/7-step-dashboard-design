@@ -59,6 +59,9 @@ export default function Dashboard() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [profileMsg, setProfileMsg] = useState("");
+  const [localSignedPdf, setLocalSignedPdf] = useState(() => {
+    try { return localStorage.getItem("jrny_signed_lease") || ""; } catch { return ""; }
+  });
 
   // Paid users only — anyone without BOTH payments done is sent back to the
   // payment screen. Waits for fresh server data (no cached-flag shortcut).
@@ -179,9 +182,6 @@ export default function Dashboard() {
   // ── Journey timeline — what actually happened, in real order ───────────────
   // Signed lease PDF: prefer the server value, fall back to the local copy
   // stored by the lease-signing flow (same pattern as DocumentSign).
-  const [localSignedPdf] = useState(() => {
-    try { return localStorage.getItem("jrny_signed_lease") || ""; } catch { return ""; }
-  });
   const signedPdf = client?.signed_lease || localSignedPdf || "";
   const extensionPdf = client?.extension_signed_pdf || "";
   const interviewDate = client?.interview_date ? formatPretty(client.interview_date) : "";
