@@ -384,6 +384,10 @@
         padding: 10px 10px 35px 7px;
     }
 
+    body.page-dashboard .navbar-custom {
+        padding: 10px 10px 10px 7px;
+    }
+
     .user-profile-details .tracking-widest-sm {
         display: none;
 

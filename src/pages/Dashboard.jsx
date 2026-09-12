@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import { useClientData } from "../hooks/useClientData";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
@@ -43,6 +44,7 @@ function modularity(value) {
 
 export default function Dashboard() {
   const { client, loading, refetch } = useClientData({ preferCachedData: false });
+  const navigate = useNavigate();
   const [fallbackRoom, setFallbackRoom] = useState(null);
 
   const [selectedRoom] = useState(() => {
@@ -65,16 +67,13 @@ export default function Dashboard() {
 
   // Paid users only — anyone without BOTH payments done is sent back to the
   // payment screen. Waits for fresh server data (no cached-flag shortcut).
-  // NOTE: temporarily disabled so the dashboard design can be previewed by
-  // any logged-in user. Re-enable when the dashboard is ready for production.
-  //
-  // useEffect(() => {
-  //   if (loading || !client) return;
-  //   const ps = getPaymentState(client);
-  //   if (!ps.depositPaid || !ps.rentPaid) {
-  //     navigate("/payment-screen", { replace: true });
-  //   }
-  // }, [loading, client, navigate]);
+  useEffect(() => {
+    if (loading || !client) return;
+    const ps = getPaymentState(client);
+    if (!ps.depositPaid || !ps.rentPaid) {
+      navigate("/payment-screen", { replace: true });
+    }
+  }, [loading, client, navigate]);
 
   useEffect(() => {
     if (selectedRoom || !client?.room_id) return;

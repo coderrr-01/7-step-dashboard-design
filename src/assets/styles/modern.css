@@ -237,6 +237,16 @@ h1, h2, h3, h4, h5, h6 {
    padding-bottom: 50px;
 }
 
+/* Dashboard has no step bar — drop the space reserved for the floating
+   stepper-row (normally padding-bottom: 50px) and hide the stepper itself. */
+body.page-dashboard .navbar-custom {
+   padding-bottom: 1rem;
+}
+
+body.page-dashboard .stepper-container-fluid {
+   display: none !important;
+}
+
 .nav-link-custom {
    color: var(--t-text-body) !important;
    font-family: 'Poppins', sans-serif;
