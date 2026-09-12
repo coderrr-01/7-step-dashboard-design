@@ -71,11 +71,10 @@ export default function Navbar() {
     <div className="stepper-container-fluid p-0">
       <div className="stepper-row">
 
-        {/* Dashboard */}
+        {/* Dashboard — inert: dashboard opens only via the "Go to Dashboard"
+            button on the payment congrats modal, not from the step bar */}
         {pathname !== "/payment-screen" && (
-          <div className="stepper-dashboard-box" onClick={() => navigate('/dashboard')} role="button" tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/dashboard'); } }}
-            title="Go to Dashboard" style={{ cursor: 'pointer' }}>
+          <div className="stepper-dashboard-box" style={{ cursor: 'default', userSelect: 'none' }}>
             <div className="homepage_icon">
               <FaHome />
               <span className="home-nav">DASHBOARD</span>
