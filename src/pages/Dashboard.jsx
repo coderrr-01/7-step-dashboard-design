@@ -175,7 +175,9 @@ export default function Dashboard() {
   const extendEnabled = expired || elapsedMonths >= 10;
 
   // Sanity: a fully-overdue term should never overflow past the track.
-  const barPct = Math.min(100, Math.max(0, pct));
+  // When the term has barely started (< 3%), still show a thin sliver of fill
+  // so the bar never looks completely empty — the lease is in progress.
+  const barPct = Math.min(100, Math.max(3, pct));
 
   // ── Journey timeline — what actually happened, in real order ───────────────
   // Signed lease PDF: prefer the server value, fall back to the local copy
