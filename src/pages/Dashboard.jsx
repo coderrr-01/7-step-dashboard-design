@@ -21,7 +21,6 @@ function progressTone(elapsed) {
   if (elapsed >= 6) return "yellow";
   return "green";
 }
-
 function formatPretty(value) {
   if (!value) return "";
   const d = new Date(value);
@@ -189,12 +188,16 @@ export default function Dashboard() {
   const leaseSignedDate = signedPdf ? (client?.effective_date ? formatPretty(client.effective_date) : (startDate ? formatPretty(startDate) : "")) : "";
   const bothPaid = paymentState.depositPaid && paymentState.rentPaid;
 
+  const JOURNEY_MILESTONES = 5;
+
   const timeline = [];
   if (appliedDate) timeline.push({ icon: "form", title: "Application Submitted", text: "Tenant application received by the Board.", date: appliedDate });
   if (interviewDate) timeline.push({ icon: "chat", title: "Interview Scheduled", text: `Board review session ${interviewTime ? `at ${interviewTime}` : ""}.`.replace(/\s+/g, " "), date: interviewDate });
   if (unitLabel) timeline.push({ icon: "home", title: "Residence Selected", text: roomMeta || "Residence booking confirmed.", date: client?.move_in_date ? formatPretty(client.move_in_date) : "" });
   if (signedPdf) timeline.push({ icon: "file", title: "Lease Signed", text: "Residency agreement executed.", date: leaseSignedDate });
   if (bothPaid) timeline.push({ icon: "pay", title: "Payments Complete", text: "Security deposit + first month's rent settled.", date: "" });
+
+  const journeyPct = Math.round((timeline.length / JOURNEY_MILESTONES) * 100);
 
   const profileEmail = client?.email || "—";
   const profilePhone = client?.phone || "—";
@@ -303,6 +306,26 @@ export default function Dashboard() {
               >
                 {extendEnabled ? "Extend Lease" : "Extend Available at 10 months"}
               </button>
+            </div>
+          </section>
+
+          {/* Journey progress */}
+          <section className="db-card db-journey-progress">
+            <div className="db-section-title-row">
+              <div>
+                <p className="db-section-eyebrow">Application Progress</p>
+                <h2 className="db-section-title">Your journey so far</h2>
+              </div>
+              <span className="db-journey-pct">{journeyPct}%</span>
+            </div>
+            <div className="db-progress-bar-wrap">
+              <div className="db-progress-track">
+                <div className="db-progress-fill" style={{ width: `${journeyPct}%` }}></div>
+              </div>
+              <div className="db-progress-labels">
+                <span>{timeline.length} of {JOURNEY_MILESTONES} steps completed</span>
+                <span>{journeyPct === 100 ? "All done" : `${JOURNEY_MILESTONES - timeline.length} step${JOURNEY_MILESTONES - timeline.length === 1 ? "" : "s"} remaining`}</span>
+              </div>
             </div>
           </section>
 

@@ -4250,6 +4250,7 @@ body .stepper-row{
     font-size: 34px;
     font-weight: 700;
     letter-spacing: -.01em;
+    color: #fff !important;
 }
 .db-hero-sub {
     margin: 0;
@@ -4322,6 +4323,24 @@ body .stepper-row{
     background: #fff;
     border: 1px solid #efe6d4;
     box-shadow: 0 10px 26px -16px rgba(31, 29, 26, .22);
+}
+.db-journey-progress {
+    margin-top: 20px;
+    padding: 26px 28px;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid #efe6d4;
+    box-shadow: 0 10px 26px -16px rgba(31, 29, 26, .22);
+}
+.db-journey-pct {
+    font-family: "Archivo", sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #b8924a;
+    line-height: 1;
+}
+.db-journey-progress .db-progress-fill {
+    background: linear-gradient(90deg, #c9a45c, #b8924a);
 }
 .db-progress-head {
     display: flex;
@@ -4854,4 +4873,6 @@ body .stepper-row{
     .db-hero-title { font-size: 27px; }
     .db-stats { grid-template-columns: 1fr; }
     .db-progress-card { padding: 20px 18px; }
+
+    .db-journey-progress { padding: 20px 18px; }
 }
