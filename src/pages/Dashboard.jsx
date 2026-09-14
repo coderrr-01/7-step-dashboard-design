@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { IoCalendarOutline, IoHomeOutline, IoCashOutline, IoClose } from "react-icons/io5";
+import { IoCalendarOutline, IoHomeOutline, IoCashOutline, IoClose, IoDocumentTextOutline } from "react-icons/io5";
 import { FaDownload, FaBolt, FaRegClock } from "react-icons/fa";
 import PageLayout from "../components/PageLayout";
 import { useClientData } from "../hooks/useClientData";
@@ -305,14 +305,19 @@ export default function Dashboard() {
           {/* Lease progress */}
           <section className={`db-progress-card ${tone}`}>
             <div className="db-progress-head">
+            <div className="db-progress-title">
+              <div className="db-section-head-icon">
+                <IoDocumentTextOutline />
+              </div>
               <div>
                 <p className="db-section-eyebrow">Lease Progress</p>
                 <h2 className="db-section-title">Rental Term</h2>
               </div>
-              <div className="db-progress-meta">
-                <span>{startDate ? formatPretty(startDate) : "—"} → {endDate ? formatPretty(endDate) : "—"}</span>
-              </div>
             </div>
+            <div className="db-progress-meta">
+              <span>{startDate ? formatPretty(startDate) : "—"} → {endDate ? formatPretty(endDate) : "—"}</span>
+            </div>
+          </div>
 
             <div className="db-progress-bar-wrap">
               <div className="db-progress-track">

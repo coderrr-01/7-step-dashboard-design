@@ -4350,6 +4350,26 @@ body .stepper-row{
     gap: 18px;
     flex-wrap: wrap;
 }
+.db-progress-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.db-section-head-icon {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    color: #fff;
+    background: linear-gradient(135deg, #d9b976, #b8924a);
+    box-shadow:
+        0 10px 22px -10px rgba(184, 146, 74, .75),
+        0 1px 0 rgba(255, 255, 255, .35) inset;
+}
 .db-section-eyebrow {
     margin: 0 0 4px;
     font-size: 11px;
