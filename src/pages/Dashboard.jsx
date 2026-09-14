@@ -451,7 +451,7 @@ export default function Dashboard() {
 
                 {/* Signed lease documents */}
                 <div className="db-docs">
-                  <div className="db-doc-item">
+                  <div className="db-doc-item download-leasebtn">
                     <div className="db-doc-icon">
                       <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                         <path d="M5 1h7l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />

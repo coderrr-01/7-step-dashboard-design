@@ -5515,7 +5515,23 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
     top: unset !important;
     right: unset !important;
     }
+    body.page-dashboard .db-main {
+    padding-bottom: 10px !important;
 }
+}
+
+
+@media (max-width: 436px) {
+    .download-leasebtn{
+    flex-direction: column;
+    justify-content: left;
+    text-align: center
+    }
+
+}
+
+
+
 
 /* ---------- Professional compact refinement ---------- */
 body.page-dashboard {
