@@ -5507,7 +5507,7 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
 @media (max-width: 767px) {
     .db-dash-grid { gap: 18px; margin-top: 18px; }
     .db-dash-main, .db-dash-aside { gap: 16px; }
-    .db-dash-aside .db-pay-box { padding-right: 18px; }
+    .db-dash-aside .db-pay-box { padding-right: 18px !important }
 }
 
 /* ---------- Professional compact refinement ---------- */

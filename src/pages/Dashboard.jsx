@@ -615,11 +615,11 @@ export default function Dashboard() {
                 </div>
 
               
-                <a className="db-help-btn" href="tel:+0000000000">
+                <a className="db-help-btn" href="tel:+1 (646) 409-0226">
                   <IoCallOutline size={14} />
                   Contact Us
                 </a>
-              </aside>
+              </aside> 
 
             </div>
             {/* ===== END RIGHT ===== */}
