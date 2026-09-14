@@ -72,13 +72,13 @@ export default function Navbar() {
       <div className="stepper-row">
 
         {/* Dashboard — opens the dashboard. When already on /dashboard it
-            simply reloads the same page (fresh data + scroll to top). */}
+            simply scrolls back to the top of the page. */}
         {pathname !== "/payment-screen" && (
           <div
             className="stepper-dashboard-box"
             onClick={() => {
               if (pathname === "/dashboard") {
-                window.location.reload();
+                window.scrollTo({ top: 0, behavior: "smooth" });
               } else {
                 navigate("/dashboard");
               }
@@ -91,7 +91,7 @@ export default function Navbar() {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 if (pathname === "/dashboard") {
-                  window.location.reload();
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 } else {
                   navigate("/dashboard");
                 }

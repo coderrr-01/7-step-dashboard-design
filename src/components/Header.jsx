@@ -119,7 +119,14 @@ export default function Header({ activeLabel }) {
                </div>
                <div className="top-header-section">
                   <nav className=" d-md-flex gap-5">
-                     <a className="nav-link-custom active" href="#">{ activeLabel }</a>
+                     <a
+                        className="nav-link-custom active"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (isDashboard) window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                     >{ activeLabel }</a>
                      <a
                         className={`nav-link-custom ${isDashboard ? (navActive === "my-profile" ? "active" : "") : ""}`}
                         href="#"
