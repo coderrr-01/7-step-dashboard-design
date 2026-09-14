@@ -84,7 +84,6 @@ export default function Dashboard() {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
       setFlashSection(null);
       requestAnimationFrame(() => setFlashSection(id));
-      setTimeout(() => setFlashSection(null), 2400);
     };
     window.addEventListener("jrny:scrollto-section", handleGoto);
     return () => window.removeEventListener("jrny:scrollto-section", handleGoto);
@@ -197,6 +196,9 @@ export default function Dashboard() {
   const pct = totalMonths > 0 ? Math.round((elapsedMonths / totalMonths) * 100) : 0;
   const expired = !!(end && today > end);
   const tone = expired ? "red" : progressTone(elapsedMonths, totalMonths);
+  // The CURRENT lease month (1-based): right after signing it is month 1,
+  // and every anniversary it ticks up — 1, 2, 3 … up to totalMonths.
+  const currentMonth = Math.min(elapsedMonths + 1, Math.max(totalMonths, 1));
   // Extend unlocks only from month 10 (within two months of expiry).
   const extendEnabled = expired || elapsedMonths >= 10;
 
@@ -346,7 +348,7 @@ export default function Dashboard() {
                     <div className="db-progress-fill" style={{ width: `${barPct}%` }}></div>
                   </div>
                   <div className="db-progress-labels">
-                    <span>{elapsedMonths} month{elapsedMonths === 1 ? "" : "s"} elapsed</span>
+                    <span>Month {currentMonth} of {Math.max(totalMonths, 1)}</span>
                     <span>{remainingMonths} month{remainingMonths === 1 ? "" : "s"} left</span>
                   </div>
                 </div>

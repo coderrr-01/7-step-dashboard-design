@@ -48,7 +48,6 @@ export default function Header({ activeLabel }) {
       setOpen(false);
       setNavActive(id);
       window.dispatchEvent(new CustomEvent("jrny:scrollto-section", { detail: { section: id } }));
-      setTimeout(() => setNavActive(""), 2400);
    };
 
    async function handleLogout() {
