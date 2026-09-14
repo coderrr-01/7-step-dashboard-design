@@ -71,10 +71,33 @@ export default function Navbar() {
     <div className="stepper-container-fluid p-0">
       <div className="stepper-row">
 
-        {/* Dashboard — inert: dashboard opens only via the "Go to Dashboard"
-            button on the payment congrats modal, not from the step bar */}
+        {/* Dashboard — opens the dashboard. When already on /dashboard it
+            simply reloads the same page (fresh data + scroll to top). */}
         {pathname !== "/payment-screen" && (
-          <div className="stepper-dashboard-box" style={{ cursor: 'default', userSelect: 'none' }}>
+          <div
+            className="stepper-dashboard-box"
+            onClick={() => {
+              if (pathname === "/dashboard") {
+                window.location.reload();
+              } else {
+                navigate("/dashboard");
+              }
+            }}
+            style={{ cursor: 'pointer', userSelect: 'none' }}
+            title="Go to Dashboard"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (pathname === "/dashboard") {
+                  window.location.reload();
+                } else {
+                  navigate("/dashboard");
+                }
+              }
+            }}
+          >
             <div className="homepage_icon">
               <FaHome />
               <span className="home-nav">DASHBOARD</span>
