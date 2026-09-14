@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { IoCalendarOutline, IoHomeOutline, IoCashOutline, IoClose } from "react-icons/io5";
 import { FaDownload, FaBolt, FaRegClock } from "react-icons/fa";
@@ -474,7 +475,7 @@ export default function Dashboard() {
                 <span className={`db-pay-box-status ${paymentState.depositPaid ? "is-paid" : "is-pending"}`}>
                   {paymentState.depositPaid ? `Paid · ${depositMethod}` : "Pending"}
                 </span>
-                <button type="button" className="db-view-detail" onClick={() => setHistoryType("deposit")}>
+                <button type="button" className="db-view-detail details-top-right" onClick={() => setHistoryType("deposit")}>
                   <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M2 6l6 5 6-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -487,7 +488,7 @@ export default function Dashboard() {
                 <span className={`db-pay-box-status ${paymentState.rentPaid ? "is-paid" : "is-pending"}`}>
                   {paymentState.rentPaid ? `Paid · ${rentMethod}` : "Pending"}
                 </span>
-                <button type="button" className="db-view-detail" onClick={() => setHistoryType("rent")}>
+                <button type="button" className="db-view-detail details-top-right" onClick={() => setHistoryType("rent")}>
                   <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M2 6l6 5 6-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -582,7 +583,8 @@ export default function Dashboard() {
           </section>
 
           {/* Payment history modal — deposit / rent */}
-          {historyType && (
+          {historyType &&
+            createPortal(
             <div className="db-modal-backdrop" onClick={() => setHistoryType(null)}>
               <div className="db-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
                 <div className="db-modal-head">
@@ -644,8 +646,9 @@ export default function Dashboard() {
                   )}
                 </div>
               </div>
-            </div>
-          )}
+            </div>,
+            document.body
+            )}
 
         </div>
       </main>
