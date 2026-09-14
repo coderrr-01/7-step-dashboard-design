@@ -4735,12 +4735,16 @@ body .stepper-row{
     background: linear-gradient(135deg, #fdfaf3, #f3ead8);
     border: 1px solid #e0d2b2;
 }
+.icon-content-set{
+    display: flex;
+    gap: 16px;
+}
 @media (max-width: 767px) {
     .db-pay-grid { grid-template-columns: 1fr; }
 }
 
 /* Profile */
-.db-profile-card { margin-top: 20px; margin-bottom: 30px; }
+.db-profile-card { margin-top: 20px; }
 .db-profile-head {
     display: flex;
     gap: 18px;
@@ -5447,7 +5451,7 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
     display: grid;
     grid-template-columns: 1fr 380px;
     gap: 28px;
-    align-items: start;
+    /* align-items: start removed — default stretch gives equal row height */
     margin-top: 24px;
 }
 .db-dash-main {
@@ -5455,6 +5459,10 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
     flex-direction: column;
     gap: 22px;
     min-width: 0;
+}
+/* Last card in each column grows so both columns end at the same height */
+.db-dash-main > :last-child {
+    flex: 1 1 auto;
 }
 .db-dash-main .db-stats,
 .db-dash-main .db-progress-card,
@@ -5466,6 +5474,9 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
     flex-direction: column;
     gap: 22px;
     min-width: 0;
+}
+.db-dash-aside > :last-child {
+    flex: 1 1 auto;
 }
 .db-dash-aside .db-pay-card,
 .db-dash-aside .db-profile-card { margin-top: 0; }

@@ -85,7 +85,7 @@ export default function Dashboard() {
       try {
         const res = await getRoomById(client.room_id);
         if (res?.success && res.room && !cancelled) setFallbackRoom(res.room);
-      } catch {}
+      } catch { }
     })();
     return () => { cancelled = true; };
   }, [selectedRoom, client?.room_id]);
@@ -237,7 +237,7 @@ export default function Dashboard() {
       const dataUrl = reader.result;
       setProfileImg(dataUrl);
       if (profileImgKey) {
-        try { localStorage.setItem(profileImgKey, dataUrl); } catch {}
+        try { localStorage.setItem(profileImgKey, dataUrl); } catch { }
       }
       setProfileMsg("Profile picture updated (saved on this device).");
       setTimeout(() => setProfileMsg(""), 3500);
@@ -282,7 +282,7 @@ export default function Dashboard() {
           </section>
 
           {/* ---- two-column layout ---- */}
-            <section className="db-stats">
+          <section className="db-stats">
             {statCards.map((card) => (
               <div key={card.label} className="db-stat-card">
                 <span className="db-stat-icon">{card.icon}</span>
@@ -299,179 +299,179 @@ export default function Dashboard() {
             {/* ===== LEFT: main content ===== */}
             <div className="db-dash-main">
 
-          {/* Stat cards — icon chip + value */}
-        
+              {/* Stat cards — icon chip + value */}
 
-          {/* Lease progress */}
-          <section className={`db-progress-card ${tone}`}>
-            <div className="db-progress-head">
-            <div className="db-progress-title">
-              <div className="db-section-head-icon">
-                <IoDocumentTextOutline />
-              </div>
-              <div>
-                <p className="db-section-eyebrow">Lease Progress</p>
-                <h2 className="db-section-title">Rental Term</h2>
-              </div>
-            </div>
-            <div className="db-progress-meta">
-              <span>{startDate ? formatPretty(startDate) : "—"} → {endDate ? formatPretty(endDate) : "—"}</span>
-            </div>
-          </div>
 
-            <div className="db-progress-bar-wrap">
-              <div className="db-progress-track">
-                <div className="db-progress-fill" style={{ width: `${barPct}%` }}></div>
-              </div>
-              <div className="db-progress-labels">
-                <span>{elapsedMonths} month{elapsedMonths === 1 ? "" : "s"} elapsed</span>
-                <span>{remainingMonths} month{remainingMonths === 1 ? "" : "s"} left</span>
-              </div>
-            </div>
+              {/* Lease progress */}
+              <section className={`db-progress-card ${tone}`}>
+                <div className="db-progress-head">
+                  <div className="db-progress-title">
+                    <div className="db-section-head-icon">
+                      <IoDocumentTextOutline />
+                    </div>
+                    <div>
+                      <p className="db-section-eyebrow">Lease Progress</p>
+                      <h2 className="db-section-title">Rental Term</h2>
+                    </div>
+                  </div>
+                  <div className="db-progress-meta">
+                    <span>{startDate ? formatPretty(startDate) : "—"} → {endDate ? formatPretty(endDate) : "—"}</span>
+                  </div>
+                </div>
 
-            <div className="db-progress-foot">
-              <p className={`db-tone-note ${tone}`}>
-                <IoCalendarOutline size={15} />
-                <span>
-                  {expired
-                    ? "Your lease term has ended."
-                    : tone === "red"
-                      ? "Your lease is nearing its end — consider extending soon."
-                      : tone === "yellow"
-                        ? "Over half of your lease has passed."
-                        : "You're early in your lease term."}
-                </span>
-              </p>
-              <button
-                type="button"
-                className="db-extend-btn"
-                disabled={!extendEnabled}
-                title={extendEnabled ? "Request a lease extension" : "Extension unlocks in the final 2 months"}
-              >
-                {extendEnabled ? "Extend Lease" : "Extend Available at 10 months"}
-              </button>
-            </div>
-          </section>
+                <div className="db-progress-bar-wrap">
+                  <div className="db-progress-track">
+                    <div className="db-progress-fill" style={{ width: `${barPct}%` }}></div>
+                  </div>
+                  <div className="db-progress-labels">
+                    <span>{elapsedMonths} month{elapsedMonths === 1 ? "" : "s"} elapsed</span>
+                    <span>{remainingMonths} month{remainingMonths === 1 ? "" : "s"} left</span>
+                  </div>
+                </div>
 
-          {/* Journey progress — stepper, green circles with ticks */}
-          <section className="db-card db-journey-progress">
-            <div className="db-section-title-row">
-              <div>
-                <p className="db-section-eyebrow">Application Progress</p>
-                <h2 className="db-section-title">Your journey so far</h2>
-              </div>
-              <span className="db-journey-pct">{journeyPct}%</span>
-            </div>
-            <div className="db-stepper-horizontal">
-              {journeySteps.map((step, i) => (
-                <div
-                  key={step.label}
-                  className={`db-journey-step ${step.done ? "is-done" : ""}`}
-                >
-                  <div className="db-journey-step-top">
-                    {i > 0 && (
-                      <span className={`db-journey-line ${journeySteps[i - 1].done ? "is-done" : ""}`}></span>
-                    )}
-                    <span className="db-journey-circle">
-                      {step.done && (
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                          <path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
+                <div className="db-progress-foot">
+                  <p className={`db-tone-note ${tone}`}>
+                    <IoCalendarOutline size={15} />
+                    <span>
+                      {expired
+                        ? "Your lease term has ended."
+                        : tone === "red"
+                          ? "Your lease is nearing its end — consider extending soon."
+                          : tone === "yellow"
+                            ? "Over half of your lease has passed."
+                            : "You're early in your lease term."}
                     </span>
-                    {i < journeySteps.length - 1 && (
-                      <span className={`db-journey-line ${step.done ? "is-done" : ""}`}></span>
+                  </p>
+                  <button
+                    type="button"
+                    className="db-extend-btn"
+                    disabled={!extendEnabled}
+                    title={extendEnabled ? "Request a lease extension" : "Extension unlocks in the final 2 months"}
+                  >
+                    {extendEnabled ? "Extend Lease" : "Extend Available at 10 months"}
+                  </button>
+                </div>
+              </section>
+
+              {/* Journey progress — stepper, green circles with ticks */}
+              <section className="db-card db-journey-progress">
+                <div className="db-section-title-row">
+                  <div>
+                    <p className="db-section-eyebrow">Application Progress</p>
+                    <h2 className="db-section-title">Your journey so far</h2>
+                  </div>
+                  <span className="db-journey-pct">{journeyPct}%</span>
+                </div>
+                <div className="db-stepper-horizontal">
+                  {journeySteps.map((step, i) => (
+                    <div
+                      key={step.label}
+                      className={`db-journey-step ${step.done ? "is-done" : ""}`}
+                    >
+                      <div className="db-journey-step-top">
+                        {i > 0 && (
+                          <span className={`db-journey-line ${journeySteps[i - 1].done ? "is-done" : ""}`}></span>
+                        )}
+                        <span className="db-journey-circle">
+                          {step.done && (
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                              <path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          )}
+                        </span>
+                        {i < journeySteps.length - 1 && (
+                          <span className={`db-journey-line ${step.done ? "is-done" : ""}`}></span>
+                        )}
+                      </div>
+                      <p className="db-journey-step-label">{step.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Journey timeline */}
+              <section className="db-card db-journey-card">
+                <div className="db-section-title-row">
+                  <div>
+                    <p className="db-section-eyebrow">Your Journey</p>
+                    <h2 className="db-section-title">What happened so far</h2>
+                  </div>
+                </div>
+
+                {timeline.length ? (
+                  <div className="db-timeline">
+                    {timeline.map((ev, i) => (
+                      <div key={ev.title} className="db-timeline-item">
+                        <div className="db-timeline-rail">
+                          <span className={`db-timeline-dot ${ev.icon}`}>
+                            {ev.icon === "form" && <IoNewspaperOutline size={16} />}
+                            {ev.icon === "chat" && <IoChatbubbleEllipsesOutline size={16} />}
+                            {ev.icon === "home" && <IoHomeOutline size={16} />}
+                            {ev.icon === "file" && <IoDocumentTextOutline size={16} />}
+                            {ev.icon === "pay" && <IoCashOutline size={16} />}
+                            {i === timeline.length - 1 && <span className="db-timeline-tick"><IoCheckmarkDoneOutline size={9} /></span>}
+                          </span>
+                          {i < timeline.length - 1 && <span className="db-timeline-line"></span>}
+                        </div>
+                        <div className="db-timeline-body">
+                          <h3>{ev.title}</h3>
+                          <p>{ev.text}</p>
+                          {ev.date && <span className="db-timeline-date">{ev.date}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="db-empty">No journey events recorded yet.</p>
+                )}
+
+                {/* Signed lease documents */}
+                <div className="db-docs">
+                  <div className="db-doc-item">
+                    <div className="db-doc-icon">
+                      <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <path d="M5 1h7l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                        <path d="M12 1v4h4M7 8h6M7 11h6M7 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <div className="db-doc-info">
+                      <strong>Signed Lease Agreement</strong>
+                      <span>{signedPdf ? (leaseSignedDate ? `Signed ${leaseSignedDate}` : "Your signed lease PDF") : "Not available yet"}</span>
+                    </div>
+                    {signedPdf ? (
+                      <a className="db-doc-dl-btn" href={signedPdf} download target="_blank" rel="noreferrer">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                          <path d="M8 1v9M4 7l4 4 4-4M2 14h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        Download
+                      </a>
+                    ) : (
+                      <span className="db-doc-na">—</span>
                     )}
                   </div>
-                  <p className="db-journey-step-label">{step.label}</p>
-                </div>
-              ))}
-            </div>
-          </section>
 
-          {/* Journey timeline */}
-          <section className="db-card db-journey-card">
-            <div className="db-section-title-row">
-              <div>
-                <p className="db-section-eyebrow">Your Journey</p>
-                <h2 className="db-section-title">What happened so far</h2>
-              </div>
-            </div>
-
-            {timeline.length ? (
-              <div className="db-timeline">
-                {timeline.map((ev, i) => (
-                  <div key={ev.title} className="db-timeline-item">
-                    <div className="db-timeline-rail">
-                      <span className={`db-timeline-dot ${ev.icon}`}>
-                        {ev.icon === "form" && <IoNewspaperOutline size={16} />}
-                        {ev.icon === "chat" && <IoChatbubbleEllipsesOutline size={16} />}
-                        {ev.icon === "home" && <IoHomeOutline size={16} />}
-                        {ev.icon === "file" && <IoDocumentTextOutline size={16} />}
-                        {ev.icon === "pay" && <IoCashOutline size={16} />}
-                        {i === timeline.length - 1 && <span className="db-timeline-tick"><IoCheckmarkDoneOutline size={9} /></span>}
-                      </span>
-                      {i < timeline.length - 1 && <span className="db-timeline-line"></span>}
+                  {extensionPdf && (
+                    <div className="db-doc-item">
+                      <div className="db-doc-icon">
+                        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                          <path d="M5 1h7l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                          <path d="M12 1v4h4M7 8h6M7 11h6M7 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                        </svg>
+                      </div>
+                      <div className="db-doc-info">
+                        <strong>Extension Lease Agreement</strong>
+                        <span>Signed extension lease PDF</span>
+                      </div>
+                      <a className="db-doc-dl-btn" href={extensionPdf} download target="_blank" rel="noreferrer">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                          <path d="M8 1v9M4 7l4 4 4-4M2 14h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        Download
+                      </a>
                     </div>
-                    <div className="db-timeline-body">
-                      <h3>{ev.title}</h3>
-                      <p>{ev.text}</p>
-                      {ev.date && <span className="db-timeline-date">{ev.date}</span>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="db-empty">No journey events recorded yet.</p>
-            )}
-
-            {/* Signed lease documents */}
-            <div className="db-docs">
-              <div className="db-doc-item">
-                <div className="db-doc-icon">
-                  <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                    <path d="M5 1h7l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-                    <path d="M12 1v4h4M7 8h6M7 11h6M7 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-                  </svg>
+                  )}
                 </div>
-                <div className="db-doc-info">
-                  <strong>Signed Lease Agreement</strong>
-                  <span>{signedPdf ? (leaseSignedDate ? `Signed ${leaseSignedDate}` : "Your signed lease PDF") : "Not available yet"}</span>
-                </div>
-                {signedPdf ? (
-                  <a className="db-doc-dl-btn" href={signedPdf} download target="_blank" rel="noreferrer">
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <path d="M8 1v9M4 7l4 4 4-4M2 14h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    Download
-                  </a>
-                ) : (
-                  <span className="db-doc-na">—</span>
-                )}
-              </div>
-
-              {extensionPdf && (
-                <div className="db-doc-item">
-                  <div className="db-doc-icon">
-                    <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                      <path d="M5 1h7l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-                      <path d="M12 1v4h4M7 8h6M7 11h6M7 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <div className="db-doc-info">
-                    <strong>Extension Lease Agreement</strong>
-                    <span>Signed extension lease PDF</span>
-                  </div>
-                  <a className="db-doc-dl-btn" href={extensionPdf} download target="_blank" rel="noreferrer">
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <path d="M8 1v9M4 7l4 4 4-4M2 14h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    Download
-                  </a>
-                </div>
-              )}
-            </div>
-          </section>
+              </section>
 
             </div>
             {/* ===== END LEFT ===== */}
@@ -479,121 +479,130 @@ export default function Dashboard() {
             {/* ===== RIGHT: Membership Fees + Profile sidebar ===== */}
             <div className="db-dash-aside">
 
-          {/* Membership fees breakdown */}
-          <section className="db-card db-pay-card">
-            <p className="db-section-eyebrow">Payments</p>
-            <h2 className="db-section-title">Membership Fees</h2>
-            <div className="db-pay-grid">
-              <div className="db-pay-box">
-                <span className="db-pay-box-label">Security Deposit</span>
-                <span className="db-pay-box-value">{depositAmount}</span>
-                <span className={`db-pay-box-status ${paymentState.depositPaid ? "is-paid" : "is-pending"}`}>
-                  {paymentState.depositPaid ? `Paid · ${depositMethod}` : "Pending"}
-                </span>
-                <button type="button" className="db-view-detail details-top-right" onClick={() => setHistoryType("deposit")}>
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M2 6l6 5 6-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  View Details
-                </button>
-              </div>
-              <div className="db-pay-box">
-                <span className="db-pay-box-label">First Month Rent</span>
-                <span className="db-pay-box-value">{rentAmount}</span>
-                <span className={`db-pay-box-status ${paymentState.rentPaid ? "is-paid" : "is-pending"}`}>
-                  {paymentState.rentPaid ? `Paid · ${rentMethod}` : "Pending"}
-                </span>
-                <button type="button" className="db-view-detail details-top-right" onClick={() => setHistoryType("rent")}>
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M2 6l6 5 6-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  View Details
-                </button>
-              </div>
-              <div className="db-pay-box db-pay-box-total">
-                <span className="db-pay-box-label">Total Paid</span>
-                <span className="db-pay-box-value">{totalPaid}</span>
-                <span className={`db-pay-box-status ${bothPaid ? "is-paid" : "is-pending"}`}>
-                  {bothPaid ? "Settled" : "Partial"}
-                </span>
-              </div>
-            </div>
-          </section>
+              {/* Membership fees breakdown */}
+              <section className="db-card db-pay-card">
+                <p className="db-section-eyebrow">Payments</p>
+                <h2 className="db-section-title">Membership Fees</h2>
+                <div className="db-pay-grid">
+                  <div className="db-pay-box">
+                    <span className="db-pay-box-label">Security Deposit</span>
+                    <span className="db-pay-box-value">{depositAmount}</span>
+                    <span className={`db-pay-box-status ${paymentState.depositPaid ? "is-paid" : "is-pending"}`}>
+                      {paymentState.depositPaid ? `Paid · ${depositMethod}` : "Pending"}
+                    </span>
+                    <button type="button" className="db-view-detail details-top-right" onClick={() => setHistoryType("deposit")}>
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M2 6l6 5 6-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      View Details
+                    </button>
+                  </div>
+                  <div className="db-pay-box">
+                    <span className="db-pay-box-label">First Month Rent</span>
+                    <span className="db-pay-box-value">{rentAmount}</span>
+                    <span className={`db-pay-box-status ${paymentState.rentPaid ? "is-paid" : "is-pending"}`}>
+                      {paymentState.rentPaid ? `Paid · ${rentMethod}` : "Pending"}
+                    </span>
+                    <button type="button" className="db-view-detail details-top-right" onClick={() => setHistoryType("rent")}>
+                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M2 6l6 5 6-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      View Details
+                    </button>
+                  </div>
+                  <div className="db-pay-box db-pay-box-total">
+                    <span className="db-pay-box-label">Total Paid</span>
+                    <span className="db-pay-box-value">{totalPaid}</span>
+                    <span className={`db-pay-box-status ${bothPaid ? "is-paid" : "is-pending"}`}>
+                      {bothPaid ? "Settled" : "Partial"}
+                    </span>
+                  </div>
+                </div>
+              </section>
 
-          {/* Profile */}
-          <section className="db-card db-profile-card">
-            <div className="db-profile-head">
-              <label className="db-profile-avatar" htmlFor="db-avatar-input" title="Click to change picture">
-                {profileImg ? (
-                  <img src={profileImg} alt="Profile" />
-                ) : (
-                  <span>{(client?.name || "U").charAt(0).toUpperCase()}</span>
-                )}
-                <span className="db-profile-cam">
-                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M1 5a2 2 0 0 1 2-2h1l1.5-2h3L10 3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-                    <circle cx="8" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.4" />
-                  </svg>
-                </span>
-                <input id="db-avatar-input" type="file" accept="image/*" hidden onChange={handleAvatarUpload} />
-              </label>
-              <div>
-                <p className="db-section-eyebrow">Profile</p>
-                <h2 className="db-section-title">{client?.name || "Member"}</h2>
-                <p className="db-profile-msg">
-                  You can update your profile picture. Email and password are locked
-                  and can only be changed by the community team.
+              {/* Profile */}
+              <section className="db-card db-profile-card">
+                <div className="db-profile-head">
+                  <label className="db-profile-avatar" htmlFor="db-avatar-input" title="Click to change picture">
+                    {profileImg ? (
+                      <img src={profileImg} alt="Profile" />
+                    ) : (
+                      <span>{(client?.name || "U").charAt(0).toUpperCase()}</span>
+                    )}
+                    <span className="db-profile-cam">
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M1 5a2 2 0 0 1 2-2h1l1.5-2h3L10 3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                        <circle cx="8" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.4" />
+                      </svg>
+                    </span>
+                    <input id="db-avatar-input" type="file" accept="image/*" hidden onChange={handleAvatarUpload} />
+                  </label>
+                  <div>
+                    <p className="db-section-eyebrow">Profile</p>
+                    <h2 className="db-section-title">{client?.name || "Member"}</h2>
+                    <p className="db-profile-msg">
+                      You can update your profile picture. Email and password are locked
+                      and can only be changed by the community team.
+                    </p>
+                    {profileMsg && <p className="db-profile-toast">{profileMsg}</p>}
+                  </div>
+                </div>
+
+                <div className="db-profile-fields">
+                  <div className="db-profile-field">
+                    <span className="db-field-label"><IoMailOutline className="db-field-icon" /> Email</span>
+                    <div className="db-profile-value">
+                      <b>{profileEmail}</b>
+                      <em className="db-lock"><IoLockClosedOutline size={10} /> Locked</em>
+                    </div>
+                  </div>
+                  <div className="db-profile-field">
+                    <span className="db-field-label"><IoCallOutline className="db-field-icon" /> Phone</span>
+                    <div className="db-profile-value">
+                      <b>{profilePhone}</b>
+                    </div>
+                  </div>
+                  <div className="db-profile-field">
+                    <span className="db-field-label"><IoCalendarOutline className="db-field-icon" /> Date of Birth</span>
+                    <div className="db-profile-value">
+                      <b>{profileDob}</b>
+                    </div>
+                  </div>
+                  <div className="db-profile-field">
+                    <span className="db-field-label"><IoLockClosedOutline className="db-field-icon" /> Password</span>
+                    <div className="db-profile-value">
+                      <b className="db-password">••••••••••</b>
+                      <em className="db-lock"><IoLockClosedOutline size={10} /> Locked</em>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Need help */}
+              <aside className="db-help-card">
+                <span className="db-help-glow"></span>
+                <div className="icon-content-set">
+                  <div>
+ <span className="db-help-icon">
+                    <IoHeadsetOutline size={24} />
+                  </span>
+                  </div>
+                 
+                  <div>
+                      <h3 className="db-help-title">Need a help?</h3>
+                <p className="db-help-text">
+                  Our community team is here for you — reach out any time and we'll
+                  assist with your residency.
                 </p>
-                {profileMsg && <p className="db-profile-toast">{profileMsg}</p>}
-              </div>
-            </div>
+                  </div>
+                </div>
 
-            <div className="db-profile-fields">
-              <div className="db-profile-field">
-                <span className="db-field-label"><IoMailOutline className="db-field-icon" /> Email</span>
-                <div className="db-profile-value">
-                  <b>{profileEmail}</b>
-                  <em className="db-lock"><IoLockClosedOutline size={10} /> Locked</em>
-                </div>
-              </div>
-              <div className="db-profile-field">
-                <span className="db-field-label"><IoCallOutline className="db-field-icon" /> Phone</span>
-                <div className="db-profile-value">
-                  <b>{profilePhone}</b>
-                </div>
-              </div>
-              <div className="db-profile-field">
-                <span className="db-field-label"><IoCalendarOutline className="db-field-icon" /> Date of Birth</span>
-                <div className="db-profile-value">
-                  <b>{profileDob}</b>
-                </div>
-              </div>
-              <div className="db-profile-field">
-                <span className="db-field-label"><IoLockClosedOutline className="db-field-icon" /> Password</span>
-                <div className="db-profile-value">
-                  <b className="db-password">••••••••••</b>
-                  <em className="db-lock"><IoLockClosedOutline size={10} /> Locked</em>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Need help */}
-          <aside className="db-help-card">
-            <span className="db-help-glow"></span>
-            <span className="db-help-icon">
-              <IoHeadsetOutline size={24} />
-            </span>
-            <h3 className="db-help-title">Need a help?</h3>
-            <p className="db-help-text">
-              Our community team is here for you — reach out any time and we'll
-              assist with your residency.
-            </p>
-            <a className="db-help-btn" href="tel:+0000000000">
-              <IoCallOutline size={14} />
-              Contact Us
-            </a>
-          </aside>
+              
+                <a className="db-help-btn" href="tel:+0000000000">
+                  <IoCallOutline size={14} />
+                  Contact Us
+                </a>
+              </aside>
 
             </div>
             {/* ===== END RIGHT ===== */}
@@ -603,69 +612,69 @@ export default function Dashboard() {
           {/* Payment history modal — deposit / rent */}
           {historyType &&
             createPortal(
-            <div className="db-modal-backdrop" onClick={() => setHistoryType(null)}>
-              <div className="db-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-                <div className="db-modal-head">
-                  <div>
-                    <p className="db-section-eyebrow">Payment History</p>
-                    <h2 className="db-section-title" style={{ textTransform: "capitalize" }}>
-                      {historyType === "deposit" ? "Security Deposit" : "Rent Payments"}
-                    </h2>
+              <div className="db-modal-backdrop" onClick={() => setHistoryType(null)}>
+                <div className="db-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+                  <div className="db-modal-head">
+                    <div>
+                      <p className="db-section-eyebrow">Payment History</p>
+                      <h2 className="db-section-title" style={{ textTransform: "capitalize" }}>
+                        {historyType === "deposit" ? "Security Deposit" : "Rent Payments"}
+                      </h2>
+                    </div>
+                    <button type="button" className="db-modal-close" onClick={() => setHistoryType(null)} aria-label="Close">
+                      <IoClose size={20} />
+                    </button>
                   </div>
-                  <button type="button" className="db-modal-close" onClick={() => setHistoryType(null)} aria-label="Close">
-                    <IoClose size={20} />
-                  </button>
-                </div>
 
-                <div className="db-pay-history">
-                  {shownHistory.length ? (
-                    shownHistory.map((rec, i) => {
-                      const done = isPaymentRecordDone(rec);
-                      const amount = typeof rec.amount === "number"
-                        ? `$ ${rec.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
-                        : rec.amount || "—";
-                      const method = modularity(rec.method);
-                      return (
-                        <div key={`${historyType}-${i}`} className={`db-pay-row ${done ? "is-paid" : "is-pending"}`}>
-                          <span className="db-pay-row-dot"></span>
-                          <div className="db-pay-row-main">
-                            <strong>{done ? "Payment complete" : "Payment pending"}</strong>
-                            <span className="db-pay-row-sub">
-                              <FaRegClock size={11} /> {rec.date || (done ? "Confirmed" : "Awaiting confirmation")}
-                              {method !== "—" && method ? ` · ${method}` : ""}
-                            </span>
-                            {rec.txnId && (
-                              <span className="db-pay-row-txn">
-                                Transaction ID: <b>{rec.txnId}</b>
+                  <div className="db-pay-history">
+                    {shownHistory.length ? (
+                      shownHistory.map((rec, i) => {
+                        const done = isPaymentRecordDone(rec);
+                        const amount = typeof rec.amount === "number"
+                          ? `$ ${rec.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
+                          : rec.amount || "—";
+                        const method = modularity(rec.method);
+                        return (
+                          <div key={`${historyType}-${i}`} className={`db-pay-row ${done ? "is-paid" : "is-pending"}`}>
+                            <span className="db-pay-row-dot"></span>
+                            <div className="db-pay-row-main">
+                              <strong>{done ? "Payment complete" : "Payment pending"}</strong>
+                              <span className="db-pay-row-sub">
+                                <FaRegClock size={11} /> {rec.date || (done ? "Confirmed" : "Awaiting confirmation")}
+                                {method !== "—" && method ? ` · ${method}` : ""}
                               </span>
-                            )}
+                              {rec.txnId && (
+                                <span className="db-pay-row-txn">
+                                  Transaction ID: <b>{rec.txnId}</b>
+                                </span>
+                              )}
+                            </div>
+                            <div className="db-pay-row-right">
+                              <span className="db-pay-row-amount">{amount}</span>
+                              <span className={`db-pay-row-badge ${done ? "is-paid" : "is-pending"}`}>
+                                <FaBolt size={9} /> {done ? "Paid" : "Pending"}
+                              </span>
+                              {rec.receipt && (
+                                <a
+                                  className="db-pay-row-receipt"
+                                  href={rec.receipt}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  <FaDownload size={11} /> Receipt
+                                </a>
+                              )}
+                            </div>
                           </div>
-                          <div className="db-pay-row-right">
-                            <span className="db-pay-row-amount">{amount}</span>
-                            <span className={`db-pay-row-badge ${done ? "is-paid" : "is-pending"}`}>
-                              <FaBolt size={9} /> {done ? "Paid" : "Pending"}
-                            </span>
-                            {rec.receipt && (
-                              <a
-                                className="db-pay-row-receipt"
-                                href={rec.receipt}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                <FaDownload size={11} /> Receipt
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p className="db-empty">No payment records yet. Your payments will appear here as soon as they are recorded.</p>
-                  )}
+                        );
+                      })
+                    ) : (
+                      <p className="db-empty">No payment records yet. Your payments will appear here as soon as they are recorded.</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>,
-            document.body
+              </div>,
+              document.body
             )}
 
         </div>
