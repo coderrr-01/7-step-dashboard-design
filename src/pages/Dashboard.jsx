@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { IoCalendarOutline, IoHomeOutline, IoCashOutline, IoClose, IoDocumentTextOutline, IoNewspaperOutline, IoChatbubbleEllipsesOutline, IoCheckmarkDoneOutline, IoMailOutline, IoCallOutline, IoLockClosedOutline } from "react-icons/io5";
+import { IoCalendarOutline, IoHomeOutline, IoCashOutline, IoClose, IoDocumentTextOutline, IoNewspaperOutline, IoChatbubbleEllipsesOutline, IoCheckmarkDoneOutline, IoMailOutline, IoCallOutline, IoLockClosedOutline, IoHeadsetOutline } from "react-icons/io5";
 import { FaDownload, FaBolt, FaRegClock } from "react-icons/fa";
 import PageLayout from "../components/PageLayout";
 import { useClientData } from "../hooks/useClientData";
@@ -577,6 +577,23 @@ export default function Dashboard() {
               </div>
             </div>
           </section>
+
+          {/* Need help */}
+          <aside className="db-help-card">
+            <span className="db-help-glow"></span>
+            <span className="db-help-icon">
+              <IoHeadsetOutline size={24} />
+            </span>
+            <h3 className="db-help-title">Need a help?</h3>
+            <p className="db-help-text">
+              Our community team is here for you — reach out any time and we'll
+              assist with your residency.
+            </p>
+            <a className="db-help-btn" href="tel:+0000000000">
+              <IoCallOutline size={14} />
+              Contact Us
+            </a>
+          </aside>
 
             </div>
             {/* ===== END RIGHT ===== */}
