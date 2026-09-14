@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { IoCalendarOutline, IoHomeOutline, IoCashOutline } from "react-icons/io5";
 import PageLayout from "../components/PageLayout";
 import { useClientData } from "../hooks/useClientData";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
@@ -237,9 +238,9 @@ export default function Dashboard() {
   };
 
   const statCards = [
-    { label: "Residence", value: unitLabel, meta: roomMeta || "Booked" },
-    { label: "Lease Ends", value: endDate ? formatPretty(endDate) : "—", meta: `${remainingMonths} month${remainingMonths === 1 ? "" : "s"} left` },
-    { label: "Deposit Paid", value: client?.security_deposit ? `$${parseFloat(client.security_deposit).toLocaleString("en-US")}` : "—", meta: paymentState.depositPaid ? `via ${depositMethod}` : "Pending" },
+    { label: "Residence", value: unitLabel, meta: roomMeta || "Booked", icon: <IoHomeOutline /> },
+    { label: "Lease Ends", value: endDate ? formatPretty(endDate) : "—", meta: `${remainingMonths} month${remainingMonths === 1 ? "" : "s"} left`, icon: <IoCalendarOutline /> },
+    { label: "Deposit Paid", value: client?.security_deposit ? `$${parseFloat(client.security_deposit).toLocaleString("en-US")}` : "—", meta: paymentState.depositPaid ? `via ${depositMethod}` : "Pending", icon: <IoCashOutline /> },
   ];
 
   return (
@@ -270,13 +271,16 @@ export default function Dashboard() {
             </span>
           </section>
 
-          {/* Stat cards */}
+          {/* Stat cards — icon chip + value */}
           <section className="db-stats">
             {statCards.map((card) => (
               <div key={card.label} className="db-stat-card">
-                <p className="db-stat-label">{card.label}</p>
-                <h3 className="db-stat-value" title={card.value}>{card.value}</h3>
-                <p className="db-stat-meta">{card.meta}</p>
+                <span className="db-stat-icon">{card.icon}</span>
+                <span className="db-stat-body">
+                  <p className="db-stat-label">{card.label}</p>
+                  <h3 className="db-stat-value" title={card.value}>{card.value}</h3>
+                  <p className="db-stat-meta">{card.meta}</p>
+                </span>
               </div>
             ))}
           </section>
