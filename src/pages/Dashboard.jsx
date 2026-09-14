@@ -273,12 +273,12 @@ export default function Dashboard() {
                 journey, how your lease is tracking, and your membership details.
               </p>
             </div>
-            <span className="db-complete-badge">
+            {/* <span className="db-complete-badge">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               Membership Active
-            </span>
+            </span> */}
           </section>
 
           {/* ---- two-column layout ---- */}
@@ -306,7 +306,7 @@ export default function Dashboard() {
             <div className="db-progress-head">
               <div>
                 <p className="db-section-eyebrow">Lease Progress</p>
-                <h2 className="db-section-title">Membership Term</h2>
+                <h2 className="db-section-title">Rental Term</h2>
               </div>
               <div className="db-progress-meta">
                 <span>{startDate ? formatPretty(startDate) : "—"} → {endDate ? formatPretty(endDate) : "—"}</span>
@@ -537,39 +537,18 @@ export default function Dashboard() {
                 <span>Email</span>
                 <div className="db-profile-value">
                   <b>{profileEmail}</b>
-                  <em className="db-lock">
-                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <rect x="3.5" y="7" width="9" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
-                      <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" strokeWidth="1.4" />
-                    </svg>
-                    Locked
-                  </em>
                 </div>
               </div>
               <div className="db-profile-field">
                 <span>Phone</span>
                 <div className="db-profile-value">
                   <b>{profilePhone}</b>
-                  <em className="db-lock">
-                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <rect x="3.5" y="7" width="9" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
-                      <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" strokeWidth="1.4" />
-                    </svg>
-                    Locked
-                  </em>
                 </div>
               </div>
               <div className="db-profile-field">
                 <span>Date of Birth</span>
                 <div className="db-profile-value">
                   <b>{profileDob}</b>
-                  <em className="db-lock">
-                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <rect x="3.5" y="7" width="9" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
-                      <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" strokeWidth="1.4" />
-                    </svg>
-                    Locked
-                  </em>
                 </div>
               </div>
               <div className="db-profile-field">
