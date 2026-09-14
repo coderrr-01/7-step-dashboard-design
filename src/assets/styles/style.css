@@ -4794,39 +4794,6 @@ body .stepper-row{
     font-weight: 700;
     color: #b8924a;
 }
-.db-profile-cam {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    background: linear-gradient(135deg, #e6c993, #b8924a);
-    border: 2px solid #fff;
-    box-shadow: 0 5px 12px -5px rgba(184, 146, 74, .8);
-    z-index: 2;
-}
-.db-profile-msg {
-    margin: 6px 0 0;
-    max-width: 520px;
-    font-size: 12.5px;
-    color: #8d8272;
-    line-height: 1.55;
-}
-.db-profile-toast {
-    margin: 8px 0 0;
-    padding: 7px 13px;
-    display: inline-block;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #1f1d1a;
-    background: rgba(46, 158, 91, .14);
-}
 .db-profile-fields {
     /* display: grid; */
     gap: 0 26px;
@@ -5733,13 +5700,6 @@ body.page-dashboard {
 }
 .db-profile-avatar > span {
     font-size: 24px;
-}
-.db-profile-cam {
-    width: 22px;
-    height: 22px;
-}
-.db-profile-msg {
-    font-size: 12px;
 }
 .db-profile-fields {
     margin-top: 10px;

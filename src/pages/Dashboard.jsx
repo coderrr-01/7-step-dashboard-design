@@ -7,7 +7,7 @@ import PageLayout from "../components/PageLayout";
 import { useClientData } from "../hooks/useClientData";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
 import { getPaymentHistory, isPaymentRecordDone } from "../utils/paymentHistory";
-import { getRoomById, getUserSub } from "../services/api";
+import { getRoomById } from "../services/api";
 
 function monthSpan(from, to) {
   if (!from || !to) return 0;
@@ -58,14 +58,6 @@ export default function Dashboard() {
     catch { return null; }
   });
 
-  // Profile avatar — edited image lives locally (no backend update endpoint).
-  const sub = getUserSub();
-  const profileImgKey = sub ? `jrny_profile_img_${sub}` : null;
-  const [profileImg, setProfileImg] = useState(() => {
-    if (!profileImgKey) return "";
-    try { return localStorage.getItem(profileImgKey) || ""; } catch { return ""; }
-  });
-  const [profileMsg, setProfileMsg] = useState("");
   const [localSignedPdf, setLocalSignedPdf] = useState(() => {
     try { return localStorage.getItem("jrny_signed_lease") || ""; } catch { return ""; }
   });
@@ -249,28 +241,6 @@ export default function Dashboard() {
   const profilePhone = client?.phone || "—";
   const profileDob = client?.date_of_birth ? formatPretty(client.date_of_birth) : "—";
 
-  const handleAvatarUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setProfileMsg("Please choose an image file.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      setProfileImg(dataUrl);
-      if (profileImgKey) {
-        try { localStorage.setItem(profileImgKey, dataUrl); } catch { }
-      }
-      setProfileMsg("Profile picture updated (saved on this device).");
-      setTimeout(() => setProfileMsg(""), 3500);
-    };
-    reader.onerror = () => setProfileMsg("Could not read the image.");
-    reader.readAsDataURL(file);
-    e.target.value = "";
-  };
-
   const statCards = [
     { label: "Residence", value: unitLabel, meta: roomMeta || "Booked", icon: <IoHomeOutline /> },
     { label: "Lease Ends", value: endDate ? formatPretty(endDate) : "—", meta: `${remainingMonths} month${remainingMonths === 1 ? "" : "s"} left`, icon: <IoCalendarOutline /> },
@@ -290,7 +260,7 @@ export default function Dashboard() {
             <span className="db-hero-shade"></span>
             <div className="db-hero-glow"></div>
             <div className="db-hero-copy">
-              <p className="db-hero-eyebrow">Welcome back</p>
+              <p className="db-hero-eyebrow">Welcome</p>
               <h1 className="db-hero-title">Hello, {firstName}!</h1>
               <p className="db-hero-sub">
                 Your residency is live. Here is everything that happened on your
@@ -547,28 +517,17 @@ export default function Dashboard() {
               {/* Profile */}
               <section id="my-profile" className={`db-card db-profile-card ${flashSection === "my-profile" ? "section-flash" : ""}`}>
                 <div className="db-profile-head">
-                  <label className="db-profile-avatar" htmlFor="db-avatar-input" title="Click to change picture">
-                    {profileImg ? (
-                      <img src={profileImg} alt="Profile" />
-                    ) : (
-                      <span>{(client?.name || "U").charAt(0).toUpperCase()}</span>
-                    )}
-                    <span className="db-profile-cam">
-                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                        <path d="M1 5a2 2 0 0 1 2-2h1l1.5-2h3L10 3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-                        <circle cx="8" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.4" />
+                  <span className="db-profile-avatar" aria-hidden="true">
+                    <span>
+                      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M4 20c1.3-3.5 4.4-5.5 8-5.5s6.7 2 8 5.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
                       </svg>
                     </span>
-                    <input id="db-avatar-input" type="file" accept="image/*" hidden onChange={handleAvatarUpload} />
-                  </label>
+                  </span>
                   <div>
                     <p className="db-section-eyebrow">Profile</p>
                     <h2 className="db-section-title">{client?.name || "Member"}</h2>
-                    <p className="db-profile-msg">
-                      You can update your profile picture. Email and password are locked
-                      and can only be changed by the community team.
-                    </p>
-                    {profileMsg && <p className="db-profile-toast">{profileMsg}</p>}
                   </div>
                 </div>
 
