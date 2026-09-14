@@ -260,7 +260,7 @@ export default function Dashboard() {
             <span className="db-hero-shade"></span>
             <div className="db-hero-glow"></div>
             <div className="db-hero-copy">
-              <p className="db-hero-eyebrow">Welcome</p>
+              <p className="db-hero-eyebrow">welcome to the community </p>
               <h1 className="db-hero-title">Hello, {firstName}!</h1>
               <p className="db-hero-sub">
                 Your residency is live. Here is everything that happened on your
