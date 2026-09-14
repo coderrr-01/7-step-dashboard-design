@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoCalendarOutline, IoHomeOutline, IoCashOutline } from "react-icons/io5";
+import { IoCalendarOutline, IoHomeOutline, IoCashOutline, IoClose } from "react-icons/io5";
+import { FaDownload, FaBolt, FaRegClock } from "react-icons/fa";
 import PageLayout from "../components/PageLayout";
 import { useClientData } from "../hooks/useClientData";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
+import { getPaymentHistory, isPaymentRecordDone } from "../utils/paymentHistory";
 import { getRoomById, getUserSub } from "../services/api";
 
 const MONTH_MS = 1000 * 60 * 60 * 24 * 30.44;
@@ -63,6 +65,7 @@ export default function Dashboard() {
   const [localSignedPdf, setLocalSignedPdf] = useState(() => {
     try { return localStorage.getItem("jrny_signed_lease") || ""; } catch { return ""; }
   });
+  const [historyType, setHistoryType] = useState(null); // "deposit" | "rent" | null
 
   // Paid users only — anyone without BOTH payments done is sent back to the
   // payment screen. Waits for fresh server data (no cached-flag shortcut).
@@ -189,6 +192,12 @@ export default function Dashboard() {
   const appliedDate = client?.submitted_at ? formatPretty(client.submitted_at) : "";
   const leaseSignedDate = signedPdf ? (client?.effective_date ? formatPretty(client.effective_date) : (startDate ? formatPretty(startDate) : "")) : "";
   const bothPaid = paymentState.depositPaid && paymentState.rentPaid;
+
+  // Payment history — parsed from backend arrays or from flat paid flags.
+  const payHistory = getPaymentHistory(client);
+  const depositHistory = payHistory.filter((r) => r.type === "deposit");
+  const rentHistory = payHistory.filter((r) => r.type === "rent");
+  const shownHistory = historyType === "deposit" ? depositHistory : historyType === "rent" ? rentHistory : [];
 
   const JOURNEY_MILESTONES = 5;
 
@@ -465,6 +474,12 @@ export default function Dashboard() {
                 <span className={`db-pay-box-status ${paymentState.depositPaid ? "is-paid" : "is-pending"}`}>
                   {paymentState.depositPaid ? `Paid · ${depositMethod}` : "Pending"}
                 </span>
+                <button type="button" className="db-view-detail" onClick={() => setHistoryType("deposit")}>
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M2 6l6 5 6-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  View Details
+                </button>
               </div>
               <div className="db-pay-box">
                 <span className="db-pay-box-label">First Month Rent</span>
@@ -472,6 +487,12 @@ export default function Dashboard() {
                 <span className={`db-pay-box-status ${paymentState.rentPaid ? "is-paid" : "is-pending"}`}>
                   {paymentState.rentPaid ? `Paid · ${rentMethod}` : "Pending"}
                 </span>
+                <button type="button" className="db-view-detail" onClick={() => setHistoryType("rent")}>
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M2 6l6 5 6-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  View Details
+                </button>
               </div>
               {bothPaid && (
                 <div className="db-pay-box db-pay-box-total">
@@ -559,6 +580,72 @@ export default function Dashboard() {
               </div>
             </div>
           </section>
+
+          {/* Payment history modal — deposit / rent */}
+          {historyType && (
+            <div className="db-modal-backdrop" onClick={() => setHistoryType(null)}>
+              <div className="db-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+                <div className="db-modal-head">
+                  <div>
+                    <p className="db-section-eyebrow">Payment History</p>
+                    <h2 className="db-section-title" style={{ textTransform: "capitalize" }}>
+                      {historyType === "deposit" ? "Security Deposit" : "Rent Payments"}
+                    </h2>
+                  </div>
+                  <button type="button" className="db-modal-close" onClick={() => setHistoryType(null)} aria-label="Close">
+                    <IoClose size={20} />
+                  </button>
+                </div>
+
+                <div className="db-pay-history">
+                  {shownHistory.length ? (
+                    shownHistory.map((rec, i) => {
+                      const done = isPaymentRecordDone(rec);
+                      const amount = typeof rec.amount === "number"
+                        ? `$ ${rec.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
+                        : rec.amount || "—";
+                      const method = modularity(rec.method);
+                      return (
+                        <div key={`${historyType}-${i}`} className={`db-pay-row ${done ? "is-paid" : "is-pending"}`}>
+                          <span className="db-pay-row-dot"></span>
+                          <div className="db-pay-row-main">
+                            <strong>{done ? "Payment complete" : "Payment pending"}</strong>
+                            <span className="db-pay-row-sub">
+                              <FaRegClock size={11} /> {rec.date || (done ? "Confirmed" : "Awaiting confirmation")}
+                              {method !== "—" && method ? ` · ${method}` : ""}
+                            </span>
+                            {rec.txnId && (
+                              <span className="db-pay-row-txn">
+                                Transaction ID: <b>{rec.txnId}</b>
+                              </span>
+                            )}
+                          </div>
+                          <div className="db-pay-row-right">
+                            <span className="db-pay-row-amount">{amount}</span>
+                            <span className={`db-pay-row-badge ${done ? "is-paid" : "is-pending"}`}>
+                              <FaBolt size={9} /> {done ? "Paid" : "Pending"}
+                            </span>
+                            {rec.receipt && (
+                              <a
+                                className="db-pay-row-receipt"
+                                href={rec.receipt}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <FaDownload size={11} /> Receipt
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="db-empty">No payment records yet. Your payments will appear here as soon as they are recorded.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
       </main>
