@@ -592,13 +592,6 @@ export default function Dashboard() {
                       <b>{profileDob}</b>
                     </div>
                   </div>
-                  <div className="db-profile-field">
-                    <span className="db-field-label"><IoLockClosedOutline className="db-field-icon" /> Password</span>
-                    <div className="db-profile-value">
-                      <b className="db-password">••••••••••</b>
-                      <em className="db-lock"><IoLockClosedOutline size={10} /> Locked</em>
-                    </div>
-                  </div>
                 </div>
               </section>
 

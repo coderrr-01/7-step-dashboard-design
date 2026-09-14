@@ -5896,4 +5896,41 @@ html { scroll-behavior: smooth; }
 @media (max-width: 767px) {
     .db-hero { border-radius: 22px; }
     .db-card, .db-progress-card, .db-journey-progress { border-radius: 18px; }
+    /* Journey stepper — compact 5-step row that never overflows:
+       smaller circles, slimmer connectors, and labels clamped to two
+       lines so every column stays the same height and aligned. */
+    .db-stepper-horizontal {
+        margin-top: 16px;
+        align-items: flex-start;
+    }
+    .db-journey-circle {
+        width: 22px;
+        height: 22px;
+        border-width: 2px;
+    }
+    .db-journey-circle svg {
+        width: 10px;
+        height: 10px;
+    }
+    .db-journey-line {
+        height: 2.5px;
+        align-self: center;
+    }
+    .db-journey-step-label {
+        margin: 6px 1px 0;
+        font-size: 9px;
+        line-height: 1.25;
+        max-width: 58px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        word-break: break-word;
+    }
+}
+@media (max-width: 370px) {
+    .db-journey-step-label {
+        font-size: 8.5px;
+        max-width: 48px;
+    }
 }
