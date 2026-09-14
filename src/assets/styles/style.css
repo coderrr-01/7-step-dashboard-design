@@ -5357,6 +5357,63 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
 .db-pdf-btn,
 .db-extend-btn:not(:disabled) { cursor: pointer; }
 
+/* ---------- Two-column dashboard layout ---------- */
+.db-dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 28px;
+    align-items: start;
+    margin-top: 24px;
+}
+.db-dash-main {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+}
+.db-dash-main .db-stats,
+.db-dash-main .db-progress-card,
+.db-dash-main .db-journey-progress,
+.db-dash-main .db-journey-card,
+.db-dash-main .db-doc-card { margin-top: 0; }
+.db-dash-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+}
+.db-dash-aside .db-pay-card,
+.db-dash-aside .db-profile-card { margin-top: 0; }
+/* Fees settle into a vertical stack in the sidebar */
+.db-dash-aside .db-pay-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+.db-dash-aside .db-pay-box {
+    padding-right: 108px; /* keep clear of the top-right View Details button */
+}
+.db-dash-aside .db-pay-box-total .db-pay-box-label {
+    letter-spacing: .14em;
+}
+/* Sticky sidebar on tall screens */
+@media (min-width: 1200px) {
+    .db-dash-aside {
+        position: sticky;
+        top: 90px;
+        max-height: calc(100vh - 110px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+}
+@media (max-width: 1199px) {
+    .db-dash-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 767px) {
+    .db-dash-grid { gap: 18px; margin-top: 18px; }
+    .db-dash-main, .db-dash-aside { gap: 16px; }
+    .db-dash-aside .db-pay-box { padding-right: 18px; }
+}
+
 /* ---------- Mobile refinements ---------- */
 @media (max-width: 767px) {
     .db-hero { border-radius: 22px; }

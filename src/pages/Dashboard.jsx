@@ -281,6 +281,12 @@ export default function Dashboard() {
             </span>
           </section>
 
+          {/* ---- two-column layout ---- */}
+          <div className="db-dash-grid">
+
+            {/* ===== LEFT: main content ===== */}
+            <div className="db-dash-main">
+
           {/* Stat cards — icon chip + value */}
           <section className="db-stats">
             {statCards.map((card) => (
@@ -464,6 +470,12 @@ export default function Dashboard() {
             </div>
           </section>
 
+            </div>
+            {/* ===== END LEFT ===== */}
+
+            {/* ===== RIGHT: Membership Fees + Profile sidebar ===== */}
+            <div className="db-dash-aside">
+
           {/* Membership fees breakdown */}
           <section className="db-card db-pay-card">
             <p className="db-section-eyebrow">Payments</p>
@@ -495,13 +507,13 @@ export default function Dashboard() {
                   View Details
                 </button>
               </div>
-              {bothPaid && (
-                <div className="db-pay-box db-pay-box-total">
-                  <span className="db-pay-box-label">Total Paid</span>
-                  <span className="db-pay-box-value">{totalPaid}</span>
-                  <span className="db-pay-box-status is-paid">Settled</span>
-                </div>
-              )}
+              <div className="db-pay-box db-pay-box-total">
+                <span className="db-pay-box-label">Total Paid</span>
+                <span className="db-pay-box-value">{totalPaid}</span>
+                <span className={`db-pay-box-status ${bothPaid ? "is-paid" : "is-pending"}`}>
+                  {bothPaid ? "Settled" : "Partial"}
+                </span>
+              </div>
             </div>
           </section>
 
@@ -581,6 +593,11 @@ export default function Dashboard() {
               </div>
             </div>
           </section>
+
+            </div>
+            {/* ===== END RIGHT ===== */}
+          </div>
+          {/* ---- /two-column layout ---- */}
 
           {/* Payment history modal — deposit / rent */}
           {historyType &&
