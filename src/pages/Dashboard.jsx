@@ -387,19 +387,6 @@ export default function Dashboard() {
                 <p className="db-section-eyebrow">Your Journey</p>
                 <h2 className="db-section-title">What happened so far</h2>
               </div>
-              {signedPdf && (
-                <a
-                  className="db-pdf-btn"
-                  href={signedPdf}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M8 1v9M4 7l4 4 4-4M2 14h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  Download Signed Lease
-                </a>
-              )}
             </div>
 
             {timeline.length ? (
