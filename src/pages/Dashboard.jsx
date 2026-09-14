@@ -200,6 +200,16 @@ export default function Dashboard() {
 
   const journeyPct = Math.round((timeline.length / JOURNEY_MILESTONES) * 100);
 
+  // Stepper version of the same journey — each milestone has a done flag so the
+  // indicator shows green circles with ticks for finished steps.
+  const journeySteps = [
+    { label: "Application Submitted", done: !!appliedDate },
+    { label: "Interview Scheduled", done: !!interviewDate },
+    { label: "Residence Selected", done: !!unitLabel },
+    { label: "Lease Signed", done: !!signedPdf },
+    { label: "Payments Completed", done: bothPaid },
+  ];
+
   const profileEmail = client?.email || "—";
   const profilePhone = client?.phone || "—";
   const profileDob = client?.date_of_birth ? formatPretty(client.date_of_birth) : "—";
@@ -237,10 +247,14 @@ export default function Dashboard() {
       <main className="db-main">
         <div className="container py-4 py-lg-5">
 
-          {/* Welcome banner */}
-          <section className="db-hero">
+          {/* Welcome banner — room image backdrop, text layered on top */}
+          <section
+            className="db-hero"
+            style={roomImage ? { backgroundImage: `url(${roomImage})` } : undefined}
+          >
+            <span className="db-hero-shade"></span>
             <div className="db-hero-glow"></div>
-            <div>
+            <div className="db-hero-copy">
               <p className="db-hero-eyebrow">Welcome back</p>
               <h1 className="db-hero-title">Hello, {firstName}!</h1>
               <p className="db-hero-sub">
@@ -310,7 +324,7 @@ export default function Dashboard() {
             </div>
           </section>
 
-          {/* Journey progress */}
+          {/* Journey progress — stepper, green circles with ticks */}
           <section className="db-card db-journey-progress">
             <div className="db-section-title-row">
               <div>
@@ -319,14 +333,27 @@ export default function Dashboard() {
               </div>
               <span className="db-journey-pct">{journeyPct}%</span>
             </div>
-            <div className="db-progress-bar-wrap">
-              <div className="db-progress-track">
-                <div className="db-progress-fill" style={{ width: `${journeyPct}%` }}></div>
-              </div>
-              <div className="db-progress-labels">
-                <span>{timeline.length} of {JOURNEY_MILESTONES} steps completed</span>
-                <span>{journeyPct === 100 ? "All done" : `${JOURNEY_MILESTONES - timeline.length} step${JOURNEY_MILESTONES - timeline.length === 1 ? "" : "s"} remaining`}</span>
-              </div>
+            <div className="db-stepper-horizontal">
+              {journeySteps.map((step, i) => (
+                <div
+                  key={step.label}
+                  className={`db-journey-step ${step.done ? "is-done" : ""}`}
+                >
+                  <div className="db-journey-step-top">
+                    <span className="db-journey-circle">
+                      {step.done && (
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                          <path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </span>
+                    {i < journeySteps.length - 1 && (
+                      <span className={`db-journey-conn ${step.done ? "is-done" : ""}`}></span>
+                    )}
+                  </div>
+                  <p className="db-journey-step-label">{step.label}</p>
+                </div>
+              ))}
             </div>
           </section>
 

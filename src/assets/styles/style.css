@@ -4920,15 +4920,25 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
 .db-hero {
     border-radius: 26px;
     border: 1px solid rgba(217, 185, 126, .3);
-    background:
-        radial-gradient(720px 360px at 90% -10%, rgba(217, 185, 126, .38), transparent 62%),
-        radial-gradient(520px 280px at 6% 130%, rgba(255, 255, 255, .09), transparent 55%),
-        linear-gradient(128deg, #17140f 0%, #211c15 55%, #342917 100%);
+    background-color: #211c15;
+    background-size: cover;
+    background-position: center;
     box-shadow:
         0 30px 62px -30px rgba(24, 20, 14, .6),
         0 1px 0 rgba(255, 255, 255, .08) inset;
 }
-.db-hero-glow { opacity: .95; }
+.db-hero-shade {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+        linear-gradient(120deg, rgba(18, 15, 10, .88) 8%, rgba(18, 15, 10, .62) 42%, rgba(18, 15, 10, .28) 78%),
+        linear-gradient(0deg, rgba(18, 15, 10, .45), rgba(18, 15, 10, 0) 40%);
+}
+.db-hero-copy { position: relative; z-index: 1; }
+.db-complete-badge { position: relative; z-index: 1; }
+.db-hero-glow { opacity: .65; z-index: 0; }
 .db-hero-eyebrow { color: #e0c48e; letter-spacing: .22em; }
 .db-hero-sub { color: rgba(255, 255, 255, .78); }
 .db-complete-badge {
@@ -4953,6 +4963,72 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+}
+
+/* ---------- Journey stepper ---------- */
+.db-stepper-horizontal {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 26px;
+}
+.db-journey-step {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.db-journey-step-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+}
+.db-journey-circle {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: #fff;
+    border: 2.5px solid #dbd1bc;
+    transition: background .25s ease, border-color .25s ease;
+}
+.db-journey-step.is-done .db-journey-circle {
+    border-color: #2e9e5b;
+    background: linear-gradient(135deg, #43bd77, #2e9e5b);
+    box-shadow: 0 6px 16px -6px rgba(46, 158, 91, .6);
+}
+.db-journey-conn {
+    position: absolute;
+    left: calc(50% + 20px);
+    right: calc(50% - 20px);
+    top: calc(50% - 2px);
+    height: 4px;
+    border-radius: 999px;
+    background: #e6ddc8;
+    transition: background .25s ease;
+}
+.db-journey-conn.is-done {
+    background: linear-gradient(90deg, #3fae6e, #7ed49c);
+}
+.db-journey-step-label {
+    margin: 10px 4px 0;
+    font-family: "Poppins", sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #9a8e78;
+}
+.db-journey-step.is-done .db-journey-step-label {
+    color: #2c2822;
 }
 
 /* ---------- Progress bars ---------- */
