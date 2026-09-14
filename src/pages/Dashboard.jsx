@@ -344,6 +344,9 @@ export default function Dashboard() {
                   className={`db-journey-step ${step.done ? "is-done" : ""}`}
                 >
                   <div className="db-journey-step-top">
+                    {i > 0 && (
+                      <span className={`db-journey-line ${journeySteps[i - 1].done ? "is-done" : ""}`}></span>
+                    )}
                     <span className="db-journey-circle">
                       {step.done && (
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -352,7 +355,7 @@ export default function Dashboard() {
                       )}
                     </span>
                     {i < journeySteps.length - 1 && (
-                      <span className={`db-journey-conn ${step.done ? "is-done" : ""}`}></span>
+                      <span className={`db-journey-line ${step.done ? "is-done" : ""}`}></span>
                     )}
                   </div>
                   <p className="db-journey-step-label">{step.label}</p>
