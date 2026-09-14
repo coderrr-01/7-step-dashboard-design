@@ -282,13 +282,7 @@ export default function Dashboard() {
           </section>
 
           {/* ---- two-column layout ---- */}
-          <div className="db-dash-grid">
-
-            {/* ===== LEFT: main content ===== */}
-            <div className="db-dash-main">
-
-          {/* Stat cards — icon chip + value */}
-          <section className="db-stats">
+            <section className="db-stats">
             {statCards.map((card) => (
               <div key={card.label} className="db-stat-card">
                 <span className="db-stat-icon">{card.icon}</span>
@@ -300,6 +294,13 @@ export default function Dashboard() {
               </div>
             ))}
           </section>
+          <div className="db-dash-grid">
+
+            {/* ===== LEFT: main content ===== */}
+            <div className="db-dash-main">
+
+          {/* Stat cards — icon chip + value */}
+        
 
           {/* Lease progress */}
           <section className={`db-progress-card ${tone}`}>
