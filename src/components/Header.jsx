@@ -1,5 +1,6 @@
 import Navbar from "./Navbar";
 import { createPortal } from "react-dom";
+import { useLocation } from "react-router-dom";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
 import { FaRegUser } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
@@ -14,9 +15,12 @@ import { useClientData } from "../hooks/useClientData";
 
 export default function Header({ activeLabel }) {
    const { client } = useClientData();
+   const { pathname } = useLocation();
+   const isDashboard = pathname === "/dashboard";
    const [open, setOpen] = useState(false);
    const [dropdown, setdropdown] = useState(false);
    const [loggingOut, setLoggingOut] = useState(false);
+   const [navActive, setNavActive] = useState(""); // currently-flashed header link
    const ref = useRef(null);
    const ddRef = useRef(null);
    // Viewport coords for the portaled dropdown — computed from the trigger
@@ -35,6 +39,16 @@ export default function Header({ activeLabel }) {
          }
       }
       setdropdown(!dropdown);
+   };
+
+   // Only the dashboard page reacts to the header nav links. On any other page
+   // they do nothing, exactly like before.
+   const gotoSection = (id) => {
+      if (!isDashboard) return;
+      setOpen(false);
+      setNavActive(id);
+      window.dispatchEvent(new CustomEvent("jrny:scrollto-section", { detail: { section: id } }));
+      setTimeout(() => setNavActive(""), 2400);
    };
 
    async function handleLogout() {
@@ -107,10 +121,26 @@ export default function Header({ activeLabel }) {
                <div className="top-header-section">
                   <nav className=" d-md-flex gap-5">
                      <a className="nav-link-custom active" href="#">{ activeLabel }</a>
-                     <a className="nav-link-custom" href="#">MY PROFILE</a>
-                     <a className="nav-link-custom" href="#">LEASE AGREEMENT</a>
-                     <a className="nav-link-custom" href="#">PAYMENT HISTORY</a>
-                     <a className="nav-link-custom" href="#">CONTACT US</a>
+                     <a
+                        className={`nav-link-custom ${isDashboard ? (navActive === "my-profile" ? "active" : "") : ""}`}
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); gotoSection("my-profile"); }}
+                     >MY PROFILE</a>
+                     <a
+                        className={`nav-link-custom ${isDashboard ? (navActive === "lease-agreement" ? "active" : "") : ""}`}
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); gotoSection("lease-agreement"); }}
+                     >LEASE AGREEMENT</a>
+                     <a
+                        className={`nav-link-custom ${isDashboard ? (navActive === "payment-history" ? "active" : "") : ""}`}
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); gotoSection("payment-history"); }}
+                     >PAYMENT HISTORY</a>
+                     <a
+                        className={`nav-link-custom ${isDashboard ? (navActive === "contact-us" ? "active" : "") : ""}`}
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); gotoSection("contact-us"); }}
+                     >CONTACT US</a>
                   </nav>
                </div>
                <div className="d-flex align-items-center gap-3 user-profile-details">
@@ -200,10 +230,10 @@ export default function Header({ activeLabel }) {
                      <img src={logo} alt="JRNY Logo" className="drawer-logo" />
                   </div>
                   <a href="#" onClick={(e) => e.preventDefault()}>Dashboard</a>
-                  <a href="#">My profile</a>
-                  <a href="#">Lease agreement</a>
-                  <a href="#">Payment history</a>
-                  <a href="#">Contact us</a>
+                  <a href="#" onClick={(e) => { e.preventDefault(); gotoSection("my-profile"); }}>My profile</a>
+                  <a href="#" onClick={(e) => { e.preventDefault(); gotoSection("lease-agreement"); }}>Lease agreement</a>
+                  <a href="#" onClick={(e) => { e.preventDefault(); gotoSection("payment-history"); }}>Payment history</a>
+                  <a href="#" onClick={(e) => { e.preventDefault(); gotoSection("contact-us"); }}>Contact us</a>
                </div>
                {/* OVERLAY */}
                {open && <div className="overlay" onClick={() => setOpen(false)} />}

@@ -9,20 +9,23 @@ import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
 import { getPaymentHistory, isPaymentRecordDone } from "../utils/paymentHistory";
 import { getRoomById, getUserSub } from "../services/api";
 
-const MONTH_MS = 1000 * 60 * 60 * 24 * 30.44;
-
 function monthSpan(from, to) {
   if (!from || !to) return 0;
   const a = new Date(from);
   const b = new Date(to);
   if (isNaN(a.getTime()) || isNaN(b.getTime())) return 0;
-  return Math.round((b - a) / MONTH_MS);
+  // Calendar-month difference (full months only).
+  let months = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
+  if (b.getDate() < a.getDate()) months -= 1;
+  return months;
 }
 
-// 0-5 months elapsed → green · 6-9 → yellow · 10+ → red (expiry nearing)
-function progressTone(elapsed) {
-  if (elapsed >= 10) return "red";
-  if (elapsed >= 6) return "yellow";
+// Lease colour ramp by months remaining:
+//  > half remaining → green · ≤ half → orange · ≤ 2 months → red
+function progressTone(elapsed, total) {
+  const remaining = total - elapsed;
+  if (remaining <= 2) return "red";
+  if (remaining <= Math.floor(total / 2)) return "yellow";
   return "green";
 }
 function formatPretty(value) {
@@ -67,6 +70,25 @@ export default function Dashboard() {
     try { return localStorage.getItem("jrny_signed_lease") || ""; } catch { return ""; }
   });
   const [historyType, setHistoryType] = useState(null); // "deposit" | "rent" | null
+  const [flashSection, setFlashSection] = useState(null); // section id being highlighted
+
+  // Header "My Profile / Lease Agreement / Payment History / Contact Us" clicks
+  // scroll to the matching dashboard section and flash a gold ring around it.
+  useEffect(() => {
+    if (loading || !client) return;
+    const handleGoto = (e) => {
+      const id = e?.detail?.section;
+      if (!id) return;
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setFlashSection(null);
+      requestAnimationFrame(() => setFlashSection(id));
+      setTimeout(() => setFlashSection(null), 2400);
+    };
+    window.addEventListener("jrny:scrollto-section", handleGoto);
+    return () => window.removeEventListener("jrny:scrollto-section", handleGoto);
+  }, [loading, client]);
 
   // Paid users only — anyone without BOTH payments done is sent back to the
   // payment screen. Waits for fresh server data (no cached-flag shortcut).
@@ -174,7 +196,7 @@ export default function Dashboard() {
   const remainingMonths = totalMonths - elapsedMonths;
   const pct = totalMonths > 0 ? Math.round((elapsedMonths / totalMonths) * 100) : 0;
   const expired = !!(end && today > end);
-  const tone = expired ? "red" : progressTone(elapsedMonths);
+  const tone = expired ? "red" : progressTone(elapsedMonths, totalMonths);
   // Extend unlocks only from month 10 (within two months of expiry).
   const extendEnabled = expired || elapsedMonths >= 10;
 
@@ -390,7 +412,7 @@ export default function Dashboard() {
               </section>
 
               {/* Journey timeline */}
-              <section className="db-card db-journey-card">
+              <section id="lease-agreement" className={`db-card db-journey-card ${flashSection === "lease-agreement" ? "section-flash" : ""}`}>
                 <div className="db-section-title-row">
                   <div>
                     <p className="db-section-eyebrow">Your Journey</p>
@@ -480,7 +502,7 @@ export default function Dashboard() {
             <div className="db-dash-aside">
 
               {/* Membership fees breakdown */}
-              <section className="db-card db-pay-card">
+              <section id="payment-history" className={`db-card db-pay-card ${flashSection === "payment-history" ? "section-flash" : ""}`}>
                 {/* <p className="db-section-eyebrow">Payments</p> */}
                 <h2 className="db-section-title">Your Amount</h2>
                 <div className="db-pay-grid">
@@ -521,7 +543,7 @@ export default function Dashboard() {
               </section>
 
               {/* Profile */}
-              <section className="db-card db-profile-card">
+              <section id="my-profile" className={`db-card db-profile-card ${flashSection === "my-profile" ? "section-flash" : ""}`}>
                 <div className="db-profile-head">
                   <label className="db-profile-avatar" htmlFor="db-avatar-input" title="Click to change picture">
                     {profileImg ? (
@@ -579,7 +601,7 @@ export default function Dashboard() {
               </section>
 
               {/* Need help */}
-              <aside className="db-help-card">
+              <aside id="contact-us" className={`db-help-card ${flashSection === "contact-us" ? "section-flash" : ""}`}>
                 <span className="db-help-glow"></span>
                 <div className="icon-content-set">
                   <div>
