@@ -325,14 +325,17 @@ export default function Dashboard() {
             </div>
 
             <div className="db-progress-foot">
-              <p className="db-tone-note">
-                {expired
-                  ? "Your lease term has ended."
-                  : tone === "red"
-                    ? "Your lease is nearing its end — consider extending soon."
-                    : tone === "yellow"
-                      ? "Over half of your lease has passed."
-                      : "You're early in your lease term."}
+              <p className={`db-tone-note ${tone}`}>
+                <IoCalendarOutline size={15} />
+                <span>
+                  {expired
+                    ? "Your lease term has ended."
+                    : tone === "red"
+                      ? "Your lease is nearing its end — consider extending soon."
+                      : tone === "yellow"
+                        ? "Over half of your lease has passed."
+                        : "You're early in your lease term."}
+                </span>
               </p>
               <button
                 type="button"

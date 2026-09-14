@@ -4413,8 +4413,35 @@ body .stepper-row{
     min-width: 220px;
     font-size: 13.5px;
     color: #6b5f4a;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid;
+    line-height: 1.5;
 }
 .db-tone-note strong { color: #2c2822; }
+.db-tone-note svg { flex-shrink: 0; }
+/* Tone-led highlight */
+.db-tone-note.green {
+    color: #1e7a44;
+    background: rgba(46, 158, 91, .1);
+    border-color: rgba(46, 158, 91, .28);
+}
+.db-tone-note.green svg { color: #2e9e5b; }
+.db-tone-note.yellow {
+    color: #8a5a12;
+    background: rgba(217, 158, 43, .12);
+    border-color: rgba(217, 158, 43, .34);
+}
+.db-tone-note.yellow svg { color: #d99e2b; }
+.db-tone-note.red {
+    color: #a03c26;
+    background: rgba(184, 67, 47, .1);
+    border-color: rgba(184, 67, 47, .3);
+}
+.db-tone-note.red svg { color: #b8432f; }
 .db-extend-btn {
     flex-shrink: 0;
     padding: 12px 26px;
