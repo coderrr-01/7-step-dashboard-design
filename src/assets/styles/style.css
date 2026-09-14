@@ -4532,25 +4532,38 @@ body .stepper-row{
     width: 40px;
     height: 40px;
     flex-shrink: 0;
-    border-radius: 12px;
+    border-radius: 13px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(201, 164, 92, .16);
+    position: relative;
+    color: #2c2822;
+    background: linear-gradient(135deg, #f6ecd6, #e6d4ac);
+    border: 1px solid rgba(201, 164, 92, .45);
+    box-shadow:
+        0 8px 18px -8px rgba(184, 146, 74, .55),
+        0 1px 0 rgba(255, 255, 255, .7) inset;
 }
-.db-timeline-dot::before {
-    content: "";
-    width: 16px;
-    height: 16px;
+.db-timeline-dot .db-timeline-tick {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #e3c48e, #b8924a);
-    box-shadow: 0 0 0 4px rgba(201, 164, 92, .18);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: linear-gradient(135deg, #43bd77, #2e9e5b);
+    border: 2px solid #fff;
+    box-shadow: 0 4px 10px -3px rgba(46, 158, 91, .6);
 }
 .db-timeline-line {
     flex: 1;
     width: 2px;
     margin: 4px 0;
-    background: linear-gradient(180deg, rgba(184, 146, 74, .55), rgba(184, 146, 74, .12));
+    background: linear-gradient(180deg, rgba(201, 164, 92, .6), rgba(201, 164, 92, .14));
 }
 .db-timeline-body {
     flex: 1;
@@ -4561,26 +4574,29 @@ body .stepper-row{
 .db-timeline-body h3 {
     margin: 0 0 3px;
     font-family: "Archivo", sans-serif;
-    font-size: 15.5px;
+    font-size: 14.5px;
     font-weight: 700;
     color: #2c2822;
 }
 .db-timeline-body p {
-    margin: 0;
+    margin: 0 0 8px;
     font-size: 12.5px;
     color: #8d8272;
     line-height: 1.5;
 }
 .db-timeline-date {
-    flex-shrink: 0;
-    align-self: flex-start;
-    margin-top: 5px;
-    padding: 5px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 11px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
-    color: #b8924a;
-    background: rgba(201, 164, 92, .12);
+    letter-spacing: .03em;
+    color: #8d7340;
+    background: linear-gradient(180deg, #fffdf7, #f7efdd);
+    border: 1px solid rgba(201, 164, 92, .32);
+    box-shadow: 0 6px 14px -8px rgba(184, 146, 74, .5);
 }
 
 /* Signed lease download */
@@ -5132,22 +5148,7 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
         0 1px 0 rgba(255, 255, 255, .4) inset;
 }
 
-/* ---------- Timeline ---------- */
-.db-timeline-dot {
-    border-radius: 50%;
-    background: rgba(201, 164, 92, .18);
-    border: 1px solid rgba(201, 164, 92, .4);
-}
-.db-timeline-dot::before {
-    width: 22px;
-    height: 22px;
-    box-shadow: 0 0 0 5px rgba(201, 164, 92, .16);
-    background: radial-gradient(circle at 35% 30%, #f1dca7, #b8924a);
-}
-.db-timeline-date {
-    background: rgba(210, 172, 92, .14);
-    border: 1px solid rgba(201, 164, 92, .28);
-}
+/* ---------- Timeline (already styled inline above) ---------- */
 
 /* ---------- Documents ---------- */
 .db-pdf-btn {
@@ -5580,17 +5581,15 @@ body.page-dashboard {
     margin-top: 14px;
 }
 .db-timeline-rail {
-    width: 34px;
+    width: 36px;
 }
 .db-timeline-dot {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    font-size: 15px;
 }
-.db-timeline-dot::before {
-    width: 13px;
-    height: 13px;
-}
+.db-timeline-dot svg { font-size: 15px; }
 .db-timeline-body {
     padding-bottom: 18px;
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { IoCalendarOutline, IoHomeOutline, IoCashOutline, IoClose, IoDocumentTextOutline } from "react-icons/io5";
+import { IoCalendarOutline, IoHomeOutline, IoCashOutline, IoClose, IoDocumentTextOutline, IoNewspaperOutline, IoChatbubbleEllipsesOutline, IoCheckmarkDoneOutline } from "react-icons/io5";
 import { FaDownload, FaBolt, FaRegClock } from "react-icons/fa";
 import PageLayout from "../components/PageLayout";
 import { useClientData } from "../hooks/useClientData";
@@ -403,14 +403,21 @@ export default function Dashboard() {
                 {timeline.map((ev, i) => (
                   <div key={ev.title} className="db-timeline-item">
                     <div className="db-timeline-rail">
-                      <span className={`db-timeline-dot ${ev.icon}`}></span>
+                      <span className={`db-timeline-dot ${ev.icon}`}>
+                        {ev.icon === "form" && <IoNewspaperOutline size={16} />}
+                        {ev.icon === "chat" && <IoChatbubbleEllipsesOutline size={16} />}
+                        {ev.icon === "home" && <IoHomeOutline size={16} />}
+                        {ev.icon === "file" && <IoDocumentTextOutline size={16} />}
+                        {ev.icon === "pay" && <IoCashOutline size={16} />}
+                        {i === timeline.length - 1 && <span className="db-timeline-tick"><IoCheckmarkDoneOutline size={9} /></span>}
+                      </span>
                       {i < timeline.length - 1 && <span className="db-timeline-line"></span>}
                     </div>
                     <div className="db-timeline-body">
                       <h3>{ev.title}</h3>
                       <p>{ev.text}</p>
+                      {ev.date && <span className="db-timeline-date">{ev.date}</span>}
                     </div>
-                    {ev.date && <span className="db-timeline-date">{ev.date}</span>}
                   </div>
                 ))}
               </div>
