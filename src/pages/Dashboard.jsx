@@ -8,6 +8,7 @@ import { useClientData } from "../hooks/useClientData";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
 import { getPaymentHistory, isPaymentRecordDone } from "../utils/paymentHistory";
 import { getRoomById } from "../services/api";
+import logo from "../assets/images/jrny-logo.png";
 
 function monthSpan(from, to) {
   if (!from || !to) return 0;
@@ -111,10 +112,14 @@ export default function Dashboard() {
   if (loading || !client) {
     return (
       <PageLayout page="Dashboard">
-        <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 min-vh-100">
-          <div className="container container-narrow py-5" style={{ textAlign: "center" }}>
-            <span className="pay-loading-ring" aria-hidden="true"></span>
-            <p style={{ marginTop: 18, fontFamily: "Poppins, sans-serif", color: "#8d8272" }}>Loading your dashboard…</p>
+        <main className="db-load-main">
+          <div className="db-load">
+            <span className="db-load-logo" aria-hidden="true">
+              <img src={logo} alt="JRNY" />
+            </span>
+            <span className="db-load-ring" aria-hidden="true"></span>
+            <p className="db-load-title">Preparing your dashboard</p>
+            <p className="db-load-sub">Pulling together your lease, payments &amp; progress…</p>
           </div>
         </main>
       </PageLayout>

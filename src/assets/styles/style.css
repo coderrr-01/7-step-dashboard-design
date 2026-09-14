@@ -5790,6 +5790,105 @@ html { scroll-behavior: smooth; }
     }
 }
 
+/* ---------- Dashboard loading screen ---------- */
+.db-load-main {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    background:
+        radial-gradient(900px 480px at 50% -10%, rgba(201, 164, 92, .18), transparent 62%),
+        linear-gradient(180deg, #fbf8f2 0%, #f4eee2 100%);
+}
+.db-load {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+    animation: dbLoadFade .5s ease;
+}
+.db-load-logo {
+    width: 92px;
+    height: 92px;
+    border-radius: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #fffdf7, #f3ead6);
+    border: 1px solid #eadfc7;
+    box-shadow:
+        0 24px 48px -22px rgba(184, 146, 74, .55),
+        0 2px 6px rgba(30, 24, 18, .05);
+    padding: 14px;
+    animation: dbLoadFloat 2.6s ease-in-out infinite;
+    position: relative;
+}
+.db-load-logo::after {
+    content: "";
+    position: absolute;
+    inset: -16px;
+    border-radius: 34px;
+    background: radial-gradient(circle at 50% 50%, rgba(201, 164, 92, .18), transparent 70%);
+    animation: dbLoadPulse 2.6s ease-in-out infinite;
+    z-index: -1;
+}
+.db-load-logo img {
+    height: 44px;
+    width: auto;
+}
+.db-load-ring {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid rgba(201, 164, 92, .25);
+    border-top-color: #c9a45c;
+    animation: dbLoadSpin .9s linear infinite;
+}
+.db-load-title {
+    margin: 2px 0 0;
+    font-family: "Archivo", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c2822;
+}
+.db-load-sub {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #8d8272;
+}
+.db-load-sub::after {
+    content: "";
+    display: inline-block;
+    width: 1.1em;
+    text-align: left;
+    animation: dbLoadDots 1.4s steps(4, end) infinite;
+}
+@keyframes dbLoadSpin {
+    to { transform: rotate(360deg); }
+}
+@keyframes dbLoadFade {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes dbLoadFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-9px); }
+}
+@keyframes dbLoadPulse {
+    0%, 100% { opacity: .4; transform: scale(.94); }
+    50%      { opacity: 1; transform: scale(1.06); }
+}
+@keyframes dbLoadDots {
+    0%   { content: ""; }
+    25%  { content: "."; }
+    50%  { content: ".."; }
+    75%  { content: "..."; }
+    100% { content: ""; }
+}
+
 /* ---------- Need help card ---------- */
 .db-help-card {
     position: relative;
