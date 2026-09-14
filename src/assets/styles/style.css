@@ -5442,9 +5442,6 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
     gap: 22px;
     min-width: 0;
 }
-.db-dash-aside > :last-child {
-    flex: 1 1 auto;
-}
 .db-dash-aside .db-pay-card,
 .db-dash-aside .db-profile-card { margin-top: 0; }
 /* Fees settle into a vertical stack in the sidebar */
