@@ -1,6 +1,6 @@
 import Navbar from "./Navbar";
 import { createPortal } from "react-dom";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
 import { FaRegUser } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
@@ -16,6 +16,7 @@ import { useClientData } from "../hooks/useClientData";
 export default function Header({ activeLabel }) {
    const { client } = useClientData();
    const { pathname } = useLocation();
+   const navigate = useNavigate();
    const isDashboard = pathname === "/dashboard";
    const [open, setOpen] = useState(false);
    const [dropdown, setdropdown] = useState(false);
@@ -235,7 +236,18 @@ export default function Header({ activeLabel }) {
                      <button className="close-btn" onClick={() => setOpen(false)}>✕</button>
                      <img src={logo} alt="JRNY Logo" className="drawer-logo" />
                   </div>
-                  <a href="#" onClick={(e) => e.preventDefault()}>Dashboard</a>
+                  <a
+                     href="#"
+                     onClick={(e) => {
+                        e.preventDefault();
+                        setOpen(false);
+                        if (isDashboard) {
+                           window.scrollTo({ top: 0, behavior: "smooth" });
+                        } else {
+                           navigate("/dashboard");
+                        }
+                     }}
+                  >Dashboard</a>
                   <a href="#" onClick={(e) => { e.preventDefault(); gotoSection("my-profile"); }}>My profile</a>
                   <a href="#" onClick={(e) => { e.preventDefault(); gotoSection("lease-agreement"); }}>Lease agreement</a>
                   <a href="#" onClick={(e) => { e.preventDefault(); gotoSection("payment-history"); }}>Payment history</a>
