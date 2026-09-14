@@ -481,8 +481,8 @@ export default function Dashboard() {
 
               {/* Membership fees breakdown */}
               <section className="db-card db-pay-card">
-                <p className="db-section-eyebrow">Payments</p>
-                <h2 className="db-section-title">Membership Fees</h2>
+                {/* <p className="db-section-eyebrow">Payments</p> */}
+                <h2 className="db-section-title">Your Amount</h2>
                 <div className="db-pay-grid">
                   <div className="db-pay-box">
                     <span className="db-pay-box-label">Security Deposit</span>
