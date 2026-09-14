@@ -4740,8 +4740,7 @@ body .stepper-row{
     background: rgba(46, 158, 91, .14);
 }
 .db-profile-fields {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    /* display: grid; */
     gap: 0 26px;
     margin-top: 12px;
 }
@@ -4852,15 +4851,15 @@ body .stepper-row{
 /* Responsive */
 @media (max-width: 991px) {
     .db-grid-row { grid-template-columns: 1fr; }
-    .db-profile-fields { grid-template-columns: 1fr; }
+    /* .db-profile-fields { grid-template-columns: 1fr; } */
 }
 @media (max-width: 767px) {
-    .db-hero { flex-direction: column; align-items: flex-start; padding: 26px 22px; }
-    .db-hero-title { font-size: 27px; }
+    .db-hero { flex-direction: column; align-items: flex-start; padding: 22px 20px; }
+    .db-hero-title { font-size: 23px; }
     .db-stats { grid-template-columns: 1fr; }
-    .db-progress-card { padding: 20px 18px; }
+    .db-progress-card { padding: 16px 16px; }
 
-    .db-journey-progress { padding: 20px 18px; }
+    .db-journey-progress { padding: 16px 16px; }
 }
 
 /* ============================================================
@@ -5412,6 +5411,238 @@ body.page-dashboard .db-main { padding-bottom: 36px; }
     .db-dash-grid { gap: 18px; margin-top: 18px; }
     .db-dash-main, .db-dash-aside { gap: 16px; }
     .db-dash-aside .db-pay-box { padding-right: 18px; }
+}
+
+/* ---------- Professional compact refinement ---------- */
+body.page-dashboard {
+    font-size: 13.5px;
+}
+/* Tighter card shells */
+.db-card {
+    padding: 18px 20px;
+    border-radius: 16px;
+}
+.db-progress-card,
+.db-journey-progress {
+    padding: 18px 20px;
+    border-radius: 16px;
+}
+.db-stat-card {
+    padding: 14px 16px;
+    border-radius: 14px;
+    gap: 12px;
+}
+/* Slimmer hero */
+.db-hero {
+    padding: 24px 26px 22px;
+    border-radius: 18px;
+}
+.db-hero-eyebrow {
+    font-size: 10.5px;
+    letter-spacing: .2em;
+}
+.db-hero-title {
+    font-size: 26px;
+    margin-bottom: 6px;
+}
+.db-hero-sub {
+    font-size: 13px;
+    line-height: 1.55;
+    max-width: 500px;
+}
+.db-complete-badge {
+    padding: 7px 13px;
+    font-size: 11.5px;
+}
+/* Stat cards — compact typography */
+.db-stat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 18px;
+}
+.db-stat-label {
+    font-size: 10px;
+    margin-bottom: 3px;
+    letter-spacing: .12em;
+}
+.db-stat-value {
+    font-size: 16.5px;
+}
+.db-stat-meta {
+    font-size: 11.5px;
+    margin-top: 2px;
+}
+/* Section heads — smaller */
+.db-section-eyebrow {
+    font-size: 10px;
+    letter-spacing: .16em;
+    margin-bottom: 3px;
+}
+.db-section-title {
+    font-size: 17px;
+}
+.db-journey-pct {
+    font-size: 26px;
+}
+/* Journey stepper — slimmer circles */
+.db-stepper-horizontal {
+    margin-top: 20px;
+}
+.db-journey-line {
+    height: 3px;
+}
+.db-journey-circle {
+    width: 26px;
+    height: 26px;
+    border-width: 2px;
+}
+.db-journey-circle svg {
+    width: 12px;
+    height: 12px;
+}
+.db-journey-step-label {
+    font-size: 10.5px;
+    margin: 8px 3px 0;
+}
+/* Progress bar — thinner */
+.db-progress-track {
+    height: 10px;
+}
+.db-progress-labels {
+    font-size: 11.5px;
+    margin-top: 7px;
+}
+.db-progress-meta {
+    font-size: 12px;
+}
+.db-progress-foot {
+    margin-top: 16px;
+    padding-top: 14px;
+}
+.db-tone-note {
+    font-size: 12.5px;
+}
+.db-extend-btn {
+    padding: 10px 22px;
+    font-size: 12.5px;
+}
+/* Timeline — compact */
+.db-timeline {
+    margin-top: 14px;
+}
+.db-timeline-rail {
+    width: 34px;
+}
+.db-timeline-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+}
+.db-timeline-dot::before {
+    width: 13px;
+    height: 13px;
+}
+.db-timeline-body {
+    padding-bottom: 18px;
+}
+.db-timeline-body h3 {
+    font-size: 14px;
+}
+.db-timeline-body p {
+    font-size: 12px;
+}
+.db-timeline-date {
+    font-size: 11px;
+    padding: 4px 11px;
+}
+/* Documents — compact rows */
+.db-pdf-btn {
+    padding: 8px 15px;
+    font-size: 12px;
+}
+.db-docs {
+    margin-top: 16px;
+    padding-top: 14px;
+    gap: 10px;
+}
+.db-doc-item {
+    padding: 10px 12px;
+    gap: 12px;
+    border-radius: 11px;
+}
+.db-doc-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+}
+.db-doc-info strong {
+    font-size: 13px;
+}
+.db-doc-info span {
+    font-size: 11.5px;
+}
+.db-doc-dl-btn {
+    padding: 8px 14px;
+    font-size: 11.5px;
+}
+/* Payments — smaller amounts, tighter boxes */
+.db-pay-box {
+    padding: 13px 14px;
+    border-radius: 13px;
+    gap: 2px;
+}
+.db-pay-box-label {
+    font-size: 10.5px;
+}
+.db-pay-box-value {
+    font-size: 20px;
+}
+.db-pay-box-status {
+    font-size: 11.5px;
+}
+.db-view-detail {
+    padding: 7px 12px;
+    font-size: 11px;
+}
+/* Profile — tighter fields */
+.db-profile-head {
+    gap: 14px;
+}
+.db-profile-avatar {
+    width: 62px;
+    height: 62px;
+}
+.db-profile-avatar > span {
+    font-size: 24px;
+}
+.db-profile-cam {
+    width: 22px;
+    height: 22px;
+}
+.db-profile-msg {
+    font-size: 12px;
+}
+.db-profile-fields {
+    margin-top: 10px;
+}
+.db-profile-field {
+    padding: 11px 0;
+}
+.db-profile-field > span {
+    font-size: 12px;
+}
+.db-profile-value b {
+    font-size: 13.5px;
+}
+/* Sidebar fees stack */
+.db-dash-aside .db-pay-box {
+    padding: 13px 14px;
+    padding-right: 108px;
+}
+.db-dash-aside .db-pay-grid {
+    gap: 12px;
+    margin-top: 14px;
 }
 
 /* ---------- Mobile refinements ---------- */
