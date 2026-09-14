@@ -4185,6 +4185,7 @@ body .stepper-row{
     color: #6b5f4a;
     background: rgba(255, 255, 255, .7);
     transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    margin-left:10px
 }
 .pay-dash-btn:hover {
     transform: translateY(-2px);
