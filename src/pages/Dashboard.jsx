@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { IoCalendarOutline, IoHomeOutline, IoCashOutline, IoClose, IoDocumentTextOutline, IoNewspaperOutline, IoChatbubbleEllipsesOutline, IoCheckmarkDoneOutline } from "react-icons/io5";
+import { IoCalendarOutline, IoHomeOutline, IoCashOutline, IoClose, IoDocumentTextOutline, IoNewspaperOutline, IoChatbubbleEllipsesOutline, IoCheckmarkDoneOutline, IoMailOutline, IoCallOutline, IoLockClosedOutline } from "react-icons/io5";
 import { FaDownload, FaBolt, FaRegClock } from "react-icons/fa";
 import PageLayout from "../components/PageLayout";
 import { useClientData } from "../hooks/useClientData";
@@ -550,27 +550,29 @@ export default function Dashboard() {
 
             <div className="db-profile-fields">
               <div className="db-profile-field">
-                <span>Email</span>
+                <span className="db-field-label"><IoMailOutline className="db-field-icon" /> Email</span>
                 <div className="db-profile-value">
                   <b>{profileEmail}</b>
+                  <em className="db-lock"><IoLockClosedOutline size={10} /> Locked</em>
                 </div>
               </div>
               <div className="db-profile-field">
-                <span>Phone</span>
+                <span className="db-field-label"><IoCallOutline className="db-field-icon" /> Phone</span>
                 <div className="db-profile-value">
                   <b>{profilePhone}</b>
                 </div>
               </div>
               <div className="db-profile-field">
-                <span>Date of Birth</span>
+                <span className="db-field-label"><IoCalendarOutline className="db-field-icon" /> Date of Birth</span>
                 <div className="db-profile-value">
                   <b>{profileDob}</b>
                 </div>
               </div>
               <div className="db-profile-field">
-                <span>Password</span>
+                <span className="db-field-label"><IoLockClosedOutline className="db-field-icon" /> Password</span>
                 <div className="db-profile-value">
                   <b className="db-password">••••••••••</b>
+                  <em className="db-lock"><IoLockClosedOutline size={10} /> Locked</em>
                 </div>
               </div>
             </div>

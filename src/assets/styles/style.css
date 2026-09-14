@@ -4755,11 +4755,29 @@ body .stepper-row{
     border-radius: 50%;
     overflow: hidden;
     cursor: pointer;
-    border: 2px solid #e7dcc4;
-    background: linear-gradient(135deg, #f3ead8, #e7dcc4);
+    border: 2px solid #fff;
+    padding: 3px;
+    background: linear-gradient(135deg, #e6c993, #b8924a, #f1dca7);
+    box-shadow:
+        0 10px 24px -10px rgba(184, 146, 74, .7),
+        0 1px 0 rgba(255, 255, 255, .6) inset;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+.db-profile-avatar::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f6ecd6, #e6d4ac);
+    z-index: 0;
+}
+.db-profile-avatar img,
+.db-profile-avatar > span {
+    position: relative;
+    z-index: 1;
+    border-radius: 50%;
 }
 .db-profile-avatar img {
     width: 100%;
@@ -4774,8 +4792,8 @@ body .stepper-row{
 }
 .db-profile-cam {
     position: absolute;
-    right: -1px;
-    bottom: -1px;
+    right: 0;
+    bottom: 0;
     width: 25px;
     height: 25px;
     border-radius: 50%;
@@ -4783,8 +4801,10 @@ body .stepper-row{
     align-items: center;
     justify-content: center;
     color: #fff;
-    background: #b8924a;
+    background: linear-gradient(135deg, #e6c993, #b8924a);
     border: 2px solid #fff;
+    box-shadow: 0 5px 12px -5px rgba(184, 146, 74, .8);
+    z-index: 2;
 }
 .db-profile-msg {
     margin: 6px 0 0;
@@ -4813,15 +4833,24 @@ body .stepper-row{
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    padding: 14px 0;
+    padding: 13px 4px;
 }
 .db-profile-field + .db-profile-field {
     border-top: 1px dashed #e7dcc4;
 }
-.db-profile-field > span {
+.db-field-label {
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
     font-size: 12.5px;
     color: #8d8272;
+}
+.db-field-icon {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    color: #b8924a;
 }
 .db-profile-value {
     display: flex;
@@ -4836,6 +4865,10 @@ body .stepper-row{
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    background: linear-gradient(180deg, #fffdf7, #f8f1e1);
+    border: 1px solid #ece0c4;
+    padding: 4px 12px;
+    border-radius: 999px;
 }
 .db-lock {
     flex-shrink: 0;
@@ -4847,7 +4880,11 @@ body .stepper-row{
     font-weight: 600;
     letter-spacing: .05em;
     text-transform: uppercase;
-    color: #a2957f;
+    color: #8d7340;
+    background: linear-gradient(180deg, #fdf6e6, #faefd3);
+    border: 1px solid rgba(201, 164, 92, .35);
+    padding: 3px 9px;
+    border-radius: 999px;
 }
 .db-password {
     letter-spacing: .12em;
