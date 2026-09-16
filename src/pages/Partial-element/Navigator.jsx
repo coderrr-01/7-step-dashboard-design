@@ -110,7 +110,7 @@ export default function Navigator({ activeStep = 1, totalSteps = 7, title }) {
               <div className="d-flex align-items-center timeline-header gap-2">
                 <div className="d-flex align-items-center gap-2">
                   <div className="phase-indicator-dot"></div>
-                  <h4 className="heading-section-label">Registration</h4>
+                  <h4 className="heading-section-label">Progress</h4>
                 </div>
                 <button className="close-btn" onClick={() => setOpen(false)}>
                   <IoClose />

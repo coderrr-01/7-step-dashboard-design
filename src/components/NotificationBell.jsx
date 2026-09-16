@@ -85,16 +85,27 @@ export default function NotificationBell({ client }) {
 
   const unread = notifications.filter((n) => !readIds.includes(n.id));
 
+  // Re-anchor the dropdown right below the bell button every time it opens.
+  // getBoundingClientRect is viewport-relative, so this stays correct even
+  // when the sticky header is involved or the app runs inside an iframe.
+  const anchor = () => {
+    const r = bellRef.current?.getBoundingClientRect();
+    if (!r) return;
+    const gap = window.innerWidth <= 600 ? 6 : 10;
+    setPosition({
+      top: Math.max(gap, r.bottom + gap),
+      right: Math.max(8, window.innerWidth - r.right),
+    });
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const raf = requestAnimationFrame(anchor);
+    return () => cancelAnimationFrame(raf);
+  }, [open]);
+
   const toggle = () => {
-    if (!open) {
-      const r = bellRef.current?.getBoundingClientRect();
-      if (r) {
-        setPosition({
-          top: r.bottom + 10,
-          right: Math.max(8, window.innerWidth - r.right),
-        });
-      }
-    }
+    if (!open) anchor();
     setOpen((o) => !o);
   };
 
