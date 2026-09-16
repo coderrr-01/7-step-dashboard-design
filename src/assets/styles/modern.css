@@ -1170,6 +1170,20 @@ textarea:focus-visible,
    pointer-events: auto;
 }
 
+/* Hint flash — user tried to scroll while the panel is open: shake + glow,
+   signaling that scrolling resumes only after closing the panel. */
+.notif-dropdown.scroll-hint {
+   animation: notif-scroll-hint 0.55s ease;
+}
+
+@keyframes notif-scroll-hint {
+   0% { transform: none; box-shadow: 0 24px 60px -20px rgba(17, 17, 17, 0.28), 0 4px 14px -8px rgba(17, 17, 17, 0.15); }
+   25% { transform: translateX(-4px); box-shadow: 0 0 0 4px rgba(224, 153, 50, 0.25); }
+   50% { transform: translateX(4px); box-shadow: 0 0 0 6px rgba(224, 153, 50, 0.35); }
+   75% { transform: translateX(-2px); }
+   100% { transform: none; }
+}
+
 .notif-head {
    display: flex;
    align-items: center;

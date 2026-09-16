@@ -42,6 +42,42 @@ export default function NotificationBell({ client }) {
   const ddRef = useRef(null);
   const [liveClient, setLiveClient] = useState(client);
   const [appStatus, setAppStatus] = useState(null);
+  const [hint, setHint] = useState(false);
+  const hintTimer = useRef(null);
+
+  // Lock page scroll while the dropdown is open (same pattern as the mobile
+  // drawer): the notification panel stays focused, no background scroll.
+  useEffect(() => {
+    if (!open) return;
+    const de = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = de.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    de.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    return () => {
+      de.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, [open]);
+
+  // If the user tries to scroll while it is open, flash a hint on the panel
+  // ("scroll unlocked only after you close this").
+  useEffect(() => {
+    if (!open) return;
+    const flashHint = () => {
+      setHint(true);
+      clearTimeout(hintTimer.current);
+      hintTimer.current = setTimeout(() => setHint(false), 600);
+    };
+    window.addEventListener("wheel", flashHint, { passive: true });
+    window.addEventListener("touchmove", flashHint, { passive: true });
+    return () => {
+      clearTimeout(hintTimer.current);
+      window.removeEventListener("wheel", flashHint);
+      window.removeEventListener("touchmove", flashHint);
+    };
+  }, [open]);
 
   // Track the fresh client from the Header whenever it refetches.
   useEffect(() => {
@@ -160,7 +196,7 @@ export default function NotificationBell({ client }) {
 
       {createPortal(
         <div
-          className={`notif-dropdown ${open ? "active" : ""}`}
+          className={`notif-dropdown ${open ? "active" : ""} ${hint ? "scroll-hint" : ""}`}
           ref={ddRef}
           style={{ top: position.top, right: position.right }}
           role="dialog"
