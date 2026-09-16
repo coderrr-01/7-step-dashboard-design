@@ -1365,4 +1365,8 @@ textarea:focus-visible,
    .notif-item-title {
       word-break: break-word;
    }
+
+   .notif-dropdown{
+          right: 26px !important 
+   }
 }
