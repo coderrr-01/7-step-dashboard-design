@@ -1,15 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useLocation, useNavigate } from "react-router-dom";
 import {
-  IoCheckmarkDoneCircleOutline,
-  IoCalendarOutline,
-  IoHomeOutline,
-  IoDocumentTextOutline,
-  IoCashOutline,
-  IoTimeOutline,
   IoAlertCircleOutline,
-  IoCheckmarkDoneOutline,
   IoNotificationsOutline,
 } from "react-icons/io5";
 import {
@@ -20,23 +12,13 @@ import {
 } from "../utils/notifications";
 
 const ICONS = {
-  app: IoCheckmarkDoneCircleOutline,
-  interview: IoCalendarOutline,
-  room: IoHomeOutline,
-  lease: IoDocumentTextOutline,
-  pay: IoCashOutline,
-  expiry: IoTimeOutline,
-  ext: IoDocumentTextOutline,
   step: IoAlertCircleOutline,
-  welcome: IoCheckmarkDoneOutline,
 };
 
 const BELL_PATH =
   "M26.25 8.12501C26.25 10.5375 24.2875 12.5 21.875 12.5C19.4625 12.5 17.5 10.5375 17.5 8.12501C17.5 5.71251 19.4625 3.75001 21.875 3.75001C24.2875 3.75001 26.25 5.71251 26.25 8.12501ZM23.75 14.7375C23.125 14.9 22.5 15 21.875 15C20.0527 14.9967 18.3059 14.2713 17.0173 12.9827C15.7287 11.6941 15.0033 9.94735 15 8.12501C15 6.28751 15.725 4.62501 16.875 3.38751C16.6482 3.10943 16.3621 2.88547 16.0378 2.73194C15.7134 2.5784 15.3589 2.49917 15 2.50001C13.625 2.50001 12.5 3.62501 12.5 5.00001V5.36251C8.7875 6.46251 6.25 9.87501 6.25 13.75V21.25L3.75 23.75V25H26.25V23.75L23.75 21.25V14.7375ZM15 28.75C16.3875 28.75 17.5 27.6375 17.5 26.25H12.5C12.5 26.913 12.7634 27.5489 13.2322 28.0178C13.7011 28.4866 14.337 28.75 15 28.75Z";
 
 export default function NotificationBell({ client }) {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, right: 8 });
   const [readIds, setReadIds] = useState(() => getReadNotifIds());
@@ -45,12 +27,12 @@ export default function NotificationBell({ client }) {
 
   const notifications = useMemo(() => {
     try {
-      return buildNotifications({ client, pathname }) || [];
+      return buildNotifications({ client }) || [];
     } catch {
       return [];
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, pathname]);
+  }, [client]);
 
   const unread = notifications.filter((n) => !readIds.includes(n.id));
 
@@ -87,11 +69,6 @@ export default function NotificationBell({ client }) {
     markNotifRead(notif.id);
     setReadIds(getReadNotifIds());
     setOpen(false);
-    if (notif.action) {
-      if (notif.action === "/dashboard" || pathname !== notif.action) {
-        navigate(notif.action);
-      }
-    }
   };
 
   const handleMarkAll = () => {
