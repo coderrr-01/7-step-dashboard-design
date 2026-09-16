@@ -6,7 +6,7 @@ import tourImg from "../../assets/images/tour-img.png";
 import interviewImg from "../../assets/images/interview-img.png";
 import { apiFetch } from '../../services/api';
 
-const WP_BASE = 'https://wordpress-1608288-6566160.cloudwaysapps.com/wp-json/jrny/v1';
+const WP_BASE = 'https://staywithjourney.com/wp-json/jrny/v1';
 
 // Today's date in the exact { label, value } shape the Calendar's onSelectDate
 // emits, so the schedule opens with today already selected (and its slots

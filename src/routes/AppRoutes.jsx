@@ -15,7 +15,7 @@ import { isLoggedIn } from "../services/api";
 
 function RequireAuth({ children }) {
   if (!isLoggedIn()) {
-    const loginUrl = (window.jrnyData?.loginUrl) || 'https://wordpress-1608288-6566160.cloudwaysapps.com/login';
+    const loginUrl = (window.jrnyData?.loginUrl) || 'https://staywithjourney.com/login';
     window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
     window.location.replace(loginUrl);
     return null;
