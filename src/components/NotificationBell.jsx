@@ -17,6 +17,7 @@ import {
   markNotifRead,
   markAllNotifsRead,
 } from "../utils/notifications";
+import { getClientData, getApplicationStatus, getToken } from "../services/api";
 
 const ICONS = {
   app: IoCheckmarkDoneCircleOutline,
@@ -39,15 +40,48 @@ export default function NotificationBell({ client }) {
   const [readIds, setReadIds] = useState(() => getReadNotifIds());
   const bellRef = useRef(null);
   const ddRef = useRef(null);
+  const [liveClient, setLiveClient] = useState(client);
+  const [appStatus, setAppStatus] = useState(null);
+
+  // Track the fresh client from the Header whenever it refetches.
+  useEffect(() => {
+    setLiveClient(client);
+  }, [client]);
+
+  // Sync loop — every 20s tick recomputes the list (catches localStorage flag
+  // changes instantly) and a silent server sync pulls the latest Zoho data so
+  // approvals turn into notifications on their own, no reload needed.
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    const sync = async () => {
+      setTick((t) => t + 1);
+      if (!getToken()) return;
+      try {
+        const [clientRes, statusRes] = await Promise.all([
+          getClientData(),
+          getApplicationStatus(),
+        ]);
+        if (cancelled) return;
+        if (clientRes?.success) setLiveClient(clientRes.data);
+        if (statusRes?.success) setAppStatus(statusRes);
+      } catch { /* best-effort */ }
+    };
+    const id = setInterval(sync, 20000);
+    sync();
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
+
+  const data = liveClient || client;
 
   const notifications = useMemo(() => {
     try {
-      return buildNotifications({ client }) || [];
+      return buildNotifications({ client: data, appStatus }) || [];
     } catch {
       return [];
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client]);
+  }, [data, appStatus, tick]);
 
   const unread = notifications.filter((n) => !readIds.includes(n.id));
 

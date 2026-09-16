@@ -1321,3 +1321,63 @@ textarea:focus-visible,
    margin: 0 auto 8px;
    color: var(--t-border-strong);
 }
+
+/* ---------- Notification list scroll polish (desktop) ---------- */
+.notif-list {
+   scrollbar-width: thin;
+   scrollbar-color: #d8ceba transparent;
+   overscroll-behavior: contain;
+   -webkit-overflow-scrolling: touch;
+}
+
+.notif-list::-webkit-scrollbar {
+   width: 6px;
+}
+
+.notif-list::-webkit-scrollbar-thumb {
+   background: #d8ceba;
+   border-radius: 3px;
+}
+
+.notif-list::-webkit-scrollbar-track {
+   background: transparent;
+}
+
+/* ---------- Mobile: full-width bottom sheet (no page scroll, no cut-off) ---------- */
+@media (max-width: 600px) {
+   .notif-dropdown {
+      top: auto !important;
+      right: 10px !important;
+      left: 10px;
+      bottom: 10px;
+      width: auto;
+      max-height: min(76vh, 560px);
+      border-radius: 18px;
+      transform-origin: center bottom;
+   }
+
+   .notif-dropdown.active {
+      transform: none;
+   }
+
+   .notif-list {
+      max-height: calc(min(76vh, 560px) - 62px);
+   }
+
+   .notif-head {
+      padding: 14px 16px;
+   }
+
+   .notif-item {
+      padding: 12px 13px;
+   }
+
+   .notif-item-msg {
+      -webkit-line-clamp: 3;
+      word-break: break-word;
+   }
+
+   .notif-item-title {
+      word-break: break-word;
+   }
+}

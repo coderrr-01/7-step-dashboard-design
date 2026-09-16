@@ -35,6 +35,33 @@ function includesAny(text, words) {
   return words.some((word) => normalized.includes(normalizeKey(word)));
 }
 
+/* Deep-walk the getApplicationStatus() response for an approval/rejection that
+   belongs to a context (e.g. "interview", or "application/verification/review").
+   Same trust model the Review / Interview pages already use. */
+function deepContextMatch(obj, words, ctxWords, ctxOn = false, seen = new Set()) {
+  if (!obj || typeof obj !== "object") return false;
+  if (seen.has(obj)) return false;
+  seen.add(obj);
+  for (const [key, val] of Object.entries(obj)) {
+    const k = String(key).toLowerCase();
+    const inCtx = ctxOn || ctxWords.some((w) => k.includes(w));
+    const hasStatusWord =
+      k.includes("status") || k.includes("approved") || k.includes("approval") ||
+      k.includes("stage") || k.includes("state") || k.includes("result");
+    if (deepContextMatch(val, words, ctxWords, inCtx, seen)) return true;
+    if (inCtx && hasStatusWord && words.some((w) => String(val).toLowerCase().includes(w))) return true;
+  }
+  return false;
+}
+
+function deepContextApproved(obj, ctxWords) {
+  return deepContextMatch(obj, APPROVED_WORDS, ctxWords);
+}
+
+function deepContextRejected(obj, ctxWords) {
+  return deepContextMatch(obj, REJECTED_WORDS, ctxWords);
+}
+
 function dateLabel(value) {
   if (!value) return "";
   const [y, m, d] = String(value).split("-").map(Number);
@@ -130,6 +157,21 @@ function deriveStepsFromClient(client) {
   }
   if (signedLease && !steps.includes(6)) steps.push(6);
   if (depositPaid && rentPaid) return [1, 2, 3, 4, 5, 6, 7];
+
+  // Fallback: even when lease_status gives no match, individual signals tell
+  // us how far the user got — so the bell always has context (esp. next step).
+  if (steps.length === 0) {
+    const sub = getUserSub();
+    let appApproved = false;
+    if (sub) {
+      try { appApproved = readJson(`jrny_application_status_${sub}`, null)?.status === "Approved"; } catch { /* ignore */ }
+    }
+    if (appApproved) steps.push(1, 2);
+    if (isInterviewApprovedCached() || (client.interview_date && client.interview_time)) steps.push(3);
+    if (client.room_id || client.room_name) steps.push(4, 5);
+    if (signedLease) steps.push(6);
+    if (depositPaid || rentPaid) steps.push(7);
+  }
   return [...new Set(steps)].sort((a, b) => a - b);
 }
 
@@ -140,7 +182,7 @@ function firstIncomplete(steps) {
   return 7;
 }
 
-export function buildNotifications({ client } = {}) {
+export function buildNotifications({ client, appStatus } = {}) {
   const data = client || {};
   const clientSteps = deriveStepsFromClient(data);
   const ps = getPaymentState(data);
@@ -151,18 +193,35 @@ export function buildNotifications({ client } = {}) {
     return sub ? `jrny_application_status_${sub}` : null;
   })();
 
-  let appApproved = false;
-  let appRejected = false;
+  // Server (getApplicationStatus) is the source of truth — localStorage is a cache
+  // fallback so notifications still appear before the first server sync.
+  const statusRes = appStatus || {};
+  const serverAppApproved =
+    statusRes.approved === true ||
+    (statusRes.status && includesAny(String(statusRes.status), APPROVED_WORDS)) ||
+    deepContextApproved(statusRes, ["application", "verification", "review"]);
+  const serverAppRejected =
+    (statusRes.status && includesAny(String(statusRes.status), REJECTED_WORDS)) ||
+    deepContextRejected(statusRes, ["application", "verification", "review"]);
+
+  let cachedAppApproved = false;
   if (appKey) {
     const cached = readJson(appKey, null);
-    if (cached && cached.status === "Approved") appApproved = true;
+    if (cached && cached.status === "Approved") cachedAppApproved = true;
   }
-  const appStatus = readFieldIgnoreCase(data, [
+  const clientAppStatus = readFieldIgnoreCase(data, [
     "application_status", "status", "application_state",
     "verification_status", "review_status", "stage",
   ]) || "";
-  if (!appApproved) appApproved = includesAny(appStatus, APPROVED_WORDS);
-  appRejected = !appApproved && includesAny(appStatus, REJECTED_WORDS);
+
+  const appApproved = serverAppApproved || cachedAppApproved || includesAny(clientAppStatus, APPROVED_WORDS);
+  const appRejected = !appApproved && (serverAppRejected || includesAny(clientAppStatus, REJECTED_WORDS));
+
+  // Interview approval — server deep-walk first, then lease_status, then cache.
+  const interviewApproved =
+    deepContextApproved(statusRes, ["interview"]) ||
+    includesAny(data.lease_status || "", ["interview approved", "interview complete", "interview accepted", "interview"]) && includesAny(data.lease_status || "", APPROVED_WORDS) ||
+    isInterviewApprovedCached();
 
   // Application approved / rejected
   if (appApproved) {
@@ -189,7 +248,7 @@ export function buildNotifications({ client } = {}) {
   }
 
   // Interview approved → room search unlocked
-  if (isInterviewApprovedCached()) {
+  if (interviewApproved) {
     notifs.push({
       id: "interview-approved", kind: "success", icon: "interview",
       title: "Interview Approved",
@@ -325,15 +384,24 @@ export function buildNotifications({ client } = {}) {
   const onboardingComplete = clientSteps.includes(7) && ps.depositPaid && ps.rentPaid;
   if (clientSteps.length > 0 && !appRejected && !onboardingComplete) {
     let step = firstIncomplete(clientSteps);
-    if (step === 4 && !isInterviewApprovedCached() && clientSteps.includes(3)) {
-      step = 3; // interview approval gates Room Search
-    }
-    if (step >= 2 && step <= 7) {
+    if (!appApproved && step === 2) {
+      // Application review is the current stage — say so explicitly.
       notifs.push({
-        id: `step-pending-${step}`, kind: "info", icon: "step",
-        title: `Next Step: ${STEP_LABELS[step]}`,
-        message: STEP_HINTS[step] || "Continue your JRNY onboarding.",
+        id: "app-review", kind: "info", icon: "app",
+        title: "Application Under Review",
+        message: "The board is reviewing your application — you will be notified once approved.",
       });
+    } else {
+      if (step === 4 && !interviewApproved && clientSteps.includes(3)) {
+        step = 3; // interview approval gates Room Search
+      }
+      if (step >= 2 && step <= 7) {
+        notifs.push({
+          id: `step-pending-${step}`, kind: "info", icon: "step",
+          title: `Next Step: ${STEP_LABELS[step]}`,
+          message: STEP_HINTS[step] || "Continue your JRNY onboarding.",
+        });
+      }
     }
   }
 
