@@ -100,8 +100,17 @@ export default function NotificationBell({ client }) {
 
   useEffect(() => {
     if (!open) return;
-    const raf = requestAnimationFrame(anchor);
-    return () => cancelAnimationFrame(raf);
+    // Track the bell while open: keep the dropdown glued under the icon as the
+    // page scrolls (or resizes), instead of floating fixed in the viewport.
+    const reanchor = () => requestAnimationFrame(anchor);
+    const first = requestAnimationFrame(anchor);
+    window.addEventListener("scroll", reanchor, true);
+    window.addEventListener("resize", reanchor);
+    return () => {
+      cancelAnimationFrame(first);
+      window.removeEventListener("scroll", reanchor, true);
+      window.removeEventListener("resize", reanchor);
+    };
   }, [open]);
 
   const toggle = () => {

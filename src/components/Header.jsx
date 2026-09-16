@@ -77,7 +77,29 @@ export default function Header({ activeLabel }) {
       window.location.replace(loginUrl);
    }
 
-   // close when click outside (trigger wrapper OR the portaled dropdown itself)
+   // Re-anchor the profile dropdown under its icon on scroll/resize so it
+    // slides with the (sticky) header instead of floating fixed in the viewport.
+    useEffect(() => {
+      if (!dropdown) return;
+      const track = () => requestAnimationFrame(() => {
+         const r = ref.current?.getBoundingClientRect();
+         if (r) {
+            setddPos({
+               top: r.bottom + 10,
+               right: Math.max(8, window.innerWidth - r.right),
+            });
+         }
+      });
+      track();
+      window.addEventListener("scroll", track, true);
+      window.addEventListener("resize", track);
+      return () => {
+         window.removeEventListener("scroll", track, true);
+         window.removeEventListener("resize", track);
+      };
+    }, [dropdown]);
+
+    // close when click outside (trigger wrapper OR the portaled dropdown itself)
    useEffect(() => {
       const handleClickOutside = (event) => {
          if (
