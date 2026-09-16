@@ -1343,29 +1343,14 @@ textarea:focus-visible,
    background: transparent;
 }
 
-/* ---------- Mobile: full-width bottom sheet (no page scroll, no cut-off) ---------- */
+/* ---------- Mobile: keep the dropdown anchored right below the bell icon ---------- */
 @media (max-width: 600px) {
    .notif-dropdown {
-      top: auto !important;
-      right: 10px !important;
-      left: 10px;
-      bottom: 10px;
-      width: auto;
-      max-height: min(76vh, 560px);
-      border-radius: 18px;
-      transform-origin: center bottom;
-   }
-
-   .notif-dropdown.active {
-      transform: none;
+      max-height: min(72vh, 420px);
    }
 
    .notif-list {
-      max-height: calc(min(76vh, 560px) - 62px);
-   }
-
-   .notif-head {
-      padding: 14px 16px;
+      max-height: calc(min(72vh, 420px) - 62px);
    }
 
    .notif-item {
