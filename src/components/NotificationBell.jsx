@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
+  IoCheckmarkDoneCircleOutline,
+  IoCalendarOutline,
+  IoHomeOutline,
+  IoDocumentTextOutline,
+  IoCashOutline,
+  IoTimeOutline,
   IoAlertCircleOutline,
+  IoCheckmarkDoneOutline,
   IoNotificationsOutline,
 } from "react-icons/io5";
 import {
@@ -12,7 +19,15 @@ import {
 } from "../utils/notifications";
 
 const ICONS = {
+  app: IoCheckmarkDoneCircleOutline,
+  interview: IoCalendarOutline,
+  room: IoHomeOutline,
+  lease: IoDocumentTextOutline,
+  pay: IoCashOutline,
+  expiry: IoTimeOutline,
+  ext: IoDocumentTextOutline,
   step: IoAlertCircleOutline,
+  welcome: IoCheckmarkDoneOutline,
 };
 
 const BELL_PATH =
