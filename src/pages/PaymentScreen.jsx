@@ -92,6 +92,20 @@ export default function PaymentScreen() {
       loadPaymentUI(method, activeStep === 'Rent' ? 'rent' : 'deposit');
    }, [activePayment, activeStep, paymentHydrated, clientLoading]);
 
+   // ACH iframe -> React: reload iframe softly without full page reload
+   useEffect(() => {
+      const handler = (event) => {
+         if (event.data?.type === 'ach_payment_success') {
+            const section = event.data.section === 'rent' ? 'rent' : 'deposit';
+            toast.success(section === 'rent' ? 'Rent payment recorded! Pending verification.' : 'Security deposit recorded! Pending verification.');
+            reloadPaymentUI(section);
+            refetch();
+         }
+      };
+      window.addEventListener('message', handler);
+      return () => window.removeEventListener('message', handler);
+   }, [refetch]);
+
    const [selectedRoom] = useState(() => {
       try { return JSON.parse(localStorage.getItem('jrny_selected_room') || 'null'); }
       catch { return null; }
