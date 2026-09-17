@@ -1,6 +1,6 @@
 // All WordPress REST calls — JWT Bearer token auth
 
-const WP_BASE = 'https://staywithjourney.com/wp-json';
+const WP_BASE = 'https://staging.staywithjourney.com/wp-json';
 const JRNY    = `${WP_BASE}/jrny/v1`;
 const LEASE   = `${WP_BASE}/lease-html-sign/v1`;
 
@@ -169,7 +169,7 @@ export async function apiFetch(url, options = {}) {
 
   if (res.status === 401) {
     logout();
-    const loginUrl = (window.jrnyData?.loginUrl) || 'https://staywithjourney.com/login';
+    const loginUrl = (window.jrnyData?.loginUrl) || 'https://staging.staywithjourney.com/login';
     if (window.parent !== window) {
       window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*');
     } else {

@@ -56,7 +56,7 @@ export default function Header({ activeLabel }) {
       await new Promise(r => setTimeout(r, 50));
 
       logout();
-      const loginUrl = (window.jrnyData?.loginUrl) || 'https://staywithjourney.com/login';
+      const loginUrl = (window.jrnyData?.loginUrl) || 'https://staging.staywithjourney.com/';
 
       if (window.parent !== window) {
          try { window.parent.postMessage({ type: 'jrny_logout', loginUrl }, '*'); } catch { /* ignore */ }
