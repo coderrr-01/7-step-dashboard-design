@@ -1183,7 +1183,6 @@ textarea:focus-visible,
    75% { transform: translateX(-2px); }
    100% { transform: none; }
 }
-
 .notif-head {
    display: flex;
    align-items: center;
@@ -1200,7 +1199,6 @@ textarea:focus-visible,
    font-size: 14px;
    color: #111;
 }
-
 .notif-head-sub {
    display: block;
    font-size: 10.5px;
@@ -1208,7 +1206,6 @@ textarea:focus-visible,
    text-transform: uppercase;
    color: #8a8171;
 }
-
 .notif-mark-all {
    background: none;
    border: none;
@@ -1220,11 +1217,9 @@ textarea:focus-visible,
    transition: color 0.2s ease;
    white-space: nowrap;
 }
-
 .notif-mark-all:hover {
    color: var(--t-brand);
 }
-
 .notif-list {
    list-style: none;
    margin: 0;

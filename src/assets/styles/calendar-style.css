@@ -194,7 +194,7 @@
   transform: translateY(-2px);
 }
 .calendar-date.weekend{
-  color: #b8924a;
+  /* color: #b8924a; */
   font-weight: 600;
 }
 
