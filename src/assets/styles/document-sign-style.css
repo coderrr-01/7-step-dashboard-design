@@ -720,6 +720,23 @@ main.ds-page-bg {
   .ds-header-title {
     font-size: 24px;
   }
+  /* Grid children default to min-width:auto, so the doc card refused to
+     shrink below its toolbar's width and pushed everything off the right
+     edge on 320px screens. Allow them to size to the track instead. */
+  .ds-layout,
+  .ds-doc-card,
+  .ds-doc-paper,
+  .ds-doc-sheet,
+  .ds-auth-card {
+    min-width: 0;
+  }
+  .ds-doc-toolbar {
+    flex-wrap: wrap;
+    padding: 12px 14px;
+  }
+  .ds-doc-toolbar-badge {
+    margin-left: auto;
+  }
   .ds-doc-paper {
     padding: 20px 14px;
   }
@@ -732,5 +749,14 @@ main.ds-page-bg {
   }
   .ds-auth-card {
     padding: 20px 16px;
+  }
+  /* Long emails / unbroken strings must wrap instead of overflowing */
+  .ds-doc-section p,
+  .ds-auth-sub,
+  .ds-legal-note,
+  .ds-security-desc,
+  .ds-header-sub {
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 }
