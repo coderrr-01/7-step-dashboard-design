@@ -218,13 +218,18 @@ export async function refreshToken() {
 }
 
 // ─── NONCE ────────────────────────────────────────────────────────────────────
+// Option B: with JWT bypass, X-WP-Nonce is no longer required for Bearer auth
+// (rest_cookie_check_errors bypass). Keep a short 12h cache for any legacy
+// cookie paths, but use credentials:'omit' so iOS ITP doesn't block the fetch.
 export async function getNonce() {
   const cached = localStorage.getItem(NONCE_KEY);
-  if (cached) return cached;
-  const res  = await apiFetch(`${JRNY}/nonce?_=${Date.now()}`, { method: 'GET' });
+  const ts = parseInt(localStorage.getItem(NONCE_KEY + '_ts') || '0', 10);
+  if (cached && Date.now() - ts < 12 * 60 * 60 * 1000) return cached;
+  const res  = await apiFetch(`${JRNY}/nonce?_=${Date.now()}`, { method: 'GET', credentials: 'omit' });
   const data = await res.json();
   if (data.nonce) {
     localStorage.setItem(NONCE_KEY, data.nonce);
+    localStorage.setItem(NONCE_KEY + '_ts', String(Date.now()));
     return data.nonce;
   }
   return '';
