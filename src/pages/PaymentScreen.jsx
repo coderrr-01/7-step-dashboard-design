@@ -179,8 +179,11 @@ export default function PaymentScreen() {
       ? parseFloat(client.rent_amount)
       : (activeRoom?.monthly_rent ? parseFloat(activeRoom.monthly_rent) : (activeRoom?.price ? parseFloat(activeRoom.price) : 0));
 
-   const depositAmount = `$ ${rawDeposit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-   const rentAmount = `$ ${rawRent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+   // iPhone Safari: while client is still loading (2-5s TTFB under old polling load),
+   // don't flash $0.00 — show placeholder so user doesn't think amount is missing.
+   const isAmountLoading = !paymentHydrated || clientLoading;
+   const depositAmount = isAmountLoading ? '—' : `$ ${rawDeposit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+   const rentAmount = isAmountLoading ? '—' : `$ ${rawRent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
    const clientName = client?.name || '';
    const clientPhone = client?.phone || '';

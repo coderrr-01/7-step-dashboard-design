@@ -259,7 +259,8 @@ export async function getRooms() {
 }
 
 export async function getRoomById(roomId) {
-  const res = await apiFetch(`${JRNY}/rooms/${encodeURIComponent(roomId)}?_=${Date.now()}`, { method: 'GET' });
+  // iPhone Safari ITP blocks credentials:'include' cross-site — use omit + Bearer JWT (same as getClientData)
+  const res = await apiFetch(`${JRNY}/rooms/${encodeURIComponent(roomId)}?_=${Date.now()}`, { method: 'GET', credentials: 'omit' });
   return res.json();
 }
 
