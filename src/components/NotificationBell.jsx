@@ -84,15 +84,18 @@ export default function NotificationBell({ client }) {
     setLiveClient(client);
   }, [client]);
 
-  // Sync loop — every 20s tick recomputes the list (catches localStorage flag
-  // changes instantly) and a silent server sync pulls the latest Zoho data so
-  // approvals turn into notifications on their own, no reload needed.
+  // Sync loop — visibility-guarded + 60s interval to cut server load.
+  // - Recomputes tick every 20s locally (catches localStorage flag changes)
+  //   without hitting the server.
+  // - Server sync (getClientData + getApplicationStatus) only when tab is
+  //   visible and at most once per 60s. Pauses entirely when tab hidden or
+  //   logged out, so background tabs don't burn Cloudways CPU.
   const [tick, setTick] = useState(0);
   useEffect(() => {
     let cancelled = false;
     const sync = async () => {
-      setTick((t) => t + 1);
       if (!getToken()) return;
+      if (typeof document !== 'undefined' && document.hidden) return;
       try {
         const [clientRes, statusRes] = await Promise.all([
           getClientData(),
@@ -103,9 +106,27 @@ export default function NotificationBell({ client }) {
         if (statusRes?.success) setAppStatus(statusRes);
       } catch { /* best-effort */ }
     };
-    const id = setInterval(sync, 20000);
+    // Local tick only — no network
+    const tickId = setInterval(() => setTick((t) => t + 1), 20000);
+    // Server poll — 60s, visibility-guarded
+    const pollId = setInterval(sync, 60000);
+    // Re-sync immediately when tab becomes visible again
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        setTick((t) => t + 1);
+        sync();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
     sync();
-    return () => { cancelled = true; clearInterval(id); };
+    return () => {
+      cancelled = true;
+      clearInterval(tickId);
+      clearInterval(pollId);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
   }, []);
 
   const data = liveClient || client;

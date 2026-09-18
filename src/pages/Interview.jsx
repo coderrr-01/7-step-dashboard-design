@@ -140,50 +140,61 @@ export default function Interview() {
    // your room" button on the confirmed screen unlocks) and while the
    // "In Review" screen is open. Polling CONTINUES until something navigates —
    // approval arriving LIVE from Zoho is what triggers the auto-advance.
-   const approvalPolling = interviewProgres || interviewBooked;
+    const approvalPolling = interviewProgres || interviewBooked;
    useEffect(() => {
-      const checkApproval = async () => {
-         // Zoho reflects interview approval through one of several endpoints, so
-         // poll all of them. Deep-scan each response; any one carrying the
-         // approval signal unlocks the button. Logs each source so the exact
-         // field/API that carries the flag is visible in the console.
-         const sources = [
-            { name: 'application-status', call: getApplicationStatus },
-            { name: 'client-data', call: getClientData },
-            { name: 'step-status', call: getStepStatus },
-         ];
-          let matched = null;
-          for (const s of sources) {
-             try {
-                const res = await s.call();
-                const ok = deepInterviewApproved(res) || bareInterviewStatusCheck(res);
-                if (ok) matched = s.name;
-                console.log(`[jrny] poll ${s.name} → ${ok ? 'APPROVED ✓' : 'no'}`,
-                   JSON.stringify(res).slice(0, 600));
-             } catch (e) {
-                console.log(`[jrny] poll ${s.name} → error:`, e && e.message ? e.message : e);
-             }
-          }
-          if (matched) {
-             saveInterviewApproved();
-             setInterviewApproved(true);
-             clearInterval(pollRef.current);
-             console.log(`[jrny] interview approved detected via ${matched}`);
-          }
-      };
+       const checkApproval = async () => {
+          if (typeof document !== 'undefined' && document.hidden) return;
+          // Zoho reflects interview approval through one of several endpoints, so
+          // poll all of them. Deep-scan each response; any one carrying the
+          // approval signal unlocks the button. Logs each source so the exact
+          // field/API that carries the flag is visible in the console.
+          const sources = [
+             { name: 'application-status', call: getApplicationStatus },
+             { name: 'client-data', call: getClientData },
+             { name: 'step-status', call: getStepStatus },
+          ];
+           let matched = null;
+           for (const s of sources) {
+              try {
+                 const res = await s.call();
+                 const ok = deepInterviewApproved(res) || bareInterviewStatusCheck(res);
+                 if (ok) matched = s.name;
+                 console.log(`[jrny] poll ${s.name} → ${ok ? 'APPROVED ✓' : 'no'}`,
+                    JSON.stringify(res).slice(0, 600));
+              } catch (e) {
+                 console.log(`[jrny] poll ${s.name} → error:`, e && e.message ? e.message : e);
+              }
+           }
+           if (matched) {
+              saveInterviewApproved();
+              setInterviewApproved(true);
+              clearInterval(pollRef.current);
+              console.log(`[jrny] interview approved detected via ${matched}`);
+           }
+       };
 
-      // Mount: single immediate check (covers already-approved interviews).
-      if (!approvalPolling) {
-         checkApproval();
-         return;
-      }
+       // Mount: single immediate check (covers already-approved interviews).
+       if (!approvalPolling) {
+          checkApproval();
+          return;
+       }
 
-      if (getCachedInterviewApproved()) { setInterviewApproved(true); return; }
+       if (getCachedInterviewApproved()) { setInterviewApproved(true); return; }
 
-      checkApproval();
-      pollRef.current = setInterval(checkApproval, 15000);
-      return () => clearInterval(pollRef.current);
-   }, [approvalPolling]);
+       checkApproval();
+       // 60s interval + pause when hidden — was 15s (3 req/tick = 720/hr → now 180/hr)
+       pollRef.current = setInterval(checkApproval, 60000);
+       const onVisible = () => {
+         if (document.visibilityState === 'visible') checkApproval();
+       };
+       document.addEventListener('visibilitychange', onVisible);
+       window.addEventListener('focus', onVisible);
+       return () => {
+         clearInterval(pollRef.current);
+         document.removeEventListener('visibilitychange', onVisible);
+         window.removeEventListener('focus', onVisible);
+       };
+    }, [approvalPolling]);
 
    const interview_btn = () => {
       setinterviewProgres(true)

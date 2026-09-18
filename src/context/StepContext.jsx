@@ -84,8 +84,26 @@ export function StepProvider({ children }) {
   // NEVER auto-navigates to /room-search. The user must click "Search your room"
   // to advance past the interview gate — even if the interview is already
   // approved.
+  // De-duped: the mount effect already fetched client-data, so reuse that
+  // result for the initial '/' redirect instead of firing a second identical
+  // request. Only re-fetch if navigating back to '/' later.
+  const hasFetchedRef = useState(() => ({ done: false }))[0];
   useEffect(() => {
     if (!getToken() || pathname !== '/' || loading) return;
+    // First hit on '/' right after mount — steps already derived, just redirect
+    if (!hasFetchedRef.done) {
+      hasFetchedRef.done = true;
+      let nextStep = findFirstIncompleteStep(completedSteps);
+      if (nextStep === '/room-search') {
+        const sub = getUserSub();
+        const entered = sub ? localStorage.getItem(`jrny_room_search_entered_${sub}`) === '1' : false;
+        if (!entered) nextStep = '/interview';
+      }
+      if (nextStep && nextStep !== pathname) {
+        navigate(nextStep, { replace: true });
+      }
+      return;
+    }
     getClientData()
       .then(data => {
         if (!data?.success) return;
@@ -93,10 +111,6 @@ export function StepProvider({ children }) {
         if (!serverSteps) return;
         setCompletedSteps(serverSteps);
         let nextStep = findFirstIncompleteStep(serverSteps);
-        // The user must click "Search your room" to advance past the interview.
-        // If they haven't clicked yet, hold at /interview even if the backend
-        // already says room-search is the next step. Once they click, the flag
-        // persists so a refresh lands back on /room-search.
         if (nextStep === '/room-search') {
           const sub = getUserSub();
           const entered = sub ? localStorage.getItem(`jrny_room_search_entered_${sub}`) === '1' : false;
@@ -108,7 +122,7 @@ export function StepProvider({ children }) {
       })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, loading]);
+  }, [pathname, loading, completedSteps]);
 
   const completeStep = (stepNumber) => {
     setCompletedSteps(prev =>

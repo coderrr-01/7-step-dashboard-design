@@ -86,6 +86,7 @@ export default function Review() {
    };
 
    const fetchStatus = async () => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       try {
          const res = await getApplicationStatus();
          if (res.success) {
@@ -113,8 +114,18 @@ export default function Review() {
       }
 
       fetchStatus();
-      pollRef.current = setInterval(fetchStatus, 15000);
-      return () => clearInterval(pollRef.current);
+      // 60s + visibility guard — was 15s (240/hr → 60/hr)
+      pollRef.current = setInterval(fetchStatus, 60000);
+      const onVisible = () => {
+        if (document.visibilityState === 'visible') fetchStatus();
+      };
+      document.addEventListener('visibilitychange', onVisible);
+      window.addEventListener('focus', onVisible);
+      return () => {
+        clearInterval(pollRef.current);
+        document.removeEventListener('visibilitychange', onVisible);
+        window.removeEventListener('focus', onVisible);
+      };
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
 

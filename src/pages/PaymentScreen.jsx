@@ -305,15 +305,16 @@ export default function PaymentScreen() {
       }
    };
 
-   useEffect(() => {
+    useEffect(() => {
       if (!pollingType) return;
 
       let stopped = false;
       let attempts = 0;
-      const MAX_ATTEMPTS = 75;
-      const interval = setInterval(tick, 4000);
+      const MAX_ATTEMPTS = 38; // ~5 min at 8s interval (was 75×4s)
+      const interval = setInterval(tick, 8000);
 
       async function tick() {
+         if (typeof document !== 'undefined' && document.hidden) return;
          attempts += 1;
          try {
             const res = await getRevolutStatus(pollingType);
