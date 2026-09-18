@@ -461,6 +461,7 @@ export async function getLastRoute() {
 // ─── PAYMENT UI (iframe HTML from WP shortcodes) ─────────────────────────────
 export async function getPaymentUI(method, section) {
   const params = new URLSearchParams({ method, section, _: String(Date.now()) });
-  const res = await apiFetch(`${JRNY}/payment-ui?${params.toString()}`, { method: 'GET' });
+  // iPhone Safari ITP blocks 3rd-party cookie — force Bearer JWT via omit (like getClientData)
+  const res = await apiFetch(`${JRNY}/payment-ui?${params.toString()}`, { method: 'GET', credentials: 'omit' });
   return res.json();
 }
