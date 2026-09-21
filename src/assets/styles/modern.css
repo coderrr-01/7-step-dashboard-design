@@ -703,6 +703,17 @@ body.page-dashboard .stepper-container-fluid {
    transform: translateY(0) scale(0.98);
 }
 
+/* Booking summary CTAs (View Room) — keep "Book Now" and "Schedule Tour"
+   the exact same height regardless of their different base paddings. */
+.parchment-card .d-grid .btn {
+   height: 52px;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   white-space: nowrap;
+   padding: 0 1rem;
+}
+
 .btn-gold {
    background: linear-gradient(135deg, #bb9a7e, #bf9b7c) !important;
    color: #fff !important;

@@ -20,7 +20,6 @@ function LocationSearch({ onSelect, selected, onClear }) {
   const [activeIndex, setActiveIndex] = useState(-1);
   const wrapRef = useRef(null);
   const debounceRef = useRef(null);
-
   useEffect(() => {
     setValue(selected?.name || "");
   }, [selected]);
@@ -79,11 +78,9 @@ function LocationSearch({ onSelect, selected, onClear }) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => runSearch(v), 350);
   };
-
   const handleSelect = async (item) => {
     setLoading(true);
     setError("");
-
     try {
       let result = item;
 

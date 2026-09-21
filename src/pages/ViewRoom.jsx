@@ -245,7 +245,9 @@ export default function ViewRoom() {
                          ) : (
                             <div className="d-grid gap-3 mb-4">
                                <Link to="/secure-booking"><button className="btn btn-outline-elite">Book Now</button></Link>
+                              <a href="https://api.whatsapp.com/send/?phone=19292419530&text&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer"><button type="button" className="btn btn-black">Schedule Tour</button></a> 
                             </div>
+                            
                          )}
                          <p className="text-center small text-muted text-uppercase mb-0 summary-disclaimer">
                             By clicking Book Now.. you agree to the preliminary institutional residency terms and the immediate payment of the holding deposit.
