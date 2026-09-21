@@ -244,8 +244,9 @@ export default function ViewRoom() {
                             </div>
                          ) : (
                             <div className="d-grid gap-3 mb-4">
-                               <Link to="/secure-booking"><button className="btn btn-black">Secure Booking Now</button></Link>
-                              <a href="https://api.whatsapp.com/send/?phone=19292419530&text&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer"><button type="button" className="btn btn-black">Schedule Tour</button></a> 
+                               <Link to="/secure-booking"><button className="btn btn-black">Secure Your Booking</button></Link>
+                              <Link to="/secure-booking"><button className="btn btn-black">Schedule Tour</button></Link>
+                              {/* <a href="https://api.whatsapp.com/send/?phone=19292419530&text&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer"><button type="button" className="btn btn-black">Schedule Tour</button></a>  */}
                             </div>
                             
                          )}
