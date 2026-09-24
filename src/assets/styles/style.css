@@ -4119,18 +4119,15 @@ body .stepper-row{
     border-radius: 14px;
     background: #fffdf8;
 }
-/* Blurred overlay while the payment form loads — covers only the checkout
-   content inside <main> (its parent is position-relative), so the app header
-   stays on top and the footer below. */
+/* Spinner shown while the payment form loads — no blur/dim, the checkout
+   stays fully visible behind it; covers only the content inside <main>. */
 .pay-overlay {
     position: absolute;
     inset: 0;
     z-index: 9999;
     display: grid;
     place-items: center;
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    pointer-events: none;
 }
 .pay-overlay .pay-loading {
     min-height: 0;
