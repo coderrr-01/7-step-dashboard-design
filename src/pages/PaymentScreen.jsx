@@ -1000,11 +1000,14 @@ function PaymentIframe({ method, section, iframeHtml, iframeLoading, iframeError
    const loading = iframeLoading[key];
    const error = iframeError[key];
 
-   if (loading) {
+   // Treat "not fetched yet" as loading too — the very first paint happens
+   // before loadPaymentUI's effect runs, and showing the error state there
+   // would flash a Retry before the spinner even starts.
+   if (loading || (!html && !error)) {
       return (
-         <div className="mb-4 text-center py-4">
-            <div className="spinner-border spinner-border-sm text-secondary" role="status" />
-            <p className="small text-muted mt-2 mb-0">Loading payment form...</p>
+         <div className="pay-loading pay-loading-inline mb-4" role="status" aria-live="polite">
+            <span className="pay-loading-ring" aria-hidden="true"></span>
+            <p>Loading payment form…</p>
          </div>
       );
    }

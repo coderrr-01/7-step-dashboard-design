@@ -4112,6 +4112,13 @@ body .stepper-row{
     letter-spacing: .04em;
 }
 .pay-loading p { margin: 0; }
+/* Loading state inside the payment form area — same look, form-sized (not fullscreen) */
+.pay-loading-inline {
+    min-height: 260px;
+    border: 1px dashed rgba(184, 146, 74, .3);
+    border-radius: 14px;
+    background: #fffdf8;
+}
 .pay-loading-ring {
     width: 46px;
     height: 46px;
