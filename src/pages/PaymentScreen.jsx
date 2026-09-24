@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import stripeIcon from "../assets/icons/stripe.svg";
@@ -592,27 +591,14 @@ export default function PaymentScreen() {
       );
    }
 
-   // Payment form is still arriving (Stripe/Revolut/ACH HTML) — cover the whole
-   // viewport with a blurred overlay + spinner so a half-empty form area never
-   // shows. Rendered through a portal onto <body> so the page-transition
-   // translate/blur animation can't nudge it off-center. The overlay lifts the
-   // instant the form is ready and the checkout paints complete.
-   if (activeFormWaiting && client) {
-      return createPortal(
-         <div className="pay-overlay" role="status" aria-live="polite">
-            <div className="pay-loading">
-               <span className="pay-loading-ring" aria-hidden="true"></span>
-               <p>Securing your payment…</p>
-            </div>
-         </div>,
-         document.body
-      );
-   }
+   // Payment form is still arriving (Stripe/Revolut/ACH HTML) — the overlay
+   // below covers only the checkout content inside <main>, so the header stays
+   // on top and the footer below. Check `<main>`'s container for `pay-overlay`.
 
    return (
       <PageLayout page="PaymentScreen">
          <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">
-            <div className="container container-narrow py-5 px-lg-5 secure-payment-details">
+            <div className="container container-narrow py-5 px-lg-5 secure-payment-details position-relative">
                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
                   <div>
                      <h1 className="display-4 serif-heading heading-hero mb-2 hero-title">
@@ -1024,9 +1010,21 @@ export default function PaymentScreen() {
 
                         </div>
                      </div>
-                  </section>
-               </div>
-            </div>
+</section>
+                </div>
+
+                {/* Blurred spinner covering only the checkout content — header
+                    stays visible on top, footer on bottom; lifts once the form
+                    HTML is ready (or failed, so the Retry shows instead). */}
+                {activeFormWaiting && (
+                   <div className="pay-overlay" role="status" aria-live="polite">
+                      <div className="pay-loading">
+                         <span className="pay-loading-ring" aria-hidden="true"></span>
+                         <p>Securing your payment…</p>
+                      </div>
+                   </div>
+                )}
+             </div>
 
          </main>
 

@@ -4119,9 +4119,11 @@ body .stepper-row{
     border-radius: 14px;
     background: #fffdf8;
 }
-/* Full-page blurred overlay shown while the payment form HTML is loading */
+/* Blurred overlay while the payment form loads — covers only the checkout
+   content inside <main> (its parent is position-relative), so the app header
+   stays on top and the footer below. */
 .pay-overlay {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 9999;
     display: grid;
