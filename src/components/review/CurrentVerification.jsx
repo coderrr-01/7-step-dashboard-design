@@ -15,10 +15,8 @@ function CurrentVerification({ data }) {
           <span></span>
         </div>
       </div>
-
       <h3 className="ver-scan-title">{data.currentlyReviewing.title}</h3>
       <p className="ver-scan-text">{data.currentlyReviewing.description}</p>
-
       <div className="ver-scan-status">
         <span className="ver-scan-live"></span>
         Scanning…

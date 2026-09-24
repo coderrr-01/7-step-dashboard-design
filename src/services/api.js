@@ -141,6 +141,7 @@ export async function wpServerLogout(token) {
 
 // ─── BASE FETCH ───────────────────────────────────────────────────────────────
 export async function apiFetch(url, options = {}) {
+  const { timeout = 0, ...rest } = options;
   const token = getToken();
   const headers = {
     'Content-Type': 'application/json',
@@ -159,12 +160,28 @@ export async function apiFetch(url, options = {}) {
   // so retrying without credentials cannot double-submit anything. Android /
   // desktop succeed on the first attempt exactly as before; on iPhone the
   // retry below lets the Bearer JWT carry authentication instead of cookies.
+  //
+  // Optional AbortController-based timeout so a hung upstream (throttled Zoho,
+  // saturated WP worker) can't leave the UI spinning forever. 0 = disabled.
+  // Polling reads pass a 20s timeout; writes stay unlimited so a slow Zoho save
+  // is never aborted after the server may have already persisted it → no
+  // double-submit / double-charge risk.
+  let controller = null;
+  let timer = null;
+  if (typeof AbortController !== 'undefined' && timeout > 0) {
+    controller = new AbortController();
+    timer = setTimeout(() => controller.abort(), timeout);
+  }
+  const signal = controller ? { signal: controller.signal } : {};
+
   let res;
   try {
-    res = await fetch(url, { ...options, credentials, headers });
+    res = await fetch(url, { ...rest, credentials, headers, ...signal });
   } catch (networkErr) {
     if (credentials !== 'include') throw new Error('Network request failed');
-    res = await fetch(url, { ...options, credentials: 'omit', headers });
+    res = await fetch(url, { ...rest, credentials: 'omit', headers, ...signal });
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 
   if (res.status === 401) {
@@ -240,7 +257,7 @@ export async function getClientData() {
   // Cache-bust via a unique URL param instead of `cache: 'no-store'` — the
   // latter can make fetch() hang indefinitely on iOS Safari/WebKit (with
   // credentials), which left the app stuck on "Loading Application" on iPhone.
-  const res  = await apiFetch(`${JRNY}/client-data?_=${Date.now()}`, { method: 'GET', credentials: 'omit' });
+  const res  = await apiFetch(`${JRNY}/client-data?_=${Date.now()}`, { method: 'GET', credentials: 'omit', timeout: 20000 });
   const data = await res.json();
   if (data.success) localStorage.setItem(clientKey(), JSON.stringify(data.data));
   return data;
@@ -248,7 +265,7 @@ export async function getClientData() {
 
 // ─── STEP STATUS ──────────────────────────────────────────────────────────────
 export async function getStepStatus() {
-  const res = await apiFetch(`${JRNY}/step-status`, { method: 'GET' });
+  const res = await apiFetch(`${JRNY}/step-status`, { method: 'GET', timeout: 20000 });
   return res.json();
 }
 
@@ -295,7 +312,7 @@ export async function getApplicationStatus() {
   // iPhone and the Verification Complete screen never appeared (Android was
   // unaffected). The Bearer JWT authenticates the call, so cookies can be
   // omitted safely; cache-bust the GET so every poll reaches the server.
-  const res = await apiFetch(`${JRNY}/application-status?_=${Date.now()}`, { method: 'GET', credentials: 'omit' });
+  const res = await apiFetch(`${JRNY}/application-status?_=${Date.now()}`, { method: 'GET', credentials: 'omit', timeout: 20000 });
   return res.json();
 }
 
@@ -387,6 +404,7 @@ export async function getRevolutStatus(type) {
   params.set('_', String(Date.now())); // cache-bust via URL (see getClientData note)
   const res = await apiFetch(`${JRNY}/revolut-status?${params.toString()}`, {
     method: 'GET',
+    timeout: 20000,
   });
   return res.json();
 }
@@ -462,6 +480,6 @@ export async function getLastRoute() {
 export async function getPaymentUI(method, section) {
   const params = new URLSearchParams({ method, section, _: String(Date.now()) });
   // iPhone Safari ITP blocks 3rd-party cookie — force Bearer JWT via omit (like getClientData)
-  const res = await apiFetch(`${JRNY}/payment-ui?${params.toString()}`, { method: 'GET', credentials: 'omit' });
+  const res = await apiFetch(`${JRNY}/payment-ui?${params.toString()}`, { method: 'GET', credentials: 'omit', timeout: 20000 });
   return res.json();
 }

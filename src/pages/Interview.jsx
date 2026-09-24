@@ -141,37 +141,32 @@ export default function Interview() {
    // "In Review" screen is open. Polling CONTINUES until something navigates —
    // approval arriving LIVE from Zoho is what triggers the auto-advance.
     const approvalPolling = interviewProgres || interviewBooked;
-   useEffect(() => {
-       const checkApproval = async () => {
-          if (typeof document !== 'undefined' && document.hidden) return;
-          // Zoho reflects interview approval through one of several endpoints, so
-          // poll all of them. Deep-scan each response; any one carrying the
-          // approval signal unlocks the button. Logs each source so the exact
-          // field/API that carries the flag is visible in the console.
-          const sources = [
-             { name: 'application-status', call: getApplicationStatus },
-             { name: 'client-data', call: getClientData },
-             { name: 'step-status', call: getStepStatus },
-          ];
-           let matched = null;
-           for (const s of sources) {
-              try {
-                 const res = await s.call();
-                 const ok = deepInterviewApproved(res) || bareInterviewStatusCheck(res);
-                 if (ok) matched = s.name;
-                 console.log(`[jrny] poll ${s.name} → ${ok ? 'APPROVED ✓' : 'no'}`,
-                    JSON.stringify(res).slice(0, 600));
-              } catch (e) {
-                 console.log(`[jrny] poll ${s.name} → error:`, e && e.message ? e.message : e);
-              }
-           }
+useEffect(() => {
+        const checkApproval = async () => {
+           if (typeof document !== 'undefined' && document.hidden) return;
+           // Zoho reflects interview approval through one of several endpoints, so
+           // query them all CONCURRENTLY (Promise.allSettled — the old loop called
+           // them one-by-one, so one slow Zoho search delayed every other source
+           // by its full latency). Deep-scan each response; any one carrying the
+           // approval signal unlocks the button.
+           const sources = [
+              { name: 'application-status', call: getApplicationStatus },
+              { name: 'client-data', call: getClientData },
+              { name: 'step-status', call: getStepStatus },
+           ];
+           const results = await Promise.allSettled(
+              sources.map((s) => s.call().then((res) => ({
+                 name: s.name,
+                 ok: deepInterviewApproved(res) || bareInterviewStatusCheck(res),
+              })))
+           );
+           const matched = results.find((r) => r.status === 'fulfilled' && r.value && r.value.ok);
            if (matched) {
               saveInterviewApproved();
               setInterviewApproved(true);
               clearInterval(pollRef.current);
-              console.log(`[jrny] interview approved detected via ${matched}`);
            }
-       };
+        };
 
        // Mount: single immediate check (covers already-approved interviews).
        if (!approvalPolling) {
@@ -182,8 +177,11 @@ export default function Interview() {
        if (getCachedInterviewApproved()) { setInterviewApproved(true); return; }
 
        checkApproval();
-       // 60s interval + pause when hidden — was 15s (3 req/tick = 720/hr → now 180/hr)
-       pollRef.current = setInterval(checkApproval, 60000);
+       // 30s interval + pause when hidden — half the max wait of the old 60s
+       // poll (approval UI/auto-advance now shows within ~10-40s of Zoho saving),
+       // while the 3 sources run in parallel so each tick costs ~1 Zoho latency,
+       // not 3×. When the backend adds a cheap cached step-status, this can drop.
+       pollRef.current = setInterval(checkApproval, 30000);
        const onVisible = () => {
          if (document.visibilityState === 'visible') checkApproval();
        };

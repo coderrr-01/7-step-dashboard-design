@@ -84,50 +84,59 @@ export default function NotificationBell({ client }) {
     setLiveClient(client);
   }, [client]);
 
-  // Sync loop — visibility-guarded + 60s interval to cut server load.
-  // - Recomputes tick every 20s locally (catches localStorage flag changes)
-  //   without hitting the server.
-  // - Server sync (getClientData + getApplicationStatus) only when tab is
-  //   visible and at most once per 60s. Pauses entirely when tab hidden or
-  //   logged out, so background tabs don't burn Cloudways CPU.
+  // Sync — NO background server interval anymore. Notifications recompute
+  // locally every 20s (tick) so localStorage flag changes (interview approved,
+  // steps) still refresh the badge without network. The server (client-data +
+  // application-status) is only pinged ON DEMAND: on mount, on tab
+  // focus/visibility, and whenever the bell is opened. That removes ~30 server
+  // requests/min per logged-in tab (2 endpoints × every 60s across all pages)
+  // which was throttling Zoho and making every approval feel like a minute.
   const [tick, setTick] = useState(0);
+  const cancelledRef = useRef(false);
+  const syncRef = useRef(async () => {});
+  syncRef.current = async () => {
+    if (!getToken()) return;
+    if (typeof document !== 'undefined' && document.hidden) return;
+    try {
+      const [clientRes, statusRes] = await Promise.all([
+        getClientData(),
+        getApplicationStatus(),
+      ]);
+      if (cancelledRef.current) return;
+      if (clientRes?.success) setLiveClient(clientRes.data);
+      if (statusRes?.success) setAppStatus(statusRes);
+    } catch { /* best-effort; polls also carry their own timeout now */ }
+  };
+
   useEffect(() => {
-    let cancelled = false;
-    const sync = async () => {
-      if (!getToken()) return;
-      if (typeof document !== 'undefined' && document.hidden) return;
-      try {
-        const [clientRes, statusRes] = await Promise.all([
-          getClientData(),
-          getApplicationStatus(),
-        ]);
-        if (cancelled) return;
-        if (clientRes?.success) setLiveClient(clientRes.data);
-        if (statusRes?.success) setAppStatus(statusRes);
-      } catch { /* best-effort */ }
-    };
+    cancelledRef.current = false;
+    return () => { cancelledRef.current = true; };
+  }, []);
+
+  useEffect(() => {
     // Local tick only — no network
     const tickId = setInterval(() => setTick((t) => t + 1), 20000);
-    // Server poll — 60s, visibility-guarded
-    const pollId = setInterval(sync, 60000);
     // Re-sync immediately when tab becomes visible again
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
         setTick((t) => t + 1);
-        sync();
+        syncRef.current();
       }
     };
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener('focus', onVisible);
-    sync();
+    syncRef.current();
     return () => {
-      cancelled = true;
       clearInterval(tickId);
-      clearInterval(pollId);
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('focus', onVisible);
     };
   }, []);
+
+  // Fresh server data the moment the user opens the dropdown.
+  useEffect(() => {
+    if (open) syncRef.current();
+  }, [open]);
 
   const data = liveClient || client;
 
