@@ -999,7 +999,7 @@ export default function PaymentScreen() {
                                  <AmountInput />
                                  {!depositPaid && activeStep === "Security" && (
                                     <p className="small text-warning d-flex align-items-center gap-1 mb-3">
-                                       <span className="material-symbols-outlined fs-6">info</span>
+                                       <span className="material-symbols-outlined fs-6">Info:</span>
                                        Please pay the Security Deposit first before proceeding to Rent.
                                     </p>
                                  )}
