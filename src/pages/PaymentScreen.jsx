@@ -45,7 +45,7 @@ export default function PaymentScreen() {
    const activeFormKey = `${activeMethodName}_${activeStep === 'Rent' ? 'rent' : 'deposit'}`;
    const activeFormReady = !!iframeHtml[activeFormKey];
    const activeFormFailed = !!iframeError[activeFormKey];
-   const activeFormWaiting = !activeFormReady && !activeFormFailed && activeMethodName !== 'cash';
+   const activeFormWaiting = !["stripe", "paypal", "revolut"].includes(activeMethodName) ? false : !activeFormReady && !activeFormFailed;
 
    // Social icons with no real URL yet — plain <a href="#"> would leak the
    // deployed (Vercel) domain on hover. Render them as buttons for now;
@@ -591,14 +591,29 @@ export default function PaymentScreen() {
       );
    }
 
-   // Payment form is still arriving (Stripe/Revolut/ACH HTML) — the overlay
-   // below covers only the checkout content inside <main>, so the header stays
-   // on top and the footer below. Check `<main>`'s container for `pay-overlay`.
+   // Payment form is still arriving — render ONLY the loader (nothing behind
+   // it) so no half-built checkout ever flashes. Header stays on top, footer on
+   // bottom; once the form HTML is ready (or failed → Retry) the checkout
+   // renders in full.
+   if (activeFormWaiting) {
+      return (
+         <PageLayout page="PaymentScreen">
+            <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">
+               <div className="container container-narrow py-5 px-lg-5 secure-payment-details">
+                  <div className="pay-loading" role="status" aria-live="polite">
+                     <span className="pay-loading-ring" aria-hidden="true"></span>
+                     <p>Securing your payment…</p>
+                  </div>
+               </div>
+            </main>
+         </PageLayout>
+      );
+   }
 
    return (
       <PageLayout page="PaymentScreen">
          <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">
-            <div className="container container-narrow py-5 px-lg-5 secure-payment-details position-relative">
+            <div className="container container-narrow py-5 px-lg-5 secure-payment-details">
                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
                   <div>
                      <h1 className="display-4 serif-heading heading-hero mb-2 hero-title">
@@ -1012,18 +1027,6 @@ export default function PaymentScreen() {
                      </div>
 </section>
                 </div>
-
-                {/* Blurred spinner covering only the checkout content — header
-                    stays visible on top, footer on bottom; lifts once the form
-                    HTML is ready (or failed, so the Retry shows instead). */}
-                {activeFormWaiting && (
-                   <div className="pay-overlay" role="status" aria-live="polite">
-                      <div className="pay-loading">
-                         <span className="pay-loading-ring" aria-hidden="true"></span>
-                         <p>Securing your payment…</p>
-                      </div>
-                   </div>
-                )}
              </div>
 
          </main>

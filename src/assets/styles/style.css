@@ -4119,27 +4119,6 @@ body .stepper-row{
     border-radius: 14px;
     background: #fffdf8;
 }
-/* Solid loader cover while the payment form loads — hides the checkout
-   content behind completely, only spinner visible. Covers only the content
-   area inside <main> so header/footer remain visible. */
-.pay-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 9999;
-    display: grid;
-    place-items: center;
-    background-color: var(--jrny-surface);
-    pointer-events: auto;
-}
-.pay-overlay .pay-loading {
-    min-height: 0;
-    gap: 16px;
-    text-align: center;
-}
-.pay-overlay .pay-loading p {
-    font-size: 15px;
-    color: #6f6353;
-}
 .pay-loading-ring {
     width: 46px;
     height: 46px;
