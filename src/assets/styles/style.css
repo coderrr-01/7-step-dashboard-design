@@ -4124,15 +4124,20 @@ body .stepper-row{
     position: fixed;
     inset: 0;
     z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
 }
 .pay-overlay .pay-loading {
     min-height: 0;
+    gap: 16px;
+    text-align: center;
+}
+.pay-overlay .pay-loading p {
+    font-size: 15px;
+    color: #6f6353;
 }
 .pay-loading-ring {
     width: 46px;

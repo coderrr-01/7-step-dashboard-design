@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import stripeIcon from "../assets/icons/stripe.svg";
@@ -579,17 +580,19 @@ export default function PaymentScreen() {
    }
 
    // Payment form is still arriving (Stripe/Revolut/ACH HTML) — cover the whole
-   // checkout with a blurred overlay + spinner so a half-empty form area never
-   // shows. The overlay lifts the instant the form is ready and the checkout
-   // paints complete.
+   // viewport with a blurred overlay + spinner so a half-empty form area never
+   // shows. Rendered through a portal onto <body> so the page-transition
+   // translate/blur animation can't nudge it off-center. The overlay lifts the
+   // instant the form is ready and the checkout paints complete.
    if (activeFormWaiting && client) {
-      return (
+      return createPortal(
          <div className="pay-overlay" role="status" aria-live="polite">
             <div className="pay-loading">
                <span className="pay-loading-ring" aria-hidden="true"></span>
-               <p>Loading payment form…</p>
+               <p>Securing your payment…</p>
             </div>
-         </div>
+         </div>,
+         document.body
       );
    }
 
