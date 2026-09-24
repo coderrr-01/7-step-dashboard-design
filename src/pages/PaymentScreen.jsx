@@ -38,6 +38,15 @@ export default function PaymentScreen() {
       return paymentMethods.findIndex(m => normalizePaymentMethod(m.name) === normalized);
    };
 
+   // Active payment form readiness — keep the full-page blurred overlay + spinner
+   // until the current form's HTML has arrived (or failed). Cash has no iframe,
+   // so it never needs to wait.
+   const activeMethodName = paymentMethods[activePayment]?.name?.toLowerCase();
+   const activeFormKey = `${activeMethodName}_${activeStep === 'Rent' ? 'rent' : 'deposit'}`;
+   const activeFormReady = !!iframeHtml[activeFormKey];
+   const activeFormFailed = !!iframeError[activeFormKey];
+   const activeFormWaiting = !activeFormReady && !activeFormFailed && activeMethodName !== 'cash';
+
    useEffect(() => {
       // Hydrate from cache immediately (preferCachedData) so the checkout and
       // celebration screens paint instantly; the background refetch keeps the
@@ -566,6 +575,21 @@ export default function PaymentScreen() {
                </div>
             </main>
          </PageLayout>
+      );
+   }
+
+   // Payment form is still arriving (Stripe/Revolut/ACH HTML) — cover the whole
+   // checkout with a blurred overlay + spinner so a half-empty form area never
+   // shows. The overlay lifts the instant the form is ready and the checkout
+   // paints complete.
+   if (activeFormWaiting && client) {
+      return (
+         <div className="pay-overlay" role="status" aria-live="polite">
+            <div className="pay-loading">
+               <span className="pay-loading-ring" aria-hidden="true"></span>
+               <p>Loading payment form…</p>
+            </div>
+         </div>
       );
    }
 
