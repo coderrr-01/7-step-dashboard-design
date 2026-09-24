@@ -13,7 +13,7 @@ import { useSteps } from "../context/StepContext";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
 
 export default function PaymentScreen() {
-   const { client, loading: clientLoading, refetch } = useClientData({ preferCachedData: false });
+   const { client, loading: clientLoading, refetch } = useClientData({ preferCachedData: true });
    const { completeStep } = useSteps();
    const navigate = useNavigate();
    const [paymentHydrated, setPaymentHydrated] = useState(false);
@@ -39,10 +39,14 @@ export default function PaymentScreen() {
    };
 
    useEffect(() => {
-      if (!clientLoading && client) {
+      // Hydrate from cache immediately (preferCachedData) so the checkout and
+      // celebration screens paint instantly; the background refetch keeps the
+      // payment flags fresh. No dependency on clientLoading — a slow/throttled
+      // Zoho call must never keep the reservation spinner on screen.
+      if (client) {
          setPaymentHydrated(true);
       }
-   }, [clientLoading, client]);
+   }, [client]);
 
    const loadPaymentUI = async (method, section, force = false) => {
       const key = `${method}_${section}`;
@@ -539,16 +543,26 @@ export default function PaymentScreen() {
 
    // Payment status is not yet known (fresh login — local flags were cleared on
    // logout). Hold on a spinner instead of flashing the checkout UI, so users
-   // with both payments done land straight on the celebration screen.
-   if (!paymentHydrated || clientLoading) {
+   // with both payments done land straight on the celebration screen. If the
+   // fetch fails or times out (throttled Zoho), show a Retry instead of an
+   // endless spinner.
+   if (!client) {
       return (
          <PageLayout page="PaymentScreen">
             <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 min-vh-100">
                <div className="container container-narrow py-5 px-lg-5 secure-payment-details">
-                  <div className="pay-loading" role="status" aria-live="polite">
-                     <span className="pay-loading-ring" aria-hidden="true"></span>
-                     <p>Loading your reservation…</p>
-                  </div>
+                  {clientLoading ? (
+                     <div className="pay-loading" role="status" aria-live="polite">
+                        <span className="pay-loading-ring" aria-hidden="true"></span>
+                        <p>Loading your reservation…</p>
+                     </div>
+                  ) : (
+                     <div className="pay-loading" role="status" aria-live="polite">
+                        <span className="material-symbols-outlined icon-lg" aria-hidden="true">error</span>
+                        <p>We couldn&apos;t load your reservation details.</p>
+                        <button type="button" className="btn btn-jrny-dark mt-3" onClick={() => refetch()}>Retry</button>
+                     </div>
+                  )}
                </div>
             </main>
          </PageLayout>
