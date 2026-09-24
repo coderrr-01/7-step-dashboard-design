@@ -598,7 +598,7 @@ export default function PaymentScreen() {
    if (activeFormWaiting) {
       return (
          <PageLayout page="PaymentScreen">
-            <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1">
+            <main className="container-fluid pb-lg-5 px-lg-5 flex-grow-1 d-flex align-items-center justify-content-center">
                <div className="container container-narrow py-5 px-lg-5 secure-payment-details">
                   <div className="pay-loading" role="status" aria-live="polite">
                      <span className="pay-loading-ring" aria-hidden="true"></span>

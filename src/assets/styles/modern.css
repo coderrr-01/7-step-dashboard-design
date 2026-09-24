@@ -111,6 +111,14 @@ html {
    scroll-behavior: smooth;
 }
 
+/* Sticky footer: make every route a flex column that fills the viewport, so
+   <main> (flex-grow-1) takes the leftover height and the footer pins to the
+   bottom — no white gap below it even on short screens like the loader. */
+.page-transition {
+   display: flex;
+   flex-direction: column;
+}
+
 /* Force Poppins as the single body font across the app */
 body,
 body.page-index,
