@@ -960,10 +960,10 @@ export default function PaymentScreen() {
                                           Pay at Office — 211E 43rd Street
                                        </button>
                                     )}
-                                    <p className="text-center text-uppercase fw-bold text-muted d-flex align-items-center justify-content-center gap-1 mb-0 security-note">
+                                    {/* <p className="text-center text-uppercase fw-bold text-muted d-flex align-items-center justify-content-center gap-1 mb-0 security-note">
                                        <span className="material-symbols-outlined icon-xs">shield</span>
                                        Secured by Journey Realty Escrow
-                                    </p>
+                                    </p> */}
                                  </div>
                               </>
                            )}

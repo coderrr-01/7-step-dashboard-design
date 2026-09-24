@@ -9,7 +9,6 @@ const POPULAR_LOCATIONS = [
   "New York",
   "Los Angeles",
 ];
-
 function LocationSearch({ onSelect, selected, onClear }) {
   const [value, setValue] = useState(selected?.name || "");
   const [suggestions, setSuggestions] = useState([]);
