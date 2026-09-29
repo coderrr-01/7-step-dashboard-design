@@ -185,30 +185,31 @@ export default function SecureBooking() {
                             {/* "Secure Your Booking" lands here (?intent=secure), where the
                                 tour section below is hidden — so the lease CTA lives with
                                 the residence details. Same handler, same classes. */}
+                           {/* Lease terms always render here, on both the tour and the
+                               secure-booking paths — the numbers apply to the residence
+                               either way. Only the CTA below is intent-specific. */}
+                           <div className="d-flex flex-wrap align-items-stretch gap-2 mt-4 residence-terms">
+                              <div className="residence-term">
+                                 <i className="bi bi-calendar-event"></i>
+                                 <span className="residence-term-label">Moving Date</span>
+                                 <span className="residence-term-value">{moveInLabel || 'To be confirmed'}</span>
+                              </div>
+                              <div className="residence-term">
+                                 <i className="bi bi-shield-check"></i>
+                                 <span className="residence-term-label">Security Deposit</span>
+                                 <span className="residence-term-value">{depositLabel || 'To be confirmed'}</span>
+                              </div>
+                              <div className="residence-term">
+                                 <i className="bi bi-cash-coin"></i>
+                                 <span className="residence-term-label">Monthly Rent</span>
+                                 <span className="residence-term-value">{rentBadgeLabel || 'To be confirmed'}</span>
+                              </div>
+                           </div>
                            {hideSchedule && (
-                              <>
-                                 <div className="d-flex flex-wrap align-items-stretch gap-2 mt-4 residence-terms">
-                                       <div className="residence-term">
-                                          <i className="bi bi-calendar-event"></i>
-                                          <span className="residence-term-label">Moving Date</span>
-                                          <span className="residence-term-value">{moveInLabel || 'To be confirmed'}</span>
-                                       </div>
-                                       <div className="residence-term">
-                                          <i className="bi bi-shield-check"></i>
-                                          <span className="residence-term-label">Security Deposit</span>
-                                          <span className="residence-term-value">{depositLabel || 'To be confirmed'}</span>
-                                       </div>
-                                       <div className="residence-term">
-                                          <i className="bi bi-cash-coin"></i>
-                                          <span className="residence-term-label">Monthly Rent</span>
-                                          <span className="residence-term-value">{rentBadgeLabel || 'To be confirmed'}</span>
-                                       </div>
-                                    </div>
-                                 <button type="button" className="btn btn-black mt-4" onClick={handleLeaseNow}>
-                                    SIGN LEASE NOW
-                                    <i className="bi bi-arrow-right"></i>
-                                 </button>
-                              </>
+                              <button type="button" className="btn btn-black mt-4" onClick={handleLeaseNow}>
+                                 SIGN LEASE NOW
+                                 <i className="bi bi-arrow-right"></i>
+                              </button>
                            )}
                          </div>
                       </div>
