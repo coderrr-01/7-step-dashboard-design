@@ -23,7 +23,7 @@ const buildToday = () => {
     return { label: `${months[mo]} ${d}, ${yr}`, value: `${padded}/${moPadded}/${yr}` };
 };
 
-function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg, onLeaseNow, securePath = '/secure-booking', showSecureBook = true, showLeaseNow = true, searchRoomApproved = false, onSearchRoom, initialBooked = false, initialLastBooked = null }) {
+function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedule, confirmedDate, confirmedTime, meetLink, submitting, roomName, roomImg, onLeaseNow, securePath = '/secure-booking', showSecureBook = true, showLeaseNow = true, searchRoomApproved = false, onSearchRoom, initialBooked = false, initialLastBooked = null, hideSchedule = false }) {
     // When the interview is already booked (e.g. returning user after a refresh
     // / re-login), reopen on the CONFIRMED tab instead of the scheduling form so
     // the interview is never asked for a second time. Only the explicit
@@ -171,39 +171,48 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                     activeTab === "schedule" && (
                         <div className="tab_schedule_room">
                             <div className="row">
+                                {/* Calendar — hidden only for the "Secure Your Booking"
+                                    intent. hideSchedule defaults to false, so the
+                                    schedule-tour flow renders exactly as before. */}
+                                {!hideSchedule && (
                                 <div
                                     className="col-md-6 pe-md-4"
                                     style={{ pointerEvents: submitting ? 'none' : 'auto' }}
                                 >
                                     <Calendar onSelectDate={(d) => { setSelectedDate(d); setSelectedTime(null); setError(''); }} />
                                 </div>
+                                )}
                                 {/* Slots */}
                                 <div className="col-md-6 ps-md-2 mt-4 mt-md-0">
-                                    <h6 className="slots-heading">
-                                        AVAILABLE SLOTS FOR {selectedDate ? selectedDate.label : 'TODAY'}
-                                    </h6>
-                                    {slotsLoading ? (
-                                        <p className="text-muted small mb-3">Loading available slots…</p>
-                                    ) : (
-                                        <div style={{ pointerEvents: submitting ? 'none' : 'auto' }}>
-                                            <Timeslot
-                                                selectedTime={selectedTime}
-                                                onSelectTime={(t) => { setSelectedTime(t); setError(''); }}
-                                                bookedSlots={bookedSlots}
-                                            />
-                                        </div>
+                                    {!hideSchedule && (
+                                    <>
+                                        <h6 className="slots-heading">
+                                            AVAILABLE SLOTS FOR {selectedDate ? selectedDate.label : 'TODAY'}
+                                        </h6>
+                                        {slotsLoading ? (
+                                            <p className="text-muted small mb-3">Loading available slots…</p>
+                                        ) : (
+                                            <div style={{ pointerEvents: submitting ? 'none' : 'auto' }}>
+                                                <Timeslot
+                                                    selectedTime={selectedTime}
+                                                    onSelectTime={(t) => { setSelectedTime(t); setError(''); }}
+                                                    bookedSlots={bookedSlots}
+                                                />
+                                            </div>
+                                        )}
+                                        {allSlotsBooked && (
+                                            <p className="text-danger small mb-2">All slots are booked for this date. Please select another date.</p>
+                                        )}
+                                        {error && <p className="text-danger small mb-2">{error}</p>}
+                                        <button
+                                            className="btn btn-gold mb-2 mt-3"
+                                            onClick={handleConfirmClick}
+                                            disabled={submitting || !selectedDate || !selectedTime}
+                                        >
+                                            {submitting ? 'Booking...' : 'Confirm Time Slot'}
+                                        </button>
+                                    </>
                                     )}
-                                    {allSlotsBooked && (
-                                        <p className="text-danger small mb-2">All slots are booked for this date. Please select another date.</p>
-                                    )}
-                                    {error && <p className="text-danger small mb-2">{error}</p>}
-                                    <button
-                                        className="btn btn-gold mb-2 mt-3"
-                                        onClick={handleConfirmClick}
-                                        disabled={submitting || !selectedDate || !selectedTime}
-                                    >
-                                        {submitting ? 'Booking...' : 'Confirm Time Slot'}
-                                    </button>
                                     {showLeaseNow && (
                                         <>
                                             <div className="divider-text">

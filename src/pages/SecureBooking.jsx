@@ -4,7 +4,7 @@ import ResidenceSlider from "./Partial-element/ResidenceSlider";
 import Calendar from "./Partial-element/Calendar.jsx";
 import InterviewSchedule from "./Partial-element/InterviewSchedule.jsx";
 import Timeslot from "./Partial-element/Timeslot.jsx";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useClientData } from "../hooks/useClientData";
 import { secureBooking, releaseSlot, selectRoom } from "../services/api";
 import { toast } from "react-toastify";
@@ -14,6 +14,11 @@ export default function SecureBooking() {
    const navigate = useNavigate();
    const { client } = useClientData();
    const { completeStep } = useSteps();
+   // "Secure Your Booking" links here with ?intent=secure; "Schedule Tour" and
+   // every other entry point arrive without it. Only the secure intent hides the
+   // calendar/scheduling section, so the tour flow is untouched by default.
+   const [searchParams] = useSearchParams();
+   const hideSchedule = searchParams.get('intent') === 'secure';
 
    // Load selected room from localStorage — same as Interview
    const selectedRoom = (() => {
@@ -169,6 +174,7 @@ export default function SecureBooking() {
                          roomName={roomName}
                          roomImg={roomImg}
                          onLeaseNow={handleLeaseNow}
+                         hideSchedule={hideSchedule}
                       />
                   </section>
                </div>
