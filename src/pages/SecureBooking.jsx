@@ -164,7 +164,7 @@ export default function SecureBooking() {
                                 tour section below is hidden — so the lease CTA lives with
                                 the residence details. Same handler, same classes. */}
                             {hideSchedule && (
-                               <button type="button" className="btn btn-black mt-3" onClick={handleLeaseNow}>
+                               <button type="button" className="btn btn-black mt-5" onClick={handleLeaseNow}>
                                   SIGN LEASE NOW
                                   <i className="bi bi-arrow-right"></i>
                                </button>
