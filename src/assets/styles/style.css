@@ -2206,6 +2206,53 @@ background-color: #b8924a;
     color: #666;
 }
 
+/* Lease terms strip above the SIGN LEASE NOW CTA */
+.residence-terms {
+    width: 100%;
+}
+
+.residence-term {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid rgba(184, 146, 74, 0.45);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.residence-term > i {
+    font-size: 1.1rem;
+    color: var(--er-gold);
+    flex: 0 0 auto;
+}
+
+.residence-term-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    line-height: 1.1;
+}
+
+.residence-term-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #2b2b2b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 575.98px) {
+    .residence-term {
+        flex: 1 1 100%;
+    }
+}
+
 .tour-note {
     font-size: 0.6rem;
     color: #999;

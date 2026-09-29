@@ -10,6 +10,21 @@ import { secureBooking, releaseSlot, selectRoom } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 
+// dd/mm/yyyy, yyyy-mm-dd and ISO strings all render as "Mon D, YYYY".
+// Invalid input is passed through untouched so the UI never shows "Invalid Date".
+function formatBadgeDate(value) {
+   if (!value) return "";
+   const d = new Date(value);
+   if (isNaN(d.getTime())) return String(value);
+   return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function formatBadgeMoney(value) {
+   const n = Number(value);
+   if (!isFinite(n) || n === 0) return "";
+   return `$${n.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+}
+
 export default function SecureBooking() {
    const navigate = useNavigate();
    const { client } = useClientData();
@@ -112,7 +127,14 @@ export default function SecureBooking() {
       ? `$${Number(selectedRoom.monthly_rent).toLocaleString()}/mo`
       : (selectedRoom?.price
          ? `$${Number(selectedRoom.price).toLocaleString()}/mo`
-         : (client?.rent_amount ? `$${Number(client.rent_amount).toLocaleString()}/mo` : ''));
+          : (client?.rent_amount ? `$${Number(client.rent_amount).toLocaleString()}/mo` : ''));
+
+   // Badge values for the CTA strip. Moving date prefers the Zoho move-in date,
+   // then falls back to the lease start date. Deposit falls back to the selected
+   // room so the badge still renders before the client record is populated.
+   const moveInLabel = formatBadgeDate(client?.move_in_date || client?.start_date);
+   const depositLabel = formatBadgeMoney(client?.security_deposit || selectedRoom?.security_deposit);
+   const rentBadgeLabel = rentLabel;
 
    const roomImages = (() => {
       if (!selectedRoom) return [];
@@ -163,12 +185,31 @@ export default function SecureBooking() {
                             {/* "Secure Your Booking" lands here (?intent=secure), where the
                                 tour section below is hidden — so the lease CTA lives with
                                 the residence details. Same handler, same classes. */}
-                            {hideSchedule && (
-                               <button type="button" className="btn btn-black mt-5" onClick={handleLeaseNow}>
-                                  SIGN LEASE NOW
-                                  <i className="bi bi-arrow-right"></i>
-                               </button>
-                            )}
+                           {hideSchedule && (
+                              <>
+                                 <div className="d-flex flex-wrap align-items-stretch gap-2 mt-4 residence-terms">
+                                       <div className="residence-term">
+                                          <i className="bi bi-calendar-event"></i>
+                                          <span className="residence-term-label">Moving Date</span>
+                                          <span className="residence-term-value">{moveInLabel || 'To be confirmed'}</span>
+                                       </div>
+                                       <div className="residence-term">
+                                          <i className="bi bi-shield-check"></i>
+                                          <span className="residence-term-label">Security Deposit</span>
+                                          <span className="residence-term-value">{depositLabel || 'To be confirmed'}</span>
+                                       </div>
+                                       <div className="residence-term">
+                                          <i className="bi bi-cash-coin"></i>
+                                          <span className="residence-term-label">Monthly Rent</span>
+                                          <span className="residence-term-value">{rentBadgeLabel || 'To be confirmed'}</span>
+                                       </div>
+                                    </div>
+                                 <button type="button" className="btn btn-black mt-4" onClick={handleLeaseNow}>
+                                    SIGN LEASE NOW
+                                    <i className="bi bi-arrow-right"></i>
+                                 </button>
+                              </>
+                           )}
                          </div>
                       </div>
                       {!hideSchedule && (
