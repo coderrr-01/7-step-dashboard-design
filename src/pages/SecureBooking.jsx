@@ -159,24 +159,34 @@ export default function SecureBooking() {
                               <span><i className="bi bi-snow2 text-gold me-1"></i> Climate Controlled</span>
                               <span><i className="bi bi-wifi text-gold me-1"></i> Gigabit Fiber</span>
                            </div> */}
-                           {/* View Room is intentionally not rendered on Secure Booking. */}
-                        </div>
-                     </div>
-                      <InterviewSchedule
-                         datatext="securePlaneblock"
-                         interview_progress={interview_btn}
-                         onConfirm={handleConfirm}
-                         onReschedule={handleReschedule}
-                         confirmedDate={confirmedDate}
-                         confirmedTime={confirmedTime}
-                         meetLink={meetLink}
-                         submitting={submitting}
-                         roomName={roomName}
-                         roomImg={roomImg}
-                         onLeaseNow={handleLeaseNow}
-                         hideSchedule={hideSchedule}
-                      />
-                  </section>
+                            {/* View Room is intentionally not rendered on Secure Booking. */}
+                            {/* "Secure Your Booking" lands here (?intent=secure), where the
+                                tour section below is hidden — so the lease CTA lives with
+                                the residence details. Same handler, same classes. */}
+                            {hideSchedule && (
+                               <button type="button" className="btn btn-black mt-3" onClick={handleLeaseNow}>
+                                  SIGN LEASE NOW
+                                  <i className="bi bi-arrow-right"></i>
+                               </button>
+                            )}
+                         </div>
+                      </div>
+                      {!hideSchedule && (
+                         <InterviewSchedule
+                            datatext="securePlaneblock"
+                            interview_progress={interview_btn}
+                            onConfirm={handleConfirm}
+                            onReschedule={handleReschedule}
+                            confirmedDate={confirmedDate}
+                            confirmedTime={confirmedTime}
+                            meetLink={meetLink}
+                            submitting={submitting}
+                            roomName={roomName}
+                            roomImg={roomImg}
+                            onLeaseNow={handleLeaseNow}
+                         />
+                      )}
+                   </section>
                </div>
             </main>
          )}
