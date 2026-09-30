@@ -7,7 +7,7 @@ import Revoulticon from "../assets/icons/revsult.svg";
 import bankicon from "../assets/icons/bank.svg";
 import CashIcon from "../assets/icons/cash.svg";
 import { useClientData } from "../hooks/useClientData";
-import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getRevolutStatus, getPaymentUI, getRoomById } from "../services/api";
+import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createRevolutCheckout, getRevolutStatus, getPaymentUI, getRoomById, patchCachedClient } from "../services/api";
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
@@ -190,10 +190,28 @@ export default function PaymentScreen() {
    // "Total Due Now: 0" (both payments done) must mark SECURE PAYMENT as
    // completed in the timeline — covers users returning to an already-paid
    // account where no payment handler runs again.
-   useEffect(() => {
+useEffect(() => {
       if (!paymentHydrated || clientLoading) return;
       if (depositPaid && rentPaid) completeStep(7);
-   }, [paymentHydrated, clientLoading, depositPaid, rentPaid]);
+    }, [paymentHydrated, clientLoading, depositPaid, rentPaid]);
+
+    // Both payments confirmed → stamp the paid state into the cached client
+    // snapshot. "Go to Dashboard" paints straight from that snapshot, and the
+    // gateway tables + CRM sync can lag a just-made payment by a few seconds, so
+    // without this the dashboard would briefly render "deposit due" for someone
+    // who just paid both. The refetch() that already runs still overwrites this
+    // with authoritative server data.
+    useEffect(() => {
+      if (!paymentHydrated || clientLoading) return;
+      if (!depositPaid || !rentPaid) return;
+      patchCachedClient({
+        deposit_paid: true,
+        rent_paid: true,
+        deposit_method: paymentState.depositMethod || normalizePaymentMethod(paymentMethods[optimisticDepositMethod]?.name),
+        rent_method: paymentState.rentMethod || normalizePaymentMethod(paymentMethods[rentMethod]?.name),
+      });
+    }, [paymentHydrated, clientLoading, depositPaid, rentPaid, optimisticDepositMethod, rentMethod, paymentState.depositMethod, paymentState.rentMethod]);
+
 
    const visibleMethods = depositPaid
       ? paymentMethods.filter((_, i) => i !== 4 && (depositMethod === null ? true : i === depositMethod))

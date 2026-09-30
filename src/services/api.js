@@ -253,14 +253,34 @@ export async function getNonce() {
 }
 
 // ─── CLIENT DATA ──────────────────────────────────────────────────────────────
+// Single-flight guard. On one screen (e.g. /dashboard) three independent
+// components mount at the same time and each used to fire its own
+// /client-data request: the page itself, the PageLayout Header, and
+// NotificationBell's mount sync. Every one of those is a multi-second Zoho
+// lookup server-side, so the browser was racing three near-identical round
+// trips and the page waited for whichever lost the race. Concurrent callers now
+// share a single in-flight promise. Cleared in `finally` so a failed request can
+// never poison later calls (each retry still performs a fresh fetch).
+let clientDataFlight = null;
+
 export async function getClientData() {
-  // Cache-bust via a unique URL param instead of `cache: 'no-store'` — the
-  // latter can make fetch() hang indefinitely on iOS Safari/WebKit (with
-  // credentials), which left the app stuck on "Loading Application" on iPhone.
-  const res  = await apiFetch(`${JRNY}/client-data?_=${Date.now()}`, { method: 'GET', credentials: 'omit', timeout: 20000 });
-  const data = await res.json();
-  if (data.success) localStorage.setItem(clientKey(), JSON.stringify(data.data));
-  return data;
+  if (clientDataFlight) return clientDataFlight;
+
+  clientDataFlight = (async () => {
+    // Cache-bust via a unique URL param instead of `cache: 'no-store'` — the
+    // latter can make fetch() hang indefinitely on iOS Safari/WebKit (with
+    // credentials), which left the app stuck on "Loading Application" on iPhone.
+    const res  = await apiFetch(`${JRNY}/client-data?_=${Date.now()}`, { method: 'GET', credentials: 'omit', timeout: 20000 });
+    const data = await res.json();
+    if (data.success) localStorage.setItem(clientKey(), JSON.stringify(data.data));
+    return data;
+  })();
+
+  try {
+    return await clientDataFlight;
+  } finally {
+    clientDataFlight = null;
+  }
 }
 
 // ─── STEP STATUS ──────────────────────────────────────────────────────────────
@@ -437,6 +457,21 @@ export function getCachedClient() {
   } catch {
     return null;
   }
+}
+
+// Merge a partial payload into the cached client without a network round trip.
+// Used right after a payment succeeds: the local gateway already knows the money
+// landed, but Zoho may be a few seconds behind, so the next page would otherwise
+// render from cache still claiming "deposit due". The real refetch that follows
+// overwrites this with authoritative server data.
+export function patchCachedClient(patch) {
+  const cached = getCachedClient();
+  if (!cached || !patch) return cached;
+  const next = { ...cached, ...patch };
+  try {
+    localStorage.setItem(clientKey(), JSON.stringify(next));
+  } catch { /* quota/private mode — cache is best-effort */ }
+  return next;
 }
 
 // ─── LAST ROUTE (server-side, cross-device) ──────────────────────────────────

@@ -5920,6 +5920,28 @@ html { scroll-behavior: smooth; }
     text-align: left;
     animation: dbLoadDots 1.4s steps(4, end) infinite;
 }
+/* Quiet strip shown while the dashboard re-syncs in the background. The page
+   itself now paints from cache, so this is the only signal that what you see
+   may still be one request behind the server. */
+.db-syncing {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    font-size: 12.5px;
+    letter-spacing: .04em;
+    color: #8d8272;
+}
+.db-syncing::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 2px solid rgba(201, 164, 92, .25);
+    border-top-color: #c9a45c;
+    animation: dbLoadSpin .9s linear infinite;
+}
 @keyframes dbLoadSpin {
     to { transform: rotate(360deg); }
 }

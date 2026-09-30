@@ -51,7 +51,7 @@ function modularity(value) {
 }
 
 export default function Dashboard() {
-  const { client, loading, refetch } = useClientData({ preferCachedData: false });
+  const { client, loading, refreshing, fetched } = useClientData({ preferCachedData: true });
   const navigate = useNavigate();
   const [fallbackRoom, setFallbackRoom] = useState(null);
 
@@ -84,14 +84,17 @@ export default function Dashboard() {
   }, [loading, client]);
 
   // Paid users only — anyone without BOTH payments done is sent back to the
-  // payment screen. Waits for fresh server data (no cached-flag shortcut).
+  // payment screen. Acts on FRESH server data only: the page now paints from the
+  // localStorage snapshot immediately, and that snapshot can legitimately lag a
+  // just-completed payment (the gateway writes locally before the CRM sync), so
+  // bouncing on it would throw away the success the user just paid for.
   useEffect(() => {
-    if (loading || !client) return;
+    if (!fetched || !client) return;
     const ps = getPaymentState(client);
     if (!ps.depositPaid || !ps.rentPaid) {
       navigate("/payment-screen", { replace: true });
     }
-  }, [loading, client, navigate]);
+  }, [fetched, client, navigate]);
 
   useEffect(() => {
     if (selectedRoom || !client?.room_id) return;
@@ -105,10 +108,10 @@ export default function Dashboard() {
     return () => { cancelled = true; };
   }, [selectedRoom, client?.room_id]);
 
-  useEffect(() => {
-    if (!loading) refetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // NOTE: a mount-time `refetch()` used to live here. It was dead code — the
+  // `if (!loading)` guard was always false on mount (loading starts true), so it
+  // never fired. useClientData already fetches on mount, and three components
+  // sharing one request means an extra call here added nothing.
 
   if (loading || !client) {
     return (
@@ -256,6 +259,14 @@ export default function Dashboard() {
     <PageLayout page="Dashboard">
       <main className="db-main">
         <div className="container py-4 py-lg-5">
+
+          {/* The page below renders from cache the moment it mounts; this strip
+              is the honest signal that a fresh sync is still landing. */}
+          {refreshing && (
+            <p className="db-syncing" role="status" aria-live="polite">
+              Refreshing your latest details…
+            </p>
+          )}
 
           {/* Welcome banner — room image backdrop, text layered on top */}
           <section
