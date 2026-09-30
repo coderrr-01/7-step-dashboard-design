@@ -207,10 +207,10 @@ export default function SecureBooking() {
                                     {selectedRoom?.status ? ` • ${selectedRoom.status}` : ''}
                                  </p>
                               </div>
-                              <div className="text-end">
+                              {/* <div className="text-end">
                                  <div className="fw-bold residence-price">{rentLabel}</div>
                                  <div className="residence-price-note">Inclusive of Concierge</div>
-                              </div>
+                              </div> */}
                            </div>
                            {/* <div className="d-flex gap-4 mt-3 residence-features">
                               <span><i className="bi bi-snow2 text-gold me-1"></i> Climate Controlled</span>
