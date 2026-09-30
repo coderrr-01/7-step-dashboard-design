@@ -17,10 +17,11 @@ function pad2(n) {
 }
 
 // Normalise whatever the API hands us into a plain "YYYY-MM-DD" string.
-// Accepts the ISO form ("2026-10-01", or the same with a "T..Z" timestamp) and
-// the dd/mm/yyyy form the booking / slot APIs use, so a move-in date stored in
-// either shape still produces a valid end date. Returns '' when the value cannot
-// be parsed — callers treat that as "no date" and show their fallback.
+// Accepts the ISO form ("2026-10-01", or the same with a "T..Z" timestamp), the
+// dd/mm/yyyy form the booking / slot APIs use, and the dd-mm-yyyy form Zoho
+// actually stores Desired_Move_in_Date in — e.g. "15-10-2026". Returns '' when
+// the value cannot be parsed, so callers treat it as "no date" and show their
+// fallback instead of rendering an empty or wrong date.
 export function toIsoDate(value) {
   if (value === null || value === undefined) return '';
   const raw = String(value).trim();
@@ -33,8 +34,17 @@ export function toIsoDate(value) {
   if (iso) return `${iso[1]}-${pad2(iso[2])}-${pad2(iso[3])}`;
 
   // "01/10/2026" — day first, the format the slot APIs speak.
-  const dmy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (dmy) return `${dmy[3]}-${pad2(dmy[2])}-${pad2(dmy[1])}`;
+  const dmySlash = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (dmySlash) return `${dmySlash[3]}-${pad2(dmySlash[2])}-${pad2(dmySlash[1])}`;
+
+  // "15-10-2026" — day first, dashes: the shape Zoho keeps move-in dates in
+  // (this one record had "15-10-2026" and new Date() calls it Invalid Date, so
+  // the whole lease term rendered blank). MUST stay day-first even when both
+  // parts are <= 12, because that is exactly how PHP's strtotime() reads it on
+  // the server: "05-10-2026" -> 2026-10-05, "05-02-1999" -> 1999-02-05. Reading
+  // it month-first here would make the UI disagree with the signed PDF.
+  const dmyDash = raw.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if (dmyDash) return `${dmyDash[3]}-${pad2(dmyDash[2])}-${pad2(dmyDash[1])}`;
 
   // Anything else (e.g. the Calendar's "Oct 1, 2026" label). Date parses these
   // in local time, so read the LOCAL parts back — toISOString() would report the
