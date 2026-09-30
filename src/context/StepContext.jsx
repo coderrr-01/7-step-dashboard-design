@@ -60,6 +60,52 @@ function findFirstIncompleteStep(serverSteps) {
   return STEP_PATHS[7];
 }
 
+// Hold key — the user is currently working inside Secure Booking. Scoped per
+// user (same pattern as jrny_room_search_entered_<sub>) so accounts on the
+// same device don't inherit each other's hold.
+const SECURE_BOOKING_HOLD = 'jrny_secure_booking_hold';
+
+function secureBookingHoldKey() {
+  const sub = getUserSub();
+  return sub ? `${SECURE_BOOKING_HOLD}_${sub}` : SECURE_BOOKING_HOLD;
+}
+
+// Called by the Secure Booking page while it is open.
+export function markSecureBookingHold() {
+  try { localStorage.setItem(secureBookingHoldKey(), '1'); } catch { /* ignore */ }
+}
+
+function hasSecureBookingHold() {
+  try { return localStorage.getItem(secureBookingHoldKey()) === '1'; } catch { return false; }
+}
+
+function clearSecureBookingHold() {
+  try { localStorage.removeItem(secureBookingHoldKey()); } catch { /* ignore */ }
+}
+
+// Single place that turns the derived step list into the screen to show, so
+// both redirect paths below (first '/' hit, later re-entry) resolve
+// identically. Room Search keeps its hard gate; Secure Booking gets the same
+// treatment so a refresh there does not jump to Lease Sign.
+function resolveNextStep(serverSteps) {
+  let nextStep = findFirstIncompleteStep(serverSteps);
+  if (nextStep === '/room-search') {
+    const sub = getUserSub();
+    const entered = sub ? localStorage.getItem(`jrny_room_search_entered_${sub}`) === '1' : false;
+    if (!entered) nextStep = '/interview';
+  }
+  // The app is a MemoryRouter, so a refresh always restarts at '/' — and once
+  // the tour is booked, lease_status is 'Booking Secured', which makes step 6
+  // (/document-sign) the first incomplete step. While the user is still on
+  // Secure Booking, hold them there. The hold is dropped as soon as they
+  // actually reach Lease Sign (see the effect below), so the SIGN LEASE NOW
+  // flow and every later step behave exactly as before.
+  if (nextStep === '/document-sign' && hasSecureBookingHold()) {
+    nextStep = '/secure-booking';
+  }
+  return nextStep;
+}
+
 export function StepProvider({ children }) {
   const [completedSteps, setCompletedSteps] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -88,17 +134,20 @@ export function StepProvider({ children }) {
   // result for the initial '/' redirect instead of firing a second identical
   // request. Only re-fetch if navigating back to '/' later.
   const hasFetchedRef = useState(() => ({ done: false }))[0];
+
+  // Reaching Lease Sign means the user is done with Secure Booking — drop the
+  // hold so a refresh on step 6 resumes at step 6 instead of bouncing back.
+  useEffect(() => {
+    if (pathname !== '/document-sign') return;
+    clearSecureBookingHold();
+  }, [pathname]);
+
   useEffect(() => {
     if (!getToken() || pathname !== '/' || loading) return;
     // First hit on '/' right after mount — steps already derived, just redirect
     if (!hasFetchedRef.done) {
       hasFetchedRef.done = true;
-      let nextStep = findFirstIncompleteStep(completedSteps);
-      if (nextStep === '/room-search') {
-        const sub = getUserSub();
-        const entered = sub ? localStorage.getItem(`jrny_room_search_entered_${sub}`) === '1' : false;
-        if (!entered) nextStep = '/interview';
-      }
+      const nextStep = resolveNextStep(completedSteps);
       if (nextStep && nextStep !== pathname) {
         navigate(nextStep, { replace: true });
       }
@@ -110,12 +159,7 @@ export function StepProvider({ children }) {
         const serverSteps = deriveStepsFromClient(data.data);
         if (!serverSteps) return;
         setCompletedSteps(serverSteps);
-        let nextStep = findFirstIncompleteStep(serverSteps);
-        if (nextStep === '/room-search') {
-          const sub = getUserSub();
-          const entered = sub ? localStorage.getItem(`jrny_room_search_entered_${sub}`) === '1' : false;
-          if (!entered) nextStep = '/interview';
-        }
+        const nextStep = resolveNextStep(serverSteps);
         if (nextStep && nextStep !== pathname) {
           navigate(nextStep, { replace: true });
         }

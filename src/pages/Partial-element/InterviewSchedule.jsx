@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Calendar from "./Calendar";
 import Timeslot, { TIME_SLOTS } from "./Timeslot";
 import { useNavigate } from 'react-router-dom';
@@ -61,6 +61,21 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
 
     const content = contentMap[datatext] || contentMap.interview;
     const navigate = useNavigate();
+
+    // initialBooked is derived by the parent from Zoho client-data, which
+    // normally arrives AFTER the first render — so the useState above almost
+    // always starts on "schedule" even for an already-booked tour. Watch the
+    // prop and reopen CONFIRMED the moment it flips true, so refreshing on the
+    // confirmed screen does not drop the user back to the empty form. The ref
+    // keeps this a one-way false→true edge, so the internal Reschedule (which
+    // sets booked=false itself) is never undone by a later re-render.
+    const bookedFromServer = useRef(initialBooked);
+    useEffect(() => {
+        if (!initialBooked || bookedFromServer.current) return;
+        bookedFromServer.current = true;
+        setBooked(true);
+        setActiveTab("confirm");
+    }, [initialBooked]);
 
     useEffect(() => {
         if (!selectedDate) { setBookedSlots([]); return; }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import ResidenceSlider from "./Partial-element/ResidenceSlider";
 import Calendar from "./Partial-element/Calendar.jsx";
@@ -8,7 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useClientData } from "../hooks/useClientData";
 import { secureBooking, releaseSlot, selectRoom } from "../services/api";
 import { toast } from "react-toastify";
-import { useSteps } from "../context/StepContext";
+import { useSteps, markSecureBookingHold } from "../context/StepContext";
 
 // dd/mm/yyyy, yyyy-mm-dd and ISO strings all render as "Mon D, YYYY".
 // Invalid input is passed through untouched so the UI never shows "Invalid Date".
@@ -23,6 +23,24 @@ function formatBadgeMoney(value) {
    const n = Number(value);
    if (!isFinite(n) || n === 0) return "";
    return `$${n.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+}
+
+// Zoho stores the booked tour as an ISO date ("2026-09-12"). These mirror the
+// Interview helpers so a refresh renders the same "Sep 12, 2026" label the
+// Calendar emits, and so Reschedule can hand the slot back as "dd/mm/yyyy".
+function formatIsoDate(iso) {
+   if (!iso) return '';
+   const [y, m, d] = String(iso).split('-').map(Number);
+   if (!y || !m || !d) return iso;
+   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+   return `${months[m - 1]} ${d}, ${y}`;
+}
+
+function isoToDmy(iso) {
+   if (!iso) return '';
+   const [y, m, d] = String(iso).split('-');
+   if (!y || !m || !d) return iso;
+   return `${d}/${m}/${y}`;
 }
 
 export default function SecureBooking() {
@@ -48,6 +66,23 @@ export default function SecureBooking() {
    const [confirmedDate, setConfirmedDate] = useState('');
    const [confirmedTime, setConfirmedTime] = useState('');
    const [meetLink, setMeetLink]           = useState('');
+
+   // While this page is open, the app must not treat Lease Sign as "the next
+   // step" — otherwise a refresh here (the app restarts at '/' because routing
+   // is in-memory) jumps straight to /document-sign. StepContext drops the hold
+   // again as soon as the user actually lands on Lease Sign.
+   useEffect(() => { markSecureBookingHold(); }, []);
+
+   // Returning user (refresh / re-login): Zoho already holds the tour, so
+   // rebuild the confirmed screen from client data instead of asking for the
+   // slot again — same restore the Interview page does with interview_date.
+   const tourBooked = !!(client?.tour_date && client?.tour_time);
+   useEffect(() => {
+      if (!tourBooked) return;
+      setConfirmedDate(formatIsoDate(client.tour_date));
+      setConfirmedTime(client.tour_time);
+      setMeetLink(client.meeting_link || '');
+   }, [tourBooked, client?.tour_date, client?.tour_time, client?.meeting_link]);
 
    const interview_btn = () => {
       setinterviewProgres(true);
@@ -214,19 +249,22 @@ export default function SecureBooking() {
                          </div>
                       </div>
                       {!hideSchedule && (
-                         <InterviewSchedule
-                            datatext="securePlaneblock"
-                            interview_progress={interview_btn}
-                            onConfirm={handleConfirm}
-                            onReschedule={handleReschedule}
-                            confirmedDate={confirmedDate}
-                            confirmedTime={confirmedTime}
-                            meetLink={meetLink}
-                            submitting={submitting}
-                            roomName={roomName}
-                            roomImg={roomImg}
-                            onLeaseNow={handleLeaseNow}
-                         />
+                        <InterviewSchedule
+                           datatext="securePlaneblock"
+                           interview_progress={interview_btn}
+                           onConfirm={handleConfirm}
+                           onReschedule={handleReschedule}
+                           confirmedDate={confirmedDate}
+                           confirmedTime={confirmedTime}
+                           meetLink={meetLink}
+                           submitting={submitting}
+                           roomName={roomName}
+                           roomImg={roomImg}
+                           onLeaseNow={handleLeaseNow}
+                           initialBooked={tourBooked}
+                           initialLastBooked={tourBooked ? { date: isoToDmy(client.tour_date), time: client.tour_time } : null}
+                       />
+
                       )}
                    </section>
                </div>
