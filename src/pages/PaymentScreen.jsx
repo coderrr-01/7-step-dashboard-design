@@ -11,6 +11,7 @@ import { submitStripePayment, submitPaypalPayment, submitRevolutPayment, createR
 import { toast } from "react-toastify";
 import { useSteps } from "../context/StepContext";
 import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
+import { toIsoDate, addOneYear, formatDateDMY } from "../utils/dates";
 
 export default function PaymentScreen() {
    const { client, loading: clientLoading, refetch } = useClientData({ preferCachedData: true });
@@ -218,16 +219,10 @@ export default function PaymentScreen() {
    // interview / room-tour date, not the tenancy start, so the term is measured
    // from the tenant application's move-in date and runs 12 months from there.
    // Same rule as Lease Sign and the dashboard, so the validity window printed
-   // here always matches the signed agreement.
-   let startDate = client?.move_in_date || client?.start_date || '';
-   let endDate = '';
-   if (startDate) {
-      const d = new Date(startDate);
-      if (!isNaN(d.getTime())) {
-         d.setFullYear(d.getFullYear() + 1);
-         endDate = d.toISOString().slice(0, 10);
-      }
-   }
+   // here always matches the signed agreement. Shared helpers from utils/dates
+   // keep the 1-year maths and the dd-mm-yyyy display identical everywhere.
+   let startDate = toIsoDate(client?.move_in_date) || toIsoDate(client?.start_date) || '';
+   let endDate = startDate ? addOneYear(startDate) : '';
    const unitLabel = activeRoom?.name || client?.unit || client?.room_name || '';
 
    const roomMeta = (() => {
@@ -521,12 +516,12 @@ export default function PaymentScreen() {
                            <div className="pay-row"><span>Paid Via</span><b>{methodUsed}</b></div>
                            <div className="pay-row">
                               <span>Membership Valid</span>
-                              <b>{startDate}{startDate && endDate ? '  →  ' : ''}{endDate || 'Active'}</b>
+                              <b>{formatDateDMY(startDate)}{startDate && endDate ? '  →  ' : ''}{formatDateDMY(endDate) || 'Active'}</b>
                            </div>
                         </div>
 
                         <p className="pay-validity">
-                           ✨ Your residency is valid through <b>{endDate || 'your lease term'}</b>.
+                           ✨ Your residency is valid through <b>{formatDateDMY(endDate) || 'your lease term'}</b>.
                            Welcome aboard — we can't wait to have you home!
                         </p>
 
@@ -645,11 +640,13 @@ export default function PaymentScreen() {
                         <div className="p-4">
                            <div className="d-flex justify-content-between small mb-2">
                               <span className="text-muted">Rent Start Date</span>
-                              <span className="fw-medium">{startDate}</span>
+                               <span className="fw-medium">{formatDateDMY(startDate)}</span>
+
                            </div>
                            <div className="d-flex justify-content-between small mb-4">
                               <span className="text-muted">Rent End Date</span>
-                              <span className="fw-medium">{endDate}</span>
+                               <span className="fw-medium">{formatDateDMY(endDate)}</span>
+
                            </div>
                            <hr className="my-4 opacity-10" />
                            <div className="d-flex justify-content-between small mb-2">

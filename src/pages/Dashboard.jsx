@@ -9,6 +9,7 @@ import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
 import { getPaymentHistory, isPaymentRecordDone } from "../utils/paymentHistory";
 import { getRoomById } from "../services/api";
 import logo from "../assets/images/jrny-logo.png";
+import { toIsoDate, addOneYear, formatDateDMY } from "../utils/dates";
 
 function monthSpan(from, to) {
   if (!from || !to) return 0;
@@ -143,17 +144,15 @@ export default function Dashboard() {
   // runs 12 months from there. An approved extension still overrides both.
   // Keeping this identical to DocumentSign means the dashboard never shows a
   // different lease start than the agreement the client actually signed.
+  // Shared helpers from utils/dates guarantee the same 1-year maths and the same
+  // dd-mm-yyyy display.
   const extStartDate = extStatus === "Approved" ? client?.requested_start_date || "" : "";
   const extEndDate = extStatus === "Approved" ? client?.requested_end_date || "" : "";
 
-  let startDate = extStartDate || client?.move_in_date || client?.start_date || "";
-  let endDate = extEndDate;
+  let startDate = toIsoDate(extStartDate) || toIsoDate(client?.move_in_date) || toIsoDate(client?.start_date) || "";
+  let endDate = toIsoDate(extEndDate);
   if (!endDate && startDate) {
-    const d = new Date(startDate);
-    if (!isNaN(d.getTime())) {
-      d.setFullYear(d.getFullYear() + 1);
-      endDate = d.toISOString().slice(0, 10);
-    }
+    endDate = addOneYear(startDate);
   }
 
   const paymentState = getPaymentState(client);
@@ -211,7 +210,9 @@ export default function Dashboard() {
   const interviewDate = client?.interview_date ? formatPretty(client.interview_date) : "";
   const interviewTime = client?.interview_time || "";
   const appliedDate = client?.submitted_at ? formatPretty(client.submitted_at) : "";
-  const leaseSignedDate = signedPdf ? (client?.effective_date ? formatPretty(client.effective_date) : (startDate ? formatPretty(startDate) : "")) : "";
+  // Lease dates use formatDateDMY (dd-mm-yyyy); every other date on the
+  // dashboard keeps formatPretty so the only lease-term format in the UI is one.
+  const leaseSignedDate = signedPdf ? (client?.effective_date ? formatPretty(client.effective_date) : (startDate ? formatDateDMY(startDate) : "")) : "";
   const bothPaid = paymentState.depositPaid && paymentState.rentPaid;
 
   // Payment history — parsed from backend arrays or from flat paid flags.
@@ -247,7 +248,7 @@ export default function Dashboard() {
 
   const statCards = [
     { label: "Residence", value: unitLabel, meta: roomMeta || "Booked", icon: <IoHomeOutline /> },
-    { label: "Lease Ends", value: endDate ? formatPretty(endDate) : "—", meta: `${remainingMonths} month${remainingMonths === 1 ? "" : "s"} left`, icon: <IoCalendarOutline /> },
+    { label: "Lease Ends", value: endDate ? formatDateDMY(endDate) : "—", meta: `${remainingMonths} month${remainingMonths === 1 ? "" : "s"} left`, icon: <IoCalendarOutline /> },
     { label: "Deposit Paid", value: client?.security_deposit ? `$${parseFloat(client.security_deposit).toLocaleString("en-US")}` : "—", meta: paymentState.depositPaid ? `via ${depositMethod}` : "Pending", icon: <IoCashOutline /> },
   ];
 
@@ -313,7 +314,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="db-progress-meta">
-                    <span>{startDate ? formatPretty(startDate) : "—"} → {endDate ? formatPretty(endDate) : "—"}</span>
+                    <span>{startDate ? formatDateDMY(startDate) : "—"} → {endDate ? formatDateDMY(endDate) : "—"}</span>
                   </div>
                 </div>
 

@@ -3,6 +3,7 @@ import PageLayout from "../components/PageLayout";
 import { toast } from "react-toastify";
 import { useClientData } from "../hooks/useClientData";
 import { signLease, requestLeaseExtension } from "../services/api";
+import { toIsoDate, addOneYear, formatDateDMY } from "../utils/dates";
 import { useSteps } from "../context/StepContext";
 import {
   FaFileSignature,
@@ -175,18 +176,15 @@ export default function DocumentSign() {
   // the printed term can never contradict itself. An approved extension
   // request still overrides both, because those are dates the tenant asked for.
   // client.start_date survives only as a last-resort fallback for records with
-  // no move-in date at all.
+  // no move-in date at all. Helpers live in utils/dates so the term maths and
+  // the dd-mm-yyyy display match the signed PDF exactly.
   const extStartDate = extStatus === "Approved" ? client?.requested_start_date || "" : "";
   const extEndDate = extStatus === "Approved" ? client?.requested_end_date || "" : "";
 
-  let startDate = extStartDate || client?.move_in_date || client?.start_date || "";
-  let endDate = extEndDate;
+  let startDate = toIsoDate(extStartDate) || toIsoDate(client?.move_in_date) || toIsoDate(client?.start_date) || "";
+  let endDate = toIsoDate(extEndDate);
   if (!endDate && startDate) {
-    const d = new Date(startDate);
-    if (!isNaN(d.getTime())) {
-      d.setFullYear(d.getFullYear() + 1);
-      endDate = d.toISOString().slice(0, 10);
-    }
+    endDate = addOneYear(startDate);
   }
 
   // Amounts: prefer the Zoho client record, fall back to the persisted
@@ -425,10 +423,10 @@ export default function DocumentSign() {
                       </h4>
                       <p>
                         The term of this Sublease will begin on{" "}
-                        <strong>{startDate}</strong> and will terminate on{" "}
-                        <strong>{endDate}</strong>. Subtenant shall be entitled to
-                        possession once payment of the security deposit has been
-                        made.
+                        <strong>{formatDateDMY(startDate)}</strong> and will
+                        terminate on <strong>{formatDateDMY(endDate)}</strong>.
+                        Subtenant shall be entitled to possession once payment of
+                        the security deposit has been made.
                       </p>
                     </section>
 
