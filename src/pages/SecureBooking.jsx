@@ -226,7 +226,7 @@ export default function SecureBooking() {
                            <div className="d-flex flex-wrap align-items-stretch gap-2 mt-4 residence-terms">
                               <div className="residence-term">
                                  <i className="bi bi-calendar-event"></i>
-                                 <span className="residence-term-label">Moving Date</span>
+                                 <span className="residence-term-label">Move-in Date</span>
                                  <span className="residence-term-value">{moveInLabel || 'To be confirmed'}</span>
                               </div>
                               <div className="residence-term">
