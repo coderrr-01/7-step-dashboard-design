@@ -137,18 +137,17 @@ export default function Dashboard() {
   const firstName = (client?.name || "").split(" ")[0] || "Member";
 
   const extStatus = client?.extension_status || "";
-  const resolvedStartDate =
-    extStatus === "Approved" && client?.requested_start_date
-      ? client.requested_start_date
-      : client?.start_date || "";
-  const resolvedEndDate =
-    extStatus === "Approved" && client?.requested_end_date
-      ? client.requested_end_date
-      : client?.end_date || "";
+  // Lease term — same rule as the Lease Sign step: the server's
+  // client.start_date / client.end_date carry the interview / room-tour date,
+  // so the tenancy term is measured from the application's move-in date and
+  // runs 12 months from there. An approved extension still overrides both.
+  // Keeping this identical to DocumentSign means the dashboard never shows a
+  // different lease start than the agreement the client actually signed.
+  const extStartDate = extStatus === "Approved" ? client?.requested_start_date || "" : "";
+  const extEndDate = extStatus === "Approved" ? client?.requested_end_date || "" : "";
 
-  let startDate = resolvedStartDate;
-  let endDate = resolvedEndDate;
-  if (!startDate && client?.move_in_date) startDate = client.move_in_date;
+  let startDate = extStartDate || client?.move_in_date || client?.start_date || "";
+  let endDate = extEndDate;
   if (!endDate && startDate) {
     const d = new Date(startDate);
     if (!isNaN(d.getTime())) {

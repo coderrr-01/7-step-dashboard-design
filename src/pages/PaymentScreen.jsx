@@ -214,16 +214,14 @@ export default function PaymentScreen() {
    const clientName = client?.name || '';
    const clientPhone = client?.phone || '';
    const clientEmail = client?.email || '';
-   // Lease dates come from Zoho CRM. When the server has not populated them
-   // (e.g. the user went straight to signing the lease / payment without a
-   // scheduled move-in), derive them from the tenant application's move-in
-   // date: start = move-in date, end = start + 1 year.
-   let startDate = client?.start_date || '';
-   let endDate = client?.end_date || '';
-   if (!startDate && client?.move_in_date) {
-      startDate = client.move_in_date;
-   }
-   if (!endDate && startDate) {
+   // Lease term — the server's client.start_date / client.end_date carry the
+   // interview / room-tour date, not the tenancy start, so the term is measured
+   // from the tenant application's move-in date and runs 12 months from there.
+   // Same rule as Lease Sign and the dashboard, so the validity window printed
+   // here always matches the signed agreement.
+   let startDate = client?.move_in_date || client?.start_date || '';
+   let endDate = '';
+   if (startDate) {
       const d = new Date(startDate);
       if (!isNaN(d.getTime())) {
          d.setFullYear(d.getFullYear() + 1);

@@ -168,25 +168,19 @@ export default function DocumentSign() {
   const extStatus = client?.extension_status || "";
   const extensionPdf = client?.extension_signed_pdf || "";
 
-  // Use requested dates when extension is Approved; otherwise consume the
-  // server-resolved start/end dates from the API (no hardcoded fallbacks).
-  const resolvedStartDate =
-    extStatus === "Approved" && client?.requested_start_date
-      ? client.requested_start_date
-      : client?.start_date || "";
-  const resolvedEndDate =
-    extStatus === "Approved" && client?.requested_end_date
-      ? client.requested_end_date
-      : client?.end_date || "";
+  // Lease term. The server-resolved client.start_date / client.end_date come
+  // out of the booking flow, so they carry the interview / room-tour date —
+  // not when the tenancy actually begins. The lease always starts on the
+  // move-in date from the tenant application, and runs 12 months from there, so
+  // the printed term can never contradict itself. An approved extension
+  // request still overrides both, because those are dates the tenant asked for.
+  // client.start_date survives only as a last-resort fallback for records with
+  // no move-in date at all.
+  const extStartDate = extStatus === "Approved" ? client?.requested_start_date || "" : "";
+  const extEndDate = extStatus === "Approved" ? client?.requested_end_date || "" : "";
 
-  // When the server has not populated lease dates (e.g. the user skipped
-  // straight to "SIGN LEASE NOW"), derive them from the tenant application's
-  // move-in date: start = move-in date, end = start + 1 year.
-  let startDate = resolvedStartDate;
-  let endDate = resolvedEndDate;
-  if (!startDate && client?.move_in_date) {
-    startDate = client.move_in_date;
-  }
+  let startDate = extStartDate || client?.move_in_date || client?.start_date || "";
+  let endDate = extEndDate;
   if (!endDate && startDate) {
     const d = new Date(startDate);
     if (!isNaN(d.getTime())) {
