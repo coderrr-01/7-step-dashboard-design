@@ -225,7 +225,7 @@ function InterviewSchedule({ interview_progress, datatext, onConfirm, onReschedu
                                                 OR
                                             </div>
                                             <button type="button" className="btn btn-black" onClick={leasebtn}>
-                                                SIGN LEASE NOW
+                                                BOOK NOW
                                                 <i className="bi bi-arrow-right"></i>
                                             </button>
                                             <div className="text-center mt-3 tour-note">
