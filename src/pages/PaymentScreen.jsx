@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import stripeIcon from "../assets/icons/stripe.svg";
@@ -14,7 +14,7 @@ import { getPaymentState, normalizePaymentMethod } from "../utils/paymentState";
 import { toIsoDate, addOneYear, formatDateDMY } from "../utils/dates";
 
 export default function PaymentScreen() {
-   const { client, loading: clientLoading, refetch } = useClientData({ preferCachedData: true });
+   const { client, loading: clientLoading, fetched: clientFetched, refetch } = useClientData({ preferCachedData: true });
    const { completeStep } = useSteps();
    const navigate = useNavigate();
    const [paymentHydrated, setPaymentHydrated] = useState(false);
@@ -25,6 +25,16 @@ export default function PaymentScreen() {
    const [iframeHtml, setIframeHtml] = useState({});
    const [iframeLoading, setIframeLoading] = useState({});
    const [iframeError, setIframeError] = useState({});
+   // Payment-form init bookkeeping. `inFlight` keeps one request per form key so
+   // the auto-init effect, the method auto-select and a StrictMode double-invoke
+   // can never fire duplicate /payment-ui calls (each one is a full WordPress +
+   // gateway render). `alive` stops a settled response from writing state after
+   // the user navigates away.
+   const inFlight = useRef({});
+   const reqId = useRef(0);
+   const alive = useRef(true);
+   useEffect(() => () => { alive.current = false; inFlight.current = {}; }, []);
+
    const paymentMethods = [
       { name: "Stripe", icon: stripeIcon },
       { name: "PayPal", icon: paypalIcon },
@@ -73,11 +83,16 @@ export default function PaymentScreen() {
 
    const loadPaymentUI = async (method, section, force = false) => {
       const key = `${method}_${section}`;
-      if (!force && iframeHtml[key]) return;
+      // Already cached, or a request for this exact form is still running —
+      // one init per form key. `force` (post-payment soft reload) always wins.
+      if (!force && (iframeHtml[key] || inFlight.current[key])) return;
+      const id = ++reqId.current;
+      inFlight.current[key] = id;
       setIframeLoading(prev => ({ ...prev, [key]: true }));
       setIframeError(prev => ({ ...prev, [key]: false }));
       try {
          const res = await getPaymentUI(method, section);
+         if (!alive.current) return;
          if (res?.success && res.html) {
             setIframeHtml(prev => ({ ...prev, [key]: res.html }));
             if (res.deposit_paid) {
@@ -94,9 +109,11 @@ export default function PaymentScreen() {
             setIframeError(prev => ({ ...prev, [key]: true }));
          }
       } catch {
+         if (!alive.current) return;
          setIframeError(prev => ({ ...prev, [key]: true }));
       } finally {
-         setIframeLoading(prev => ({ ...prev, [key]: false }));
+         if (inFlight.current[key] === id) delete inFlight.current[key];
+         if (alive.current) setIframeLoading(prev => ({ ...prev, [key]: false }));
       }
    };
 
@@ -113,11 +130,21 @@ export default function PaymentScreen() {
    };
 
    useEffect(() => {
-      if (!paymentHydrated || clientLoading) return;
+      // Initialize the form only once the reservation fetch has SETTLED.
+      // `paymentHydrated` alone is not enough: with preferCachedData it flips on
+      // the first paint from the localStorage snapshot, so /payment-ui used to
+      // race the still-running /client-data request. jrny_payment_ui warms its
+      // pricing transient from client-data, so a cold-cache call pays for live
+      // Zoho lookups and can blow past getPaymentUI's 60s abort — surfacing as
+      // "Payment form could not be loaded." Reloading (Retry) worked because the
+      // cache was warm by then. `clientFetched` is useClientData's documented
+      // signal for "the network result has landed" — gate on it so the first
+      // load takes the same warm-cache path Retry does.
+      if (!paymentHydrated || !clientFetched || clientLoading) return;
       const method = paymentMethods[activePayment]?.name?.toLowerCase();
       if (!method || method === 'cash') return;
       loadPaymentUI(method, activeStep === 'Rent' ? 'rent' : 'deposit');
-   }, [activePayment, activeStep, paymentHydrated, clientLoading]);
+   }, [activePayment, activeStep, paymentHydrated, clientFetched, clientLoading]);
 
    // ACH iframe -> React: reload iframe softly without full page reload
    useEffect(() => {
@@ -1066,7 +1093,10 @@ function PaymentIframe({ method, section, iframeHtml, iframeLoading, iframeError
       );
    }
 
-   if (error || !html) {
+   // html is the source of truth for what to render: once a response landed the
+   // form is available, so a later failed attempt for the same key must not
+   // replace a working iframe with the error card.
+   if (!html && error) {
       return (
          <div className="mb-4 p-3 text-center border rounded">
             <p className="small text-muted mb-2">Payment form could not be loaded.</p>

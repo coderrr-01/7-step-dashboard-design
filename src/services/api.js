@@ -515,6 +515,6 @@ export async function getLastRoute() {
 export async function getPaymentUI(method, section) {
   const params = new URLSearchParams({ method, section, _: String(Date.now()) });
   // iPhone Safari ITP blocks 3rd-party cookie — force Bearer JWT via omit (like getClientData)
-  const res = await apiFetch(`${JRNY}/payment-ui?${params.toString()}`, { method: 'GET', credentials: 'omit', timeout: 60000 });
+  const res = await apiFetch(`${JRNY}/payment-ui?${params.toString()}`, { method: 'GET', credentials: 'omit', timeout: 20000 });
   return res.json();
 }
