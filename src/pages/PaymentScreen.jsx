@@ -731,7 +731,7 @@ useEffect(() => {
                            </div>
                         </div>
                         <Link to="/apply" className="btn btn-outline-elite w-100">
-                           View Application
+                           View Dashboard
                         </Link>
                      </div>
                      <div className="merchant-footer text-center">
