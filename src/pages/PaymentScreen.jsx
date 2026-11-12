@@ -202,6 +202,13 @@ export default function PaymentScreen() {
    const paymentState = getPaymentState(client);
    const depositPaid = optimisticDepositPaid || paymentState.depositPaid;
    const rentPaid = optimisticRentPaid || paymentState.rentPaid;
+
+   // A customer returning after their deposit should continue with rent.
+   useEffect(() => {
+      if (paymentHydrated && !clientLoading && depositPaid && !rentPaid) {
+         setActiveStep('Rent');
+      }
+   }, [paymentHydrated, clientLoading, depositPaid, rentPaid]);
    const depositMethod = optimisticDepositMethod ?? (methodIndexFor(paymentState.depositMethod) >= 0 ? methodIndexFor(paymentState.depositMethod) : null);
    const rentMethod = methodIndexFor(paymentState.rentMethod) >= 0 ? methodIndexFor(paymentState.rentMethod) : null;
 
