@@ -110,6 +110,9 @@ export default function SecureBooking() {
             date: selectedDate.value,
             time: selectedTime,
             booking_type: 'Apartment Tour',
+            room_id:   roomId,
+            room_name: roomName,
+            room_img:  roomImg,
             client_id: client?.id || '',
          });
 

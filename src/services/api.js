@@ -347,11 +347,11 @@ export async function bookInterview({ date, time, booking_type, room_id, room_na
 }
 
 // ─── SECURE BOOKING ───────────────────────────────────────────────────────────
-export async function secureBooking({ date, time, booking_type, client_id }) {
+export async function secureBooking({ date, time, booking_type, client_id, room_id, room_name, room_img }) {
   const nonce = await getNonce();
   const res   = await apiFetch(`${JRNY}/secure-booking`, {
     method: 'POST', headers: { 'X-WP-Nonce': nonce },
-    body: JSON.stringify({ date, time, booking_type, client_id }),
+    body: JSON.stringify({ date, time, booking_type, room_id, room_name, room_img, client_id }),
   });
   return res.json();
 }
