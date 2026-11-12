@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import stripeIcon from "../assets/icons/stripe.svg";
 import paypalIcon from "../assets/icons/paypal.svg";
@@ -730,9 +730,13 @@ useEffect(() => {
                               <p className="mb-0 text-truncate fw-medium">{clientEmail}</p>
                            </div>
                         </div>
-                        <Link to="/apply" className="btn btn-outline-elite w-100">
+                        <button
+                           type="button"
+                           className="btn btn-outline-elite w-100"
+                           onClick={() => navigate('/dashboard')}
+                        >
                            View Dashboard
-                        </Link>
+                        </button>
                      </div>
                      <div className="merchant-footer text-center">
                         <p className="text-uppercase text-primary-container fw-bold mb-1 security-note">Official Merchant</p>
