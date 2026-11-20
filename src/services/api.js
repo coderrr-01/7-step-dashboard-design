@@ -291,7 +291,7 @@ export async function getStepStatus() {
 
 // ─── ROOMS ───────────────────────────────────────────────────────────────────
 export async function getRooms() {
-  const res = await fetch(`${JRNY}/rooms`, { method: 'GET', credentials: 'include' });
+  const res = await apiFetch(`${JRNY}/rooms`, { method: 'GET', credentials: 'omit' });
   return res.json();
 }
 
