@@ -290,6 +290,7 @@ export async function getStepStatus() {
 }
 
 // ─── ROOMS ───────────────────────────────────────────────────────────────────
+// Room visibility is tenant-specific, so send the dashboard JWT on this cross-site request.
 export async function getRooms() {
   const res = await apiFetch(`${JRNY}/rooms`, { method: 'GET', credentials: 'omit' });
   return res.json();
